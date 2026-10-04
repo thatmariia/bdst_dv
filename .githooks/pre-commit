@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+# Check the exact staged files, including partially staged changes.
+staged_dir=$(mktemp -d)
+trap 'rm -rf "$staged_dir"' EXIT HUP INT TERM
+git checkout-index --all --prefix="$staged_dir/"
+Rscript scripts/check.R "$staged_dir"
