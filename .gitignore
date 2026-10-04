@@ -1,6 +1,6 @@
 # Downloaded data and generated reports
 /data/raw/
-/_site/
+/build/
 /.quarto/
 /report/*.html
 /report/*_files/

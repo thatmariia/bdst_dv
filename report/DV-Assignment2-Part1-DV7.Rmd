@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2.1: School composition and school choice"
-author: "Mariia Steeghs-Turchina · DV7 (solo project)"
+author: "Mariia Steeghs-Turchina · DV7"
 output:
   html_document:
     toc: true
