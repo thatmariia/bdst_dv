@@ -5,7 +5,7 @@ output:
   html_document:
     toc: true
     self_contained: true
-    code_folding: hide
+    code_folding: show
 ---
 
 ```{r setup, include = FALSE}
@@ -14,18 +14,6 @@ knitr::opts_chunk$set(
   echo = TRUE, message = FALSE,
   fig.width = 8, fig.height = 4.5, fig.align = "center", out.width = "100%"
 )
-```
-
-```{r data, include = FALSE}
-source("R/download.R")
-source("R/prepare.R")
-source("R/plots.R")
-paths <- download_data()
-data <- prepare_data(paths)
-intake <- check_intake(paths[["intake"]])
-schools_2023 <- dplyr::filter(data$schools, year == 2023)
-selected <- dplyr::filter(schools_2023, eligible)
-format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
 ```
 
 ## Research question
@@ -49,6 +37,21 @@ in plain language, with uncertainty visible in any later estimates.
 ## Exploratory process
 
 ### Data and cleaning
+
+The notebook sources the functions in `R/`, then calls them to download,
+prepare, and inspect the data. Plotting functions are called below each step.
+
+```{r data}
+source("R/download.R")
+source("R/prepare.R")
+source("R/plots.R")
+paths <- download_data()
+data <- prepare_data(paths)
+intake <- check_intake(paths[["intake"]])
+schools_2023 <- dplyr::filter(data$schools, year == 2023)
+selected <- dplyr::filter(schools_2023, eligible)
+format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
+```
 
 I use DUO enrolment by school location and home postcode (PC4), DUO school
 totals, and CBS population by PC4. One raw DUO row is a school–postcode–year;
