@@ -30,6 +30,12 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
       - name: Check lint and style
         run: Rscript scripts/check.R
+      - uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: source-data-${{ hashFiles('R/download.R') }}
+      - name: Download data
+        run: Rscript scripts/download.R
       - name: Render website
         run: quarto render
       - uses: actions/configure-pages@v5

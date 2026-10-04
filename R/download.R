@@ -9,8 +9,20 @@ download_file <- function(url, path) {
     dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
     temporary <- tempfile(tmpdir = dirname(path))
     on.exit(unlink(temporary))
-    status <- download.file(url, temporary, mode = "wb", quiet = TRUE)
-    stopifnot(status == 0, file.info(temporary)$size > 0)
+    for (attempt in seq_len(3L)) {
+        status <- tryCatch(
+            download.file(url, temporary, mode = "wb"),
+            error = function(error) {
+                message(conditionMessage(error))
+                1L
+            }
+        )
+        if (status == 0 && isTRUE(file.info(temporary)$size > 0)) break
+        unlink(temporary)
+        if (attempt == 3L) stop("Download failed after 3 attempts: ", url)
+        message("Retrying download: ", url)
+        Sys.sleep(2^attempt)
+    }
     stopifnot(file.rename(temporary, path))
     path
 }
@@ -51,7 +63,8 @@ download_population <- function(path) {
 #' @param raw_dir Folder for cached raw files.
 #' @return Named paths for origins, totals, intake, and population.
 download_data <- function(raw_dir = "data/raw") {
-    options(timeout = max(300, getOption("timeout")))
+    previous <- options(timeout = max(900, getOption("timeout")))
+    on.exit(options(previous))
     base <- "https://onderwijsdata.duo.nl/dataset/"
     sources <- c(
         origins = paste0(
