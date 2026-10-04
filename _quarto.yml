@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - report/*.Rmd
+  post-render: scripts/copy-sources.R
+
+website:
+  title: Data visualization
+  site-url: https://thatmariia.github.io/bdst_dv/
+  navbar:
+    left:
+      - href: index.qmd
+        text: Assignments
+    right:
+      - href: https://github.com/thatmariia/bdst_dv
+        icon: github
+        text: GitHub
+  search: true
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: show
+    embed-resources: true
+
+execute:
+  echo: true
+  message: false

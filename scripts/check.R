@@ -6,6 +6,7 @@ files <- list.files(
     c("R", "scripts", "report"),
     pattern = "\\.(R|Rmd)$", full.names = TRUE, recursive = TRUE
 )
+files <- c(files, "index.qmd")
 stopifnot(length(files) > 0)
 styler::cache_deactivate()
 style <- styler::style_file(

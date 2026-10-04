@@ -38,21 +38,17 @@ in plain language, with uncertainty visible in any later estimates.
 
 ### Data and cleaning
 
-The notebook sources the functions in `R/`, then calls them to download,
-prepare, and inspect the data. Plotting functions are called below each step.
+The download script caches the source files. Functions in `R/` then prepare,
+inspect, and plot the data.
 
 ```{r data}
-library(jsonlite)
-library(readr)
 library(ggplot2)
 library(scales)
-library(dplyr)
 
-source("R/download.R")
+source("scripts/download.R")
 source("R/prepare.R")
 source("R/plots.R")
 
-paths <- download_data()
 data <- prepare_data(paths)
 intake <- check_intake(paths[["intake"]])
 schools_2023 <- filter(data$schools, year == 2023)

@@ -1,6 +1,7 @@
 # Downloaded data and generated reports
 /data/raw/
 /_site/
+/.quarto/
 /report/*.html
 /report/*_files/
 *_cache/
@@ -17,3 +18,5 @@
 .Renviron
 .httr-oauth
 .DS_Store
+
+**/*.quarto_ipynb
