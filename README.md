@@ -35,7 +35,7 @@ stay out of Git; package installation is separate from knitting.
 ## GitHub Pages
 
 The workflow checks, knits, and publishes reports on pushes to `main` or
-`codex/assignment-2-1`. Pull requests to `main` build without deploying.
+`ass-2-1`. Pull requests to `main` build without deploying.
 
 Before the first push, set **Settings → Pages → Source → GitHub Actions**
 and allow the publishing branch in the `github-pages` environment if it

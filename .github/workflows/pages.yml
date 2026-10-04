@@ -2,7 +2,7 @@ name: Check and publish reports
 
 on:
   push:
-    branches: [main, codex/assignment-2-1]
+    branches: [main, ass-2-1]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -41,7 +41,7 @@ jobs:
     if: >-
       github.event_name != 'pull_request' &&
       (github.ref == 'refs/heads/main' ||
-       github.ref == 'refs/heads/codex/assignment-2-1')
+       github.ref == 'refs/heads/ass-2-1')
     needs: build
     runs-on: ubuntu-latest
     concurrency:
