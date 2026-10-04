@@ -6,6 +6,8 @@ Research question: is the neighbourhood composition of a primary school's
 new intake associated with that of its existing pupils?
 
 This branch contains the data exploration and decisions for Part 1.
+The notebook loads its packages explicitly before sourcing the documented
+functions in `R/`.
 
 - `R/`: download, prepare, and plot the data.
 - `scripts/`: setup, checks, and rendering.
@@ -36,6 +38,8 @@ stay out of Git; package installation is separate from knitting.
 
 The workflow checks, knits, and publishes reports on pushes to `main` or
 `ass-2-1` in a single job.
+The landing page lists every `.Rmd` in `report/` with an HTML report link,
+an R Markdown download, and a link back to this repository.
 
 Before the first push, set **Settings → Pages → Source → GitHub Actions**
 and allow the publishing branch in the `github-pages` environment if it
