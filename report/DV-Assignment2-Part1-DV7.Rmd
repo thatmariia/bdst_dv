@@ -31,14 +31,14 @@ lasting segregation beyond differences in where families live.
 
 We use four public datasets:
 
-- **DUO pupil origins (2022–2023):** pupil counts by school location and
+- **[DUO pupil origins (2022–2023)](https://onderwijsdata.duo.nl/dataset/4ea91ae5-51ef-48a4-aa67-7098343f75bc):** pupil counts by school location and
   home postcode (PC4). We use these to describe where each school's pupils live.
-- **DUO school totals (2022–2023):** total enrolment per school location.
+- **[DUO school totals (2022–2023)](https://onderwijsdata.duo.nl/dataset/cf80e90d-ed19-4a10-a138-00c5c345cb5e):** total enrolment per school location.
   We use these to check how much of each school's enrolment our data cover.
-- **CBS postcode population (2022):** resident counts by migration background
+- **[CBS postcode population (2022)](https://opendata.cbs.nl/#/CBS/nl/dataset/83503NED/table):** resident counts by migration background
   and PC4. We combine these with pupil origins to describe schools'
   neighbourhood composition, rather than individual pupils' backgrounds.
-- **DUO pupils by age and postcode (2023):** pupil counts by age, school,
+- **[DUO pupils by age and postcode (2023)](https://duo.nl/open_onderwijsdata/images/03.-leerlingen-po-totaaloverzicht-2023-2024.csv):** pupil counts by age, school,
   and home postcode. We check whether four-year-old counts can support a
   later analysis of intake, particularly given suppressed small counts.
 
