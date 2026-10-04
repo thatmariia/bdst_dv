@@ -1,3 +1,22 @@
+# Age four is an intake proxy, not a direct measure of new enrolments.
+check_intake <- function(path) {
+  raw <- readr::read_delim(
+    path,
+    delim = ";",
+    col_types = readr::cols(.default = readr::col_character()),
+    progress = FALSE, num_threads = 1
+  ) |>
+    dplyr::filter(SOORT_PO == "Bo")
+  counts <- raw$LEEFTIJD_4
+  stopifnot(all(counts == "<5" | grepl("^[0-9]+$", counts)))
+  positive <- counts != "0"
+  data.frame(
+    positive_cells = sum(positive),
+    suppressed_cells = sum(counts == "<5"),
+    suppressed_share = sum(counts == "<5") / sum(positive)
+  )
+}
+
 read_duo <- function(path) {
   readr::read_csv(
     path,

@@ -45,5 +45,12 @@ stopifnot(
 # Duplicate origin keys must fail instead of multiplying counts in a join.
 readr::write_csv(rbind(origins, origins[1, ]), paths[["origins"]])
 stopifnot(inherits(try(prepare_data(paths), silent = TRUE), "try-error"))
+intake_path <- file.path(directory, "intake.csv")
+readr::write_delim(data.frame(
+  SOORT_PO = c("Bo", "Bo", "Bo", "Sbo"),
+  LEEFTIJD_4 = c("0", "12", "<5", "<5")
+), intake_path, delim = ";")
+intake <- check_intake(intake_path)
+stopifnot(intake$positive_cells == 2, intake$suppressed_share == 0.5)
 unlink(directory, recursive = TRUE)
 message("Data checks passed.")

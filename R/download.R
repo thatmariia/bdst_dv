@@ -51,6 +51,10 @@ download_data <- function(raw_dir = "data/raw") {
     totals = paste0(
       base, "cf80e90d-ed19-4a10-a138-00c5c345cb5e/resource/",
       "9278ae97-4014-49f4-91fc-8cc255c2595d/download/brin6_totaal.csv"
+    ),
+    intake = paste0(
+      "https://duo.nl/open_onderwijsdata/images/",
+      "03.-leerlingen-po-totaaloverzicht-2023-2024.csv"
     )
   )
   paths <- file.path(raw_dir, paste0(names(sources), ".csv"))

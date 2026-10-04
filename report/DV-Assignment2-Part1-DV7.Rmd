@@ -20,7 +20,9 @@ knitr::opts_chunk$set(
 source("R/download.R")
 source("R/prepare.R")
 source("R/plots.R")
-data <- prepare_data(download_data())
+paths <- download_data()
+data <- prepare_data(paths)
+intake <- check_intake(paths[["intake"]])
 schools_2023 <- dplyr::filter(data$schools, year == 2023)
 selected <- dplyr::filter(schools_2023, eligible)
 format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
@@ -103,6 +105,13 @@ Large changes could also arise from mergers or changing data coverage.
 
 ### Decisions for the next stage
 
+I also checked DUO's October 2023 file by age and home postcode. Among
+`r format_n(intake$positive_cells)` school–postcode cells with at least one
+four-year-old, `r scales::percent(intake$suppressed_share, accuracy = 0.1)`
+are suppressed as `<5`. This is the share of **cells**, not pupils.
+Age four is a proxy for intake, not an exact record of new enrolments.
+Small flows will therefore need a defensible treatment before modelling.
+
 - Keep neighbourhood composition as an explicitly labelled proxy; avoid
   claims about individual families or a school's quality.
 - Examine four-year-old intake separately from existing pupils. Most
@@ -118,6 +127,7 @@ Large changes could also arise from mergers or changing data coverage.
 
 [DUO pupil origins](https://onderwijsdata.duo.nl/dataset/4ea91ae5-51ef-48a4-aa67-7098343f75bc),
 [DUO school totals](https://onderwijsdata.duo.nl/dataset/cf80e90d-ed19-4a10-a138-00c5c345cb5e),
+[DUO pupils by age and postcode](https://duo.nl/open_onderwijsdata/images/03.-leerlingen-po-totaaloverzicht-2023-2024.csv),
 and [CBS table 83503NED](https://opendata.cbs.nl/#/CBS/nl/dataset/83503NED/table).
 The first knit downloads these public sources; later knits reuse local
 copies. No raw data is committed. Source releases may be revised.
