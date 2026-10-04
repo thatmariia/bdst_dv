@@ -27,6 +27,21 @@ small differences in pupil composition could reinforce themselves over
 time. This question explores whether school choice might contribute to
 lasting segregation beyond differences in where families live.
 
+## Datasets
+
+We use four public datasets:
+
+- **DUO pupil origins (2022–2023):** pupil counts by school location and
+  home postcode (PC4). We use these to describe where each school's pupils live.
+- **DUO school totals (2022–2023):** total enrolment per school location.
+  We use these to check how much of each school's enrolment our data cover.
+- **CBS postcode population (2022):** resident counts by migration background
+  and PC4. We combine these with pupil origins to describe schools'
+  neighbourhood composition, rather than individual pupils' backgrounds.
+- **DUO pupils by age and postcode (2023):** pupil counts by age, school,
+  and home postcode. We check whether four-year-old counts can support a
+  later analysis of intake, particularly given suppressed small counts.
+
 ## Exploratory process
 
 ### Data and cleaning
@@ -50,8 +65,7 @@ selected <- filter(schools_2023, eligible)
 format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
 ```
 
-We use DUO enrolment by school location and home postcode (PC4), DUO school
-totals, and CBS population by PC4. One raw DUO row is a school–postcode–year;
+One row in the DUO pupil-origins data is a school–postcode–year;
 one plotted observation is a school location. School codes stay as text to
 preserve leading zeros. We restrict exploration to regular primary schools
 in 2022 and 2023 and join CBS by the home postcode, never the school's address.
