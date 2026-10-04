@@ -1,6 +1,8 @@
 # Cache raw sources; interrupted downloads never become valid cache files.
 download_file <- function(url, path) {
-  if (file.exists(path)) return(path)
+  if (file.exists(path)) {
+    return(path)
+  }
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
   temporary <- tempfile(tmpdir = dirname(path))
   on.exit(unlink(temporary))
@@ -12,7 +14,9 @@ download_file <- function(url, path) {
 
 # One fixed CBS vintage lets year-to-year changes reflect pupil origins.
 download_population <- function(path) {
-  if (file.exists(path)) return(path)
+  if (file.exists(path)) {
+    return(path)
+  }
   endpoint <- "https://opendata.cbs.nl/ODataApi/odata/83503NED/TypedDataSet"
   query <- paste(
     "Geslacht eq 'T001038' and Perioden eq '2022JJ00' and",
