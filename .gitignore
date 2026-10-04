@@ -1,6 +1,8 @@
 # Data ----
 data/raw/
 
+.vscode/
+
 # Common data formats, in case data ends up outside data/
 *.csv
 *.tsv

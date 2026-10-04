@@ -8,7 +8,7 @@
 # We need FOUR files in total, and it's worth understanding why each one
 # is here before you run this:
 #
-#   1. eindscores        - the average doorstroomtoets score per school, per
+#   1. eindscores         - the average doorstroomtoets score per school, per
 #                           test provider (IEP, Route8, DIA, AMN, DOE, LIB).
 #
 #   2. referentieniveaus  - the piece eindscores is missing: how many pupils
