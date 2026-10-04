@@ -3,3 +3,9 @@ reports <- list.files("report", pattern = "\\.Rmd$", full.names = TRUE)
 destination <- file.path(Sys.getenv("QUARTO_PROJECT_OUTPUT_DIR"), "downloads")
 dir.create(destination, recursive = TRUE, showWarnings = FALSE)
 stopifnot(all(file.copy(reports, destination, overwrite = TRUE)))
+rendered <- list.files(
+    file.path(Sys.getenv("QUARTO_PROJECT_OUTPUT_DIR"), "report"),
+    pattern = "\\.html$",
+    full.names = TRUE
+)
+stopifnot(all(file.copy(rendered, "report", overwrite = TRUE)))

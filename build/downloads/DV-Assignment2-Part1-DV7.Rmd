@@ -22,38 +22,38 @@ Among regular Dutch primary schools, is the neighbourhood composition of
 four-year-old intake associated with that of pupils already enrolled in
 the previous year, after accounting for where families live?
 
-**Level: inference.** If families consider who already attends a school,
-small differences in pupil composition could reinforce themselves over
-time. This question explores whether school choice might contribute to
-lasting segregation beyond differences in where families live.
+**Level: inference.** If families respond to a school's existing composition,
+a small change in intake could persist. We ask whether the data are
+consistent with that possibility. They cannot by themselves show that
+composition causes school choice.
 
 ## Datasets
 
 We use four public datasets:
 
 - **[DUO pupil origins (2022–2023)](https://onderwijsdata.duo.nl/dataset/4ea91ae5-51ef-48a4-aa67-7098343f75bc):**
-  pupil counts by school location and home postcode (PC4).
-  We use these to describe where each school's pupils live.
+  counts by school location and home postcode (PC4).
+  We use these to calculate each school's neighbourhood composition.
 - **[DUO school totals (2022–2023)](https://onderwijsdata.duo.nl/dataset/cf80e90d-ed19-4a10-a138-00c5c345cb5e):**
   total enrolment per school location.
-  We use these to check how much of each school's enrolment our data cover.
+  We use these as the denominator for coverage.
 - **[CBS postcode population (2022)](https://opendata.cbs.nl/#/CBS/nl/dataset/83503NED/table):**
-  resident counts by migration background and PC4.
-  We combine these with pupil origins to describe schools' neighbourhood composition.
+  residents by migration background and PC4.
+  We use these to describe the neighbourhoods linked to pupils' postcodes.
 - **[DUO pupils by age and postcode (2023)](https://duo.nl/open_onderwijsdata/images/03.-leerlingen-po-totaaloverzicht-2023-2024.csv):**
-  pupil counts by age, school, and home postcode.
-  We check whether four-year-old counts can support a
-  later analysis of intake, particularly given suppressed small counts.
+  counts by age, school, and home postcode.
+  We inspect age-four cells as a possible intake measure and quantify suppression.
 
 ## Exploratory process
 
 ### Data and cleaning
 
-The download script caches the source files. Functions in `R/` then prepare,
-inspect, and plot the data.
+The download script caches the source files.
+Functions in `R/` then prepare, inspect, and plot the data.
 
 ```{r data}
 library(ggplot2)
+library(plotly)
 library(scales)
 
 source("scripts/download.R")
@@ -68,22 +68,18 @@ selected <- filter(schools_2023, eligible)
 format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
 ```
 
-One row in the DUO pupil-origins data is a school–postcode–year;
-one plotted observation is a school location. School codes stay as text to
-preserve leading zeros. We restrict exploration to regular primary schools
-in 2022 and 2023 and join CBS by the home postcode, never the school's address.
+Each row in the DUO origins data represents one school–postcode–year; each
+plotted point represents one school. We keep school codes as text, retain
+regular primary schools in 2022 and 2023, and join CBS to pupils' home PC4.
 
 The **neighbourhood composition proxy** is the pupil-weighted average of
 the share of residents in CBS's historical “non-western migration
-background” category in pupils' home postcodes. It describes neighbourhoods,
-**not individual pupils' backgrounds**. Both enrolment years use CBS 2022
-so that postcode population changes do not drive the comparison.
+background” category. Both enrolment years use the 2022 CBS release.
 
-Suppressed DUO counts (`-1`) remain missing. Only exact counts with a valid
-CBS match and at least 50 postcode residents enter the weighted average.
-We require at least 50 matched pupils per school and coverage of at least
-80% of its total enrolment. These are exploratory quality rules; omitted
-pupils may differ from those observed.
+DUO marks suppressed counts as `-1`, we treat them as missing. A postcode
+enters the weighted average only when its count is exact and CBS reports at
+least 50 residents. A school is eligible when at least 50 pupils are matched
+and coverage is at least 80%.
 
 ```{r coverage}
 plot_coverage(data$schools)
@@ -95,7 +91,7 @@ Of `r format_n(nrow(schools_2023))` regular primary school locations in 2023,
 Overall median coverage is
 `r percent(median(schools_2023$coverage, na.rm = TRUE), accuracy = 0.1)`.
 Coverage combines count suppression, unusable postcodes, and missing CBS
-values; it is not a pure postcode match rate.
+values.
 
 ### First patterns
 
@@ -109,8 +105,8 @@ The middle half of included schools spans
 This variation makes the question worth investigating, but may reflect
 residential segregation and geography as well as school choice.
 
-```{r persistence, fig.height = 6.5}
-plot_persistence(data$pairs)
+```{r persistence-interactive}
+ggplotly(plot_persistence(data$pairs), tooltip = "text")
 ```
 
 Among `r format_n(nrow(data$pairs))` schools meeting the rules in both years,

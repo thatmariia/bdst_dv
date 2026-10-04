@@ -1,7 +1,6 @@
 # Downloaded data and temporary render files
 /data/raw/
 /.quarto/
-/report/*.html
 /report/*_files/
 *_cache/
 *.knit.md

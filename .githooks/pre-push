@@ -1,9 +1,8 @@
 #!/bin/sh
 set -eu
 
-quarto render
-if ! git diff --quiet HEAD -- build/ ||
-    [ -n "$(git ls-files --others --exclude-standard -- build/)" ]; then
-    echo "Commit the updated build/ files, then push again." >&2
+if ! git diff --quiet HEAD -- build/ report/*.html ||
+    [ -n "$(git ls-files --others --exclude-standard -- build/ report/*.html)" ]; then
+    echo "Commit the updated site and report HTML files, then push again." >&2
     exit 1
 fi

@@ -29,10 +29,9 @@ The pre-commit hook checks staged R, Rmd, and Qmd files for lint and formatting.
 R code uses four-space indentation, enforced by the formatter and linter.
 Fix formatting with `Rscript scripts/check.R --fix`, then review and stage.
 
-Rendering downloads four public DUO/CBS files once and creates the website
-in `build/`. Commit this folder alongside the notebook and source changes.
-Use `quarto preview` to browse locally. Before pushing, commit pending changes.
-The pre-push hook renders locally and stops if `build/` needs committing.
+Rendering downloads four public DUO/CBS files once, creates the website in
+`build/`, and writes each report HTML beside its `.Rmd` in `report/`. Commit
+both generated locations alongside the notebook and source changes.
 
 To download data separately, run `Rscript scripts/download.R`. The notebook
 also calls this script; reusable download functions stay in `R/download.R`.

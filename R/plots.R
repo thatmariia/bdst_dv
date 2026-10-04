@@ -72,7 +72,15 @@ plot_composition <- function(schools) {
 #' @return A ggplot scatter plot.
 plot_persistence <- function(pairs) {
     pairs$highlight <- abs(pairs$change) > 0.05
-    ggplot(pairs, aes(composition_2022, composition_2023)) +
+    pairs$tooltip <- paste0(
+        "School: ", pairs$school_id,
+        "<br>2022: ", label_percent()(pairs$composition_2022),
+        "<br>2023: ", label_percent()(pairs$composition_2023)
+    )
+    ggplot(
+        pairs,
+        aes(composition_2022, composition_2023, text = tooltip)
+    ) +
         geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
         geom_point(colour = "#0072B2", alpha = 0.2, size = 1.2) +
         geom_point(

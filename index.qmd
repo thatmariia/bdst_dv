@@ -4,7 +4,7 @@ subtitle: Mariia Steeghs-Turchina · DV7
 toc: false
 ---
 
-Explore each report or download its R Markdown source.
+Open a report or download its R Markdown source.
 
 ```{r assignments, echo = FALSE, results = "asis"}
 reports <- list.files("report", pattern = "\\.Rmd$", full.names = TRUE)
