@@ -50,10 +50,10 @@ selected <- filter(schools_2023, eligible)
 format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
 ```
 
-I use DUO enrolment by school location and home postcode (PC4), DUO school
+We use DUO enrolment by school location and home postcode (PC4), DUO school
 totals, and CBS population by PC4. One raw DUO row is a school–postcode–year;
 one plotted observation is a school location. School codes stay as text to
-preserve leading zeros. I restrict exploration to regular primary schools
+preserve leading zeros. We restrict exploration to regular primary schools
 in 2022 and 2023 and join CBS by the home postcode, never the school's address.
 
 The **neighbourhood composition proxy** is the pupil-weighted average of
@@ -64,7 +64,7 @@ so that postcode population changes do not drive the comparison.
 
 Suppressed DUO counts (`-1`) remain missing. Only exact counts with a valid
 CBS match and at least 50 postcode residents enter the weighted average.
-I require at least 50 matched pupils per school and coverage of at least
+We require at least 50 matched pupils per school and coverage of at least
 80% of its total enrolment. These are exploratory quality rules; omitted
 pupils may differ from those observed.
 
@@ -105,7 +105,7 @@ Large changes could also arise from mergers or changing data coverage.
 
 ### Decisions for the next stage
 
-I also checked DUO's October 2023 file by age and home postcode. Among
+We also checked DUO's October 2023 file by age and home postcode. Among
 `r format_n(intake$positive_cells)` school–postcode cells with at least one
 four-year-old, `r percent(intake$suppressed_share, accuracy = 0.1)`
 are suppressed as `<5`. This is the share of **cells**, not pupils.
