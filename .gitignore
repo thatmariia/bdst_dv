@@ -9,9 +9,7 @@
 
 # Individual work and local settings
 /assignment-1/*
-!/assignment-1/assignment-1-README.md
 /misc/
-/.claude/
 /.vscode/
 .Rproj.user/
 .Rhistory
