@@ -1,31 +1,35 @@
+#' Return the shared ggplot theme for the exploratory figures.
 exploration_theme <- function() {
-    ggplot2::theme_minimal(base_size = 12) +
-        ggplot2::theme(
-            panel.grid.minor = ggplot2::element_blank(),
+    theme_minimal(base_size = 12) +
+        theme(
+            panel.grid.minor = element_blank(),
             plot.title.position = "plot",
-            plot.title = ggplot2::element_text(face = "bold"),
+            plot.title = element_text(face = "bold"),
             legend.position = "bottom"
         )
 }
 
+#' Plot count coverage in 2023 and highlight the 80% threshold.
+#' @param schools School-year table from prepare_data().
+#' @return A ggplot histogram.
 plot_coverage <- function(schools) {
-    ggplot2::ggplot(
-        dplyr::filter(schools, year == 2023, !is.na(coverage)),
-        ggplot2::aes(coverage)
+    ggplot(
+        filter(schools, year == 2023, !is.na(coverage)),
+        aes(coverage)
     ) +
-        ggplot2::geom_histogram(
+        geom_histogram(
             binwidth = 0.025, boundary = 0, fill = "#0072B2"
         ) +
-        ggplot2::geom_vline(
+        geom_vline(
             xintercept = 0.8, colour = "#D55E00", linewidth = 1
         ) +
-        ggplot2::annotate(
+        annotate(
             "text",
             x = 0.78, y = Inf, label = "80% coverage rule",
             hjust = 1, vjust = 1.5, colour = "#A54800"
         ) +
-        ggplot2::scale_x_continuous(labels = scales::label_percent()) +
-        ggplot2::labs(
+        scale_x_continuous(labels = label_percent()) +
+        labs(
             title = "A. Check what the published counts cover",
             subtitle = paste(
                 "Regular primary schools in 2023;", "missing totals excluded"
@@ -39,16 +43,19 @@ plot_coverage <- function(schools) {
         exploration_theme()
 }
 
+#' Plot neighbourhood composition across eligible schools in 2023.
+#' @param schools School-year table from prepare_data().
+#' @return A ggplot histogram.
 plot_composition <- function(schools) {
-    ggplot2::ggplot(
-        dplyr::filter(schools, year == 2023, eligible),
-        ggplot2::aes(composition)
+    ggplot(
+        filter(schools, year == 2023, eligible),
+        aes(composition)
     ) +
-        ggplot2::geom_histogram(
+        geom_histogram(
             binwidth = 0.025, boundary = 0, fill = "#0072B2"
         ) +
-        ggplot2::scale_x_continuous(labels = scales::label_percent()) +
-        ggplot2::labs(
+        scale_x_continuous(labels = label_percent()) +
+        labs(
             title = "B. Schools draw from different neighbourhoods",
             subtitle = paste(
                 "2023 enrolment weighted by",
@@ -60,19 +67,22 @@ plot_composition <- function(schools) {
         exploration_theme()
 }
 
+#' Compare each school's composition across years and flag large changes.
+#' @param pairs Eligible two-year pairs from prepare_data().
+#' @return A ggplot scatter plot.
 plot_persistence <- function(pairs) {
     pairs$highlight <- abs(pairs$change) > 0.05
-    ggplot2::ggplot(pairs, ggplot2::aes(composition_2022, composition_2023)) +
-        ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
-        ggplot2::geom_point(colour = "#0072B2", alpha = 0.2, size = 1.2) +
-        ggplot2::geom_point(
-            data = dplyr::filter(pairs, highlight), shape = 17,
+    ggplot(pairs, aes(composition_2022, composition_2023)) +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+        geom_point(colour = "#0072B2", alpha = 0.2, size = 1.2) +
+        geom_point(
+            data = filter(pairs, highlight), shape = 17,
             colour = "#D55E00", size = 2.5
         ) +
-        ggplot2::scale_x_continuous(labels = scales::label_percent()) +
-        ggplot2::scale_y_continuous(labels = scales::label_percent()) +
-        ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-        ggplot2::labs(
+        scale_x_continuous(labels = label_percent()) +
+        scale_y_continuous(labels = label_percent()) +
+        coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+        labs(
             title = "C. Composition changes little within a school",
             subtitle = paste(
                 "Orange triangles: changes larger than", "5 percentage points"

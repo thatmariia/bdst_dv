@@ -42,14 +42,22 @@ The notebook sources the functions in `R/`, then calls them to download,
 prepare, and inspect the data. Plotting functions are called below each step.
 
 ```{r data}
+library(jsonlite)
+library(readr)
+library(ggplot2)
+library(scales)
+library(dplyr)
+
 source("R/download.R")
 source("R/prepare.R")
 source("R/plots.R")
+
 paths <- download_data()
 data <- prepare_data(paths)
 intake <- check_intake(paths[["intake"]])
-schools_2023 <- dplyr::filter(data$schools, year == 2023)
-selected <- dplyr::filter(schools_2023, eligible)
+schools_2023 <- filter(data$schools, year == 2023)
+selected <- filter(schools_2023, eligible)
+#' Format counts with thousands separators.
 format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
 ```
 
@@ -79,7 +87,7 @@ Of `r format_n(nrow(schools_2023))` regular primary school locations in 2023,
 `r format_n(sum(is.na(schools_2023$coverage)))` lack a usable total and
 `r format_n(nrow(selected))` pass both quality rules.
 Overall median coverage is
-`r scales::percent(median(schools_2023$coverage, na.rm = TRUE), accuracy = 0.1)`.
+`r percent(median(schools_2023$coverage, na.rm = TRUE), accuracy = 0.1)`.
 Coverage combines count suppression, unusable postcodes, and missing CBS
 values; it is not a pure postcode match rate.
 
@@ -90,8 +98,8 @@ plot_composition(data$schools)
 ```
 
 The middle half of included schools spans
-`r scales::percent(quantile(selected$composition, 0.25), accuracy = 0.1)` to
-`r scales::percent(quantile(selected$composition, 0.75), accuracy = 0.1)`.
+`r percent(quantile(selected$composition, 0.25), accuracy = 0.1)` to
+`r percent(quantile(selected$composition, 0.75), accuracy = 0.1)`.
 This variation makes the question worth investigating, but may reflect
 residential segregation and geography as well as school choice.
 
@@ -110,7 +118,7 @@ Large changes could also arise from mergers or changing data coverage.
 
 I also checked DUO's October 2023 file by age and home postcode. Among
 `r format_n(intake$positive_cells)` school–postcode cells with at least one
-four-year-old, `r scales::percent(intake$suppressed_share, accuracy = 0.1)`
+four-year-old, `r percent(intake$suppressed_share, accuracy = 0.1)`
 are suppressed as `<5`. This is the share of **cells**, not pupils.
 Age four is a proxy for intake, not an exact record of new enrolments.
 Small flows will therefore need a defensible treatment before modelling.
