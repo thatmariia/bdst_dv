@@ -1,6 +1,5 @@
-# Downloaded data and generated reports
+# Downloaded data and temporary render files
 /data/raw/
-/build/
 /.quarto/
 /report/*.html
 /report/*_files/

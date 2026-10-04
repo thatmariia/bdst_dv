@@ -19,25 +19,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: renv
-      - uses: quarto-dev/quarto-actions/setup@v2
-        with:
-          version: 1.10.18
-      - name: Install XML library for linting
-        run: sudo apt-get update && sudo apt-get install -y libxml2-dev
-      - uses: r-lib/actions/setup-renv@v2
-      - name: Check lint and style
-        run: Rscript scripts/check.R
-      - uses: actions/cache@v4
-        with:
-          path: data/raw
-          key: source-data-${{ hashFiles('R/download.R') }}
-      - name: Download data
-        run: Rscript scripts/download.R
-      - name: Render website
-        run: quarto render
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

@@ -24,14 +24,16 @@ Rscript scripts/check.R
 quarto render
 ```
 
-Setup restores pinned packages and enables the pre-commit hook for this
-checkout. The hook checks staged R, Rmd, and Qmd files for lint and formatting.
+Setup restores pinned packages and enables Git hooks for this checkout.
+The pre-commit hook checks staged R, Rmd, and Qmd files for lint and formatting.
 R code uses four-space indentation, enforced by the formatter and linter.
 Fix formatting with `Rscript scripts/check.R --fix`, then review and stage.
 
 Rendering downloads four public DUO/CBS files once and creates the website
-in `build/`. Use `quarto preview` to browse locally.
+in `build/`. Commit this folder alongside the notebook and source changes.
+Use `quarto preview` to browse locally. Before pushing, commit pending changes.
+The pre-push hook renders locally and stops if `build/` needs committing.
 
 To download data separately, run `Rscript scripts/download.R`. The notebook
 also calls this script; reusable download functions stay in `R/download.R`.
-Existing downloads are reused. Data and generated HTML stay out of Git.
+Existing downloads are reused. Raw data stay out of Git.
