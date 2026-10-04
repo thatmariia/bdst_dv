@@ -1,26 +1,15 @@
-<!--
-  Replace the title, group members, research question and "About this
-  project" below with your own project description. Keep the "Cloning" and
-  "Reproducing" sections, and update them if you change how the project
-  runs. Keep it short — a few lines per section is enough. This README is the
-  front page of your repo, not the report itself (that's in report/);
-  it just orients anyone (including us, grading) opening the repo for the
-  first time.
--->
+# Assignment 2.1 — School composition
 
-# Your Project Title
+**Mariia Steeghs-Turchina · DV7 · solo project**
 
-**Research question:** One sentence stating what you're investigating.
+Research question: is the neighbourhood composition of a primary school's
+new intake associated with that of its existing pupils?
 
-**Level:** Analytics / Inference / Prediction
+This branch contains the data exploration and decisions for Part 1.
 
-## About this project
+- `R/`: download, prepare, and plot the data.
+- `scripts/`: setup, checks, and rendering.
+- `report/`: the R Markdown submission.
+- `data/raw/`: downloaded data, excluded from Git.
 
-A short paragraph (3-5 sentences) on what this project looks at in the DUO doorstroomtoets (transfer test) data, and what you're trying to communicate with your final visualization.
-
-## Reproducing this project
-
-1. Open the project.
-2. Run `scripts/00-packages.R` to install and load the packages this project uses.
-3. Run `scripts/01-get-data.R` once to download the data into `data/raw/`.
-4. Knit `report/DV-Assignment2-Part2-GroupX.Rmd` (the final report). Knitting runs both scripts above for you.
+Restore packages with `renv::restore()`. Open the Part 1 report and knit it.

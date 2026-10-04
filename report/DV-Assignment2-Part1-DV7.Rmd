@@ -1,0 +1,29 @@
+---
+title: "Assignment 2.1: School composition and school choice"
+author: "Mariia Steeghs-Turchina · DV7 (solo project)"
+output:
+  html_document:
+    toc: true
+    self_contained: true
+---
+
+## Research question
+
+Among regular Dutch primary schools, is the neighbourhood composition of
+four-year-old intake associated with that of pupils already enrolled in
+the previous year, after accounting for where families live?
+
+**RQ5 · Inference.** The intended outcome is the number of four-year-olds
+from each home postcode choosing each school. A later count model would
+compare intake with previous pupil composition, accounting for school,
+home postcode, year, and existing links between postcodes and schools.
+Part 1 explores whether the data can support this question.
+
+**Audience:** municipal education officers and interested parents. The
+visualization should explain variation and persistence between schools
+in plain language, with uncertainty visible in any later estimates.
+
+## Exploratory process
+
+I first examine enrolment by home postcode, neighbourhood composition,
+and coverage of the published counts. These decisions precede modelling.
