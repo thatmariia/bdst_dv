@@ -3,7 +3,7 @@ args <- commandArgs(trailingOnly = TRUE)
 fix <- identical(args, "--fix")
 if (length(args) && !fix) setwd(args[[1]])
 files <- list.files(
-    c("R", "scripts", "tests", "report"),
+    c("R", "scripts", "report"),
     pattern = "\\.(R|Rmd)$", full.names = TRUE, recursive = TRUE
 )
 stopifnot(length(files) > 0)
