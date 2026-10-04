@@ -5,7 +5,26 @@ output:
   html_document:
     toc: true
     self_contained: true
+    code_folding: hide
 ---
+
+```{r setup, include = FALSE}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE,
+  fig.width = 8, fig.height = 4.5, fig.align = "center", out.width = "100%"
+)
+```
+
+```{r data, include = FALSE}
+source("R/download.R")
+source("R/prepare.R")
+source("R/plots.R")
+data <- prepare_data(download_data())
+schools_2023 <- dplyr::filter(data$schools, year == 2023)
+selected <- dplyr::filter(schools_2023, eligible)
+format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
+```
 
 ## Research question
 
@@ -18,6 +37,8 @@ from each home postcode choosing each school. A later count model would
 compare intake with previous pupil composition, accounting for school,
 home postcode, year, and existing links between postcodes and schools.
 Part 1 explores whether the data can support this question.
+An association would not by itself establish that composition causes
+school choice.
 
 **Audience:** municipal education officers and interested parents. The
 visualization should explain variation and persistence between schools
@@ -25,5 +46,79 @@ in plain language, with uncertainty visible in any later estimates.
 
 ## Exploratory process
 
-I first examine enrolment by home postcode, neighbourhood composition,
-and coverage of the published counts. These decisions precede modelling.
+### Data and cleaning
+
+I use DUO enrolment by school location and home postcode (PC4), DUO school
+totals, and CBS population by PC4. One raw DUO row is a school–postcode–year;
+one plotted observation is a school location. School codes stay as text to
+preserve leading zeros. I restrict exploration to regular primary schools
+in 2022 and 2023 and join CBS by the home postcode, never the school's address.
+
+The **neighbourhood composition proxy** is the pupil-weighted average of
+the share of residents in CBS's historical “non-western migration
+background” category in pupils' home postcodes. It describes neighbourhoods,
+**not individual pupils' backgrounds**. Both enrolment years use CBS 2022
+so that postcode population changes do not drive the comparison.
+
+Suppressed DUO counts (`-1`) remain missing. Only exact counts with a valid
+CBS match and at least 50 postcode residents enter the weighted average.
+I require at least 50 matched pupils per school and coverage of at least
+80% of its total enrolment. These are exploratory quality rules; omitted
+pupils may differ from those observed.
+
+```{r coverage}
+plot_coverage(data$schools)
+```
+
+Of `r format_n(nrow(schools_2023))` regular primary school locations in 2023,
+`r format_n(sum(is.na(schools_2023$coverage)))` lack a usable total and
+`r format_n(nrow(selected))` pass both quality rules.
+Overall median coverage is
+`r scales::percent(median(schools_2023$coverage, na.rm = TRUE), accuracy = 0.1)`.
+Coverage combines count suppression, unusable postcodes, and missing CBS
+values; it is not a pure postcode match rate.
+
+### First patterns
+
+```{r composition}
+plot_composition(data$schools)
+```
+
+The middle half of included schools spans
+`r scales::percent(quantile(selected$composition, 0.25), accuracy = 0.1)` to
+`r scales::percent(quantile(selected$composition, 0.75), accuracy = 0.1)`.
+This variation makes the question worth investigating, but may reflect
+residential segregation and geography as well as school choice.
+
+```{r persistence, fig.height = 6.5}
+plot_persistence(data$pairs)
+```
+
+Among `r format_n(nrow(data$pairs))` schools meeting the rules in both years,
+the median absolute change is
+`r round(100 * median(abs(data$pairs$change)), 2)` percentage points.
+The `r sum(abs(data$pairs$change) > 0.05)` orange triangles flag changes
+larger than five points for closer inspection, not automatic exclusion.
+Large changes could also arise from mergers or changing data coverage.
+
+### Decisions for the next stage
+
+- Keep neighbourhood composition as an explicitly labelled proxy; avoid
+  claims about individual families or a school's quality.
+- Examine four-year-old intake separately from existing pupils. Most
+  pupils remain enrolled between years, so persistence in total enrolment
+  is expected and does not demonstrate feedback.
+- Check school continuity and coverage before interpreting large changes;
+  compare results under stricter coverage rules.
+- For the later inference, account for home-postcode and school differences
+  and existing recruitment links. Show estimated associations with
+  uncertainty; these exploratory plots do not answer the causal question.
+
+### Sources and reproducibility
+
+[DUO pupil origins](https://onderwijsdata.duo.nl/dataset/4ea91ae5-51ef-48a4-aa67-7098343f75bc),
+[DUO school totals](https://onderwijsdata.duo.nl/dataset/cf80e90d-ed19-4a10-a138-00c5c345cb5e),
+and [CBS table 83503NED](https://opendata.cbs.nl/#/CBS/nl/dataset/83503NED/table).
+The first knit downloads these public sources; later knits reuse local
+copies. No raw data is committed. Source releases may be revised.
+Code: [thatmariia/bdst_dv](https://github.com/thatmariia/bdst_dv).
