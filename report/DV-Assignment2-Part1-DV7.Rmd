@@ -11,8 +11,8 @@ output:
 ```{r setup, include = FALSE}
 knitr::opts_knit$set(root.dir = normalizePath(".."))
 knitr::opts_chunk$set(
-  echo = TRUE, message = FALSE,
-  fig.width = 8, fig.height = 4.5, fig.align = "center", out.width = "100%"
+    echo = TRUE, message = FALSE,
+    fig.width = 8, fig.height = 4.5, fig.align = "center", out.width = "100%"
 )
 ```
 

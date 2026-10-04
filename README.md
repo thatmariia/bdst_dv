@@ -24,8 +24,9 @@ Rscript scripts/render.R
 ```
 
 Setup restores pinned packages and enables the pre-commit hook for this
-checkout. The hook checks the staged R/Rmd files for lint and formatting;
-fix formatting with `Rscript scripts/check.R --fix`, then review and stage.
+checkout. The hook checks the staged R/Rmd files for lint and formatting.
+R code uses four-space indentation, enforced by the formatter and linter.
+Fix formatting with `Rscript scripts/check.R --fix`, then review and stage.
 
 Rendering downloads four public DUO/CBS files once and creates
 `report/DV-Assignment2-Part1-DV7.html`. The `.Rmd` and `.html` are the Canvas
