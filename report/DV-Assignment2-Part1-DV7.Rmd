@@ -1,0 +1,148 @@
+---
+title: "Assignment 2.1: School composition and school choice"
+author: "Mariia Steeghs-Turchina · DV7"
+output:
+  html_document:
+    toc: true
+    self_contained: true
+    code_folding: show
+---
+
+```{r setup, include = FALSE}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+knitr::opts_chunk$set(
+    echo = TRUE, message = FALSE,
+    fig.width = 8, fig.height = 4.5, fig.align = "center", out.width = "100%"
+)
+```
+
+## Research question
+
+Among regular Dutch primary schools, is the neighbourhood composition of
+four-year-old intake associated with that of pupils already enrolled in
+the previous year, after accounting for where families live?
+
+**Level: inference.** If families respond to a school's existing composition,
+a small change in intake could persist. We ask whether the data are
+consistent with that possibility. They cannot by themselves show that
+composition causes school choice.
+
+**Target audience.** Education officers concerned with segregation and
+parents choosing schools. The visualization should connect
+school-level patterns to those decisions.
+
+## Datasets
+
+We use four public datasets:
+
+- **[DUO pupil origins (2022–2023)](https://onderwijsdata.duo.nl/dataset/4ea91ae5-51ef-48a4-aa67-7098343f75bc):**
+  counts by school location and home postcode (PC4).
+  We use these to calculate each school's neighbourhood composition.
+- **[DUO school totals (2022–2023)](https://onderwijsdata.duo.nl/dataset/cf80e90d-ed19-4a10-a138-00c5c345cb5e):**
+  total enrolment per school location.
+  We use these as the denominator for coverage.
+- **[CBS postcode population (2022)](https://opendata.cbs.nl/#/CBS/nl/dataset/83503NED/table):**
+  residents by migration background and PC4.
+  We use these to describe the neighbourhoods linked to pupils' postcodes.
+- **[DUO pupils by age and postcode (2023)](https://duo.nl/open_onderwijsdata/images/03.-leerlingen-po-totaaloverzicht-2023-2024.csv):**
+  counts by age, school, and home postcode.
+  We inspect age-four cells as a possible intake measure and quantify suppression.
+
+## Exploratory process
+
+### Data and cleaning
+
+The download script caches the source files.
+Functions in `R/` then prepare, inspect, and plot the data.
+
+```{r data}
+library(ggplot2)
+library(plotly)
+library(scales)
+
+source("scripts/download.R")
+source("R/prepare.R")
+source("R/plots.R")
+
+data <- prepare_data(paths)
+intake <- check_intake(paths[["intake"]])
+schools_2023 <- filter(data$schools, year == 2023)
+selected <- filter(schools_2023, eligible)
+#' Format counts with thousands separators.
+format_n <- function(x) format(x, big.mark = ",", scientific = FALSE)
+```
+
+Each row in the DUO origins data represents one school–postcode–year; each
+plotted point represents one school. We keep school codes as text, retain
+regular primary schools in 2022 and 2023, and join CBS to pupils' home PC4.
+
+The **neighbourhood composition proxy** is the pupil-weighted average of
+the share of residents in CBS's historical “non-western migration
+background” category. Both enrolment years use the 2022 CBS release.
+
+DUO marks suppressed counts as `-1`, we treat them as missing. A postcode
+enters the weighted average only when its count is exact and CBS reports at
+least 50 residents. A school is eligible when at least 50 pupils are matched
+and coverage is at least 80%.
+
+```{r coverage}
+plot_coverage(data$schools)
+```
+
+Of `r format_n(nrow(schools_2023))` regular primary school locations in 2023,
+`r format_n(sum(is.na(schools_2023$coverage)))` lack a usable total and
+`r format_n(nrow(selected))` pass both quality rules.
+Overall median coverage is
+`r percent(median(schools_2023$coverage, na.rm = TRUE), accuracy = 0.1)`.
+Coverage combines count suppression, unusable postcodes, and missing CBS
+values.
+
+### First patterns
+
+```{r composition}
+plot_composition(data$schools)
+```
+
+The middle half of included schools spans
+`r percent(quantile(selected$composition, 0.25), accuracy = 0.1)` to
+`r percent(quantile(selected$composition, 0.75), accuracy = 0.1)`.
+This variation makes the question worth investigating, but may reflect
+residential segregation and geography as well as school choice.
+
+```{r persistence-interactive}
+ggplotly(plot_persistence(data$pairs), tooltip = "text")
+```
+
+Among `r format_n(nrow(data$pairs))` schools meeting the rules in both years,
+the median absolute change is
+`r round(100 * median(abs(data$pairs$change)), 2)` percentage points.
+The `r sum(abs(data$pairs$change) > 0.05)` orange triangles flag changes
+larger than five points for closer inspection.
+Large changes could also arise from mergers or changing data coverage.
+
+### Next stage
+
+We also checked DUO's October 2023 file by age and home postcode. Among
+`r format_n(intake$positive_cells)` school–postcode cells with at least one
+four-year-old, `r percent(intake$suppressed_share, accuracy = 0.1)`
+are suppressed as `<5`. Age four is a proxy for intake.
+Small flows will therefore need a defensible treatment before modelling.
+
+- Keep neighbourhood composition as a labelled proxy.
+- Examine four-year-old intake separately from existing pupils. Most
+  pupils remain enrolled between years, so persistence in total enrolment
+  is expected.
+- Check school continuity and coverage before interpreting large changes.
+- For the later inference, account for home-postcode and school differences
+  and existing recruitment links. Show estimated associations with
+  uncertainty; these exploratory plots do not answer the causal question.
+
+### Sources and reproducibility
+
+[DUO pupil origins](https://onderwijsdata.duo.nl/dataset/4ea91ae5-51ef-48a4-aa67-7098343f75bc),
+[DUO school totals](https://onderwijsdata.duo.nl/dataset/cf80e90d-ed19-4a10-a138-00c5c345cb5e),
+[DUO pupils by age and postcode](https://duo.nl/open_onderwijsdata/images/03.-leerlingen-po-totaaloverzicht-2023-2024.csv),
+and [CBS table 83503NED](https://opendata.cbs.nl/#/CBS/nl/dataset/83503NED/table).
+The first knit downloads these public sources; later knits reuse local
+copies. The raw data is not committed. Source releases may be revised.
+Code: [thatmariia/bdst_dv](https://github.com/thatmariia/bdst_dv).

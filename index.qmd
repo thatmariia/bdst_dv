@@ -1,0 +1,26 @@
+---
+title: Assignments
+subtitle: Mariia Steeghs-Turchina · DV7
+toc: false
+---
+
+Open a report or download its R Markdown source.
+
+```{r assignments, echo = FALSE, results = "asis"}
+reports <- list.files("report", pattern = "\\.Rmd$", full.names = TRUE)
+for (report in reports) {
+    title <- rmarkdown::yaml_front_matter(report)$title
+    if (is.null(title)) title <- tools::file_path_sans_ext(basename(report))
+    html <- sub("\\.Rmd$", ".html", report)
+    source <- file.path("downloads", basename(report))
+    cat(sprintf(
+        paste0(
+            "## %s\n\n[HTML report](%s) · ",
+            '[R Markdown (.Rmd)](%s){download=""}\n\n'
+        ),
+        htmltools::htmlEscape(title),
+        URLencode(html, reserved = FALSE),
+        URLencode(source, reserved = FALSE)
+    ))
+}
+```

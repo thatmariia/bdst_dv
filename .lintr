@@ -1,0 +1,6 @@
+# dplyr/ggplot2 resolve bare column names inside data, not the R environment.
+linters: linters_with_defaults(
+    object_usage_linter = NULL,
+    indentation_linter = indentation_linter(indent = 4L)
+  )
+encoding: "UTF-8"
