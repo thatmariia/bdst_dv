@@ -2,7 +2,7 @@ name: Publish reports
 
 on:
   push:
-    branches: [main, ass-2-1]
+    branches: [main, ass-2-1, ass-2-2]
 
 permissions:
   contents: read
