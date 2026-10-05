@@ -1,4 +1,4 @@
-# Assignment 2.1 — School composition
+# School composition
 
 **DV7**
 
