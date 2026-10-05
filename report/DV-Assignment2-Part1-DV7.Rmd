@@ -27,6 +27,10 @@ a small change in intake could persist. We ask whether the data are
 consistent with that possibility. They cannot by themselves show that
 composition causes school choice.
 
+**Target audience.** Education officers concerned with segregation and
+parents choosing schools. The visualization should connect
+school-level patterns to those decisions.
+
 ## Datasets
 
 We use four public datasets:
