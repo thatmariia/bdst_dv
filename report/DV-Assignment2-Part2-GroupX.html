@@ -4104,8 +4104,8 @@ HOW TO RENDER THIS FILE
    in `report/`.
 3. Rendering starts from a clean R session: it only knows what is created
    *in this file*. Code runs from the project root, and the setup chunk
-   below sources scripts/download.R and the helpers in R/, so packages and
-   data are always loaded. The first render downloads the data, so you need
+   below sources R/get-data.R, so packages and data are always
+   loaded. The first render downloads the data, so you need
    an internet connection.
 
 If rendering fails:
