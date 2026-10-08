@@ -4,7 +4,7 @@ fix <- identical(args, "--fix")
 if (length(args) && !fix) setwd(args[[1]])
 files <- list.files(
     c("R", "scripts", "report"),
-    pattern = "\\.(R|Rmd)$", full.names = TRUE, recursive = TRUE
+    pattern = "\\.(R|Rmd|qmd)$", full.names = TRUE, recursive = TRUE
 )
 files <- c(files, "index.qmd")
 stopifnot(length(files) > 0)

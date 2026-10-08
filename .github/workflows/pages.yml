@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p build/report build/downloads
           cp report/*.html build/report/
-          cp report/*.Rmd build/downloads/
+          cp report/*.Rmd report/*.qmd build/downloads/
 
       - uses: actions/configure-pages@v5
 

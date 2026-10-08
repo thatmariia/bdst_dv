@@ -4,22 +4,21 @@ subtitle: Mariia Steeghs-Turchina · DV7
 toc: false
 ---
 
-Open a report or download its R Markdown source.
+Open a report or download its source.
 
 ```{r assignments, echo = FALSE, results = "asis"}
-reports <- list.files("report", pattern = "\\.Rmd$", full.names = TRUE)
+reports <- list.files("report", pattern = "\\.(Rmd|qmd)$", full.names = TRUE)
+formats <- c(Rmd = "R Markdown (.Rmd)", qmd = "Quarto (.qmd)")
 for (report in reports) {
     title <- rmarkdown::yaml_front_matter(report)$title
     if (is.null(title)) title <- tools::file_path_sans_ext(basename(report))
-    html <- sub("\\.Rmd$", ".html", report)
+    html <- sub("\\.(Rmd|qmd)$", ".html", report)
     source <- file.path("downloads", basename(report))
     cat(sprintf(
-        paste0(
-            "## %s\n\n[HTML report](%s) · ",
-            '[R Markdown (.Rmd)](%s){download=""}\n\n'
-        ),
+        "## %s\n\n[HTML report](%s) · [%s](%s){download=\"\"}\n\n",
         htmltools::htmlEscape(title),
         URLencode(html, reserved = FALSE),
+        formats[[tools::file_ext(report)]],
         URLencode(source, reserved = FALSE)
     ))
 }

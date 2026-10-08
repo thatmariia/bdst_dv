@@ -4,6 +4,7 @@ project:
   render:
     - index.qmd
     - report/*.Rmd
+    - report/*.qmd
   post-render: scripts/copy-sources.R
 
 website:

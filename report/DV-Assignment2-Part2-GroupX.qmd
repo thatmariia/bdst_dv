@@ -1,0 +1,84 @@
+---
+title: "DV Assignment 2: [Your Title Here]"
+author: "Group X: Firstname Lastname, Firstname Lastname, Firstname Lastname"
+date: today
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: true
+knitr:
+  opts_knit:
+    root.dir: ".."
+---
+
+<!--
+HOW TO RENDER THIS FILE
+
+1. Open your group project in RStudio first (the `Project:` button in the
+   top right should show your repo name). Keep this file in `report/`.
+2. Click the `Render` button at the top of this file (or press
+   Ctrl/Cmd + Shift + K), or run `quarto render report/<this file>.qmd` in
+   the terminal. An .html file with the same name appears next to this .qmd
+   in `report/`.
+3. Rendering starts from a clean R session: it only knows what is created
+   *in this file*. Code runs from the project root, and the setup chunk
+   below sources scripts/download.R and the helpers in R/, so packages and
+   data are always loaded. The first render downloads the data, so you need
+   an internet connection.
+
+If rendering fails:
+- "could not find function": the package isn't loaded - add a library()
+  call to the setup chunk (and install it with renv::install() and
+  renv::snapshot() so the lockfile knows about it).
+- "object not found": you created it in the Console, not in this file (or
+  in a script that this file doesn't source).
+- "cannot open file": paths are relative to the project root, e.g.
+  "R/prepare.R", not "../R/prepare.R".
+- Check that all code chunks have unique labels.
+- Google the error message you receive, as it often provides clues about
+  what went wrong.
+
+This comment does not show up in the rendered .html, so you can leave it here.
+-->
+
+```{r}
+#| label: setup
+#| include: false
+# clear environment so rendering only depends on what's in this file
+rm(list = ls())
+
+library(ggplot2)
+library(plotly)
+library(scales)
+
+# TODO: downloads the data into data/raw/ if you don't already have it
+```
+
+## Research question
+
+*What are you investigating, and why does it matter? Who is the target audience for your final visualization, and how does that shape your choices? You can start from what you wrote in Part 1.*
+
+## Exploratory process
+
+*Describe how you explored the data before settling on your final visualization. Include at least one exploratory plot below (this can be the one from Part 1, or an updated one), and a short note on what it told you and how it influenced your final visualization.*
+
+```{r}
+#| label: exploratory-plot
+```
+
+## Final visualization
+
+*Your final, explanatory visualization goes below. Include a short write-up: what does it communicate, why is this the best way to communicate it, and how robust is the finding?*
+
+```{r}
+#| label: final-plot
+```
+
+## Conclusion
+
+*What can you conclude from your visualization? What are the limitations of this analysis?*
+
+---
+
+**Before submitting:** run the lintr check on this file, and re-render from a clean environment (`rm(list = ls())`, already done above) to make sure everything reproduces from scratch.
