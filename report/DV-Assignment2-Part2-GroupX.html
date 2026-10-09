@@ -4084,7 +4084,10 @@ vertical-align: -.125em;
    
   <ul>
   <li><a href="#research-question" id="toc-research-question" class="nav-link active" data-scroll-target="#research-question">Research question</a></li>
-  <li><a href="#getting-data" id="toc-getting-data" class="nav-link" data-scroll-target="#getting-data">Getting data</a></li>
+  <li><a href="#getting-data" id="toc-getting-data" class="nav-link" data-scroll-target="#getting-data">Getting data</a>
+  <ul class="collapse">
+  <li><a href="#duo-gap-matrix" id="toc-duo-gap-matrix" class="nav-link" data-scroll-target="#duo-gap-matrix">DUO gap matrix</a></li>
+  </ul></li>
   <li><a href="#exploratory-process" id="toc-exploratory-process" class="nav-link" data-scroll-target="#exploratory-process">Exploratory process</a></li>
   <li><a href="#final-visualization" id="toc-final-visualization" class="nav-link" data-scroll-target="#final-visualization">Final visualization</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
@@ -4312,6 +4315,28 @@ vertical-align: -.125em;
 </table>
 </div>
 </div>
+<section id="duo-gap-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="duo-gap-matrix">DUO gap matrix</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>gap_matrix</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>             pro/vmbo bb vmbo bb/kb vmbo kb/gt vmbo gt/havo havo/vwo vwo
+pro                  0.0        1.0        1.0          1.0      1.0 1.0
+vmbo bb             -0.5        0.5        1.0          1.0      1.0 1.0
+vmbo bb/kb          -1.0        0.0        1.0          1.0      1.0 1.0
+vmbo kb             -1.0       -0.5        0.5          1.0      1.0 1.0
+vmbo kb/gt          -1.0       -1.0        0.0          1.0      1.0 1.0
+vmbo gt             -1.0       -1.0       -0.5          0.5      1.0 1.0
+vmbo gt/havo        -1.0       -1.0       -1.0          0.0      1.0 1.0
+havo                -1.0       -1.0       -1.0         -0.5      0.5 1.0
+havo/vwo            -1.0       -1.0       -1.0         -1.0      0.0 0.5
+vwo                 -1.0       -1.0       -1.0         -1.0     -0.5 0.0</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="exploratory-process" class="level2">
 <h2 class="anchored" data-anchor-id="exploratory-process">Exploratory process</h2>

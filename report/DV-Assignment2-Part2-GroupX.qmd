@@ -85,6 +85,18 @@ The present research question is to attempt to quantify the impact of each sourc
 knitr::kable(data_overview, format.args = list(big.mark = ","))
 ```
 
+**DUO gap matrix**
+
+The following table shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO.
+The rows correspond to the provisional advice, and the columns correspond to the test result.
+Let $G(i, j)$ be the entry in row $i$ and column $j$ of this matrix.
+Then $G(i, j)$ is the indication of how much higher the track $i$ is valued than track $j$.
+
+```{r}
+#| label: duo-gap-matrix
+knitr::kable(gap_matrix, format.args = list(big.mark = ","))
+```
+
 ## Exploratory process
 
 *Describe how you explored the data before settling on your final visualization. Include at least one exploratory plot below (this can be the one from Part 1, or an updated one), and a short note on what it told you and how it influenced your final visualization.*
