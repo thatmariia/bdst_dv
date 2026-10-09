@@ -260,6 +260,7 @@ source("R/exploratory/plots_standard.R")
 
 ```{r}
 #| label: compliance-values
+#| fig-height: 1.6
 #| fig-cap: "Compliance with the policy of raising the advice with a higher test result."  # nolint: line_length_linter
 compliance_heatmap
 ```
@@ -274,6 +275,7 @@ compliance_plot
 
 ```{r}
 #| label: joint-plot
+#| fig-height: 9
 #| fig-cap: "Distributions of provisional and test advice by test year (use the slider to switch years)."  # nolint: line_length_linter
 joint_plot()
 ```
@@ -299,7 +301,7 @@ $$
 $$
 
 $$
-\text{diff}_p = h_p + \ell_p.
+\text{disagreement}_p = h_p + \ell_p.
 $$
 
 ```{r}

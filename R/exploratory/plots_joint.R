@@ -66,7 +66,7 @@ joint_plot <- function(years = sort(unique(cvte_conditional$test_year))) {
         geom_point() +
         scale_x_discrete(labels = short_advice) +
         scale_y_discrete(labels = short_advice) +
-        scale_size_area(max_size = 14, guide = "none") +
+        scale_size_area(max_size = 8, guide = "none") +
         scale_colour_manual(values = comparison_colours, name = NULL) +
         guides(colour = guide_legend(override.aes = list(size = 4))) +
         labs(x = "test advice", y = "teacher's provisional advice") +
@@ -80,13 +80,21 @@ joint_plot <- function(years = sort(unique(cvte_conditional$test_year))) {
             legend.position = "bottom"
         )
 
-    # plotly ignores legend.position, so the legend is moved below here. The
-    # frames act as a year selector: no play button, no transition.
+    # plotly ignores legend.position: the legend goes above the plot and the
+    # year slider below the x-axis title. The frames act as a year selector:
+    # no play button, no transition.
     plotly::ggplotly(plot, tooltip = "text") |>
-        plotly::layout(legend = list(
-            orientation = "h", x = 0.5, xanchor = "center", y = -0.3
-        )) |>
+        plotly::layout(
+            legend = list(
+                orientation = "h", x = 0.5, xanchor = "center",
+                y = 1.02, yanchor = "bottom"
+            ),
+            margin = list(b = 90)
+        ) |>
         plotly::animation_opts(frame = 0, transition = 0, redraw = TRUE) |>
         plotly::animation_button(visible = FALSE) |>
-        plotly::animation_slider(currentvalue = list(prefix = "Test year: "))
+        plotly::animation_slider(
+            y = -0.15, yanchor = "top",
+            currentvalue = list(prefix = "Test year: ", xanchor = "left")
+        )
 }

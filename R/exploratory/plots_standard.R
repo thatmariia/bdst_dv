@@ -1,3 +1,12 @@
+#' Provider group of a test, as shown in the colour legend.
+provider_group <- function(test) {
+    case_when(
+        startsWith(test, "Lib") ~ "Lib",
+        startsWith(test, "IEP") ~ "IEP",
+        TRUE ~ "other tests"
+    )
+}
+
 provider_colour <- function(test) {
     case_when(
         startsWith(test, "Lib") ~ pal[["blue"]],
@@ -42,11 +51,21 @@ standardized_arrows <- standardized_points |>
 
 standardized_plot <- Reduce(
     function(plot, name) {
-        points <- filter(standardized_points, test == name)
+        # Latest year first, so the legend shows a filled circle.
+        points <- filter(standardized_points, test == name) |>
+            arrange(desc(test_year))
+        group <- provider_group(name)
+        # One legend entry per provider group (its first test); clicking it
+        # toggles all tests of that group.
+        first_in_group <- name == unique(standardized_points$test)[
+            match(group, provider_group(unique(standardized_points$test)))
+        ]
         plotly::add_trace(
             plot,
             data = points, x = ~leniency, y = ~disagreement,
-            type = "scatter", mode = "markers", name = name,
+            type = "scatter", mode = "markers", name = I(group),
+            legendgroup = I(group), showlegend = first_in_group,
+            legendrank = match(group, c("Lib", "IEP", "other tests")),
             marker = list(
                 size = 9, color = points$colour,
                 symbol = if_else(
@@ -60,9 +79,15 @@ standardized_plot <- Reduce(
     },
     unique(standardized_points$test),
     plotly::plot_ly()
-) |>
+)
+
+standardized_plot <- standardized_plot |>
     plotly::layout(
-        showlegend = FALSE,
+        showlegend = TRUE,
+        legend = list(
+            orientation = "h", x = 0.5, xanchor = "center",
+            y = 1.02, yanchor = "bottom"
+        ),
         xaxis = list(
             title = "leniency: higher \u2212 lower", tickformat = ".0%",
             zeroline = TRUE, zerolinecolor = "grey"
