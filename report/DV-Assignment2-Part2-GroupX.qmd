@@ -244,8 +244,26 @@ school_weighting |>
 
 *Describe how you explored the data before settling on your final visualization. Include at least one exploratory plot below (this can be the one from Part 1, or an updated one), and a short note on what it told you and how it influenced your final visualization.*
 
+For the pupils that got a test advice that differed from the provisional advice,
+we can check the share of pupils that got their advice raised.
+This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies
+and the overall compliance with that policy across the country.
+
 ```{r}
-#| label: exploratory-plot
+#| label: exploratory-setup
+#| include: false
+source("R/exploratory/data.R")
+source("R/exploratory/plots.R")
+```
+
+```{r}
+#| label: compliance-values
+compliance_heatmap
+```
+
+```{r}
+#| label: compliance-plot
+compliance_plot
 ```
 
 ## Final visualization

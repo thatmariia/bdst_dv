@@ -4227,6 +4227,9 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#duo-gap-matrix" id="toc-duo-gap-matrix" class="nav-link" data-scroll-target="#duo-gap-matrix">DUO gap matrix</a></li>
   <li><a href="#cvte-data" id="toc-cvte-data" class="nav-link" data-scroll-target="#cvte-data">CvTE data</a></li>
+  <li><a href="#duo-data" id="toc-duo-data" class="nav-link" data-scroll-target="#duo-data">DUO data</a></li>
+  <li><a href="#cito-data" id="toc-cito-data" class="nav-link" data-scroll-target="#cito-data">Cito data</a></li>
+  <li><a href="#inspectorate-data" id="toc-inspectorate-data" class="nav-link" data-scroll-target="#inspectorate-data">Inspectorate data</a></li>
   </ul></li>
   <li><a href="#exploratory-process" id="toc-exploratory-process" class="nav-link" data-scroll-target="#exploratory-process">Exploratory process</a></li>
   <li><a href="#final-visualization" id="toc-final-visualization" class="nav-link" data-scroll-target="#final-visualization">Final visualization</a></li>
@@ -4306,6 +4309,7 @@ window.Quarto = {
 </section>
 <section id="getting-data" class="level2">
 <h2 class="anchored" data-anchor-id="getting-data">Getting data</h2>
+<p>We use and derive the following tables from the mentioned sources:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -4436,7 +4440,7 @@ window.Quarto = {
 <tr class="even">
 <td style="text-align: left;">cito_misclassification</td>
 <td style="text-align: left;">Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D</td>
-<td style="text-align: left;">share of test advices that change when the score is redrawn with its standard error: 23.3%</td>
+<td style="text-align: left;">simulated share of changing test advices if the test was repeated with its standard error</td>
 <td style="text-align: left;">2022</td>
 <td style="text-align: left;">national (paper CET)</td>
 <td style="text-align: right;">7</td>
@@ -4580,48 +4584,940 @@ window.Quarto = {
 </table>
 </div>
 </div>
+<p>To compare the recommendations, we define two weight vectors <span class="math inline">\(v\)</span> and <span class="math inline">\(w\)</span> for the provisional advice <span class="math inline">\(i\)</span> and the test result <span class="math inline">\(j\)</span>, respectively. The weight vectors are defined as follows:</p>
+<p><span class="math display">\[
+v_i = (0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0),
+\]</span></p>
+<p><span class="math display">\[
+w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
+\]</span></p>
 </section>
 <section id="cvte-data" class="level3">
 <h3 class="anchored" data-anchor-id="cvte-data">CvTE data</h3>
-<p>For each test (separating the paper and digital versions), CvTE provides a table that shows the distribution of a test result <span class="math inline">\(j\)</span> for each provisional advice <span class="math inline">\(i\)</span>. A sample table is shown below.</p>
+<p>For each test (separating the paper and digital versions) and year, CvTE provides a table that shows the distribution of a test result <span class="math inline">\(j\)</span> for each provisional advice <span class="math inline">\(i\)</span>. A sample table is shown below.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cvte_conditional <span class="sc">|&gt;</span> <span class="fu">filter</span>(test_year <span class="sc">==</span> <span class="dv">2025</span> <span class="sc">&amp;</span> test <span class="sc">==</span> <span class="st">&quot;Lib digital&quot;</span> <span class="sc">&amp;</span> provisional <span class="sc">==</span> <span class="st">&quot;havo&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cvte_conditional <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(test_year <span class="sc">==</span> <span class="dv">2025</span> <span class="sc">&amp;</span> test <span class="sc">==</span> <span class="st">&quot;Lib digital&quot;</span> <span class="sc">&amp;</span> provisional <span class="sc">==</span> <span class="st">&quot;havo&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 6
-  test_year test        provisional test_advice    pct note 
-      &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;
-1      2025 Lib digital havo        pro/vmbo bb    0   &lt;NA&gt; 
-2      2025 Lib digital havo        vmbo bb/kb     0.3 &lt;NA&gt; 
-3      2025 Lib digital havo        vmbo kb/gt     8   &lt;NA&gt; 
-4      2025 Lib digital havo        vmbo gt/havo  56.9 &lt;NA&gt; 
-5      2025 Lib digital havo        havo/vwo      31   &lt;NA&gt; 
-6      2025 Lib digital havo        vwo            3.8 &lt;NA&gt; </code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">test</th>
+<th style="text-align: left;">provisional</th>
+<th style="text-align: left;">test_advice</th>
+<th style="text-align: right;">pct</th>
+<th style="text-align: left;">note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: left;">pro/vmbo bb</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: left;">vmbo bb/kb</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: left;">vmbo kb/gt</td>
+<td style="text-align: right;">8.0</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: left;">vmbo gt/havo</td>
+<td style="text-align: right;">56.9</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: left;">havo/vwo</td>
+<td style="text-align: right;">31.0</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: left;">vwo</td>
+<td style="text-align: right;">3.8</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<p>CvTE also provides a table showing the distribution of provisional advice <span class="math inline">\(i\)</span> for each test.</p>
+<p>CvTE also provides a table showing the distribution of provisional advice <span class="math inline">\(i\)</span> for each test and year.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(cvte_provisional, n = 50)</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>cvte_provisional <span class="sc">|&gt;</span> <span class="fu">filter</span>(test_year <span class="sc">==</span> <span class="dv">2025</span> <span class="sc">&amp;</span> test <span class="sc">==</span> <span class="st">&quot;Lib digital&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cvte_provisional <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(test_year <span class="sc">==</span> <span class="dv">2025</span> <span class="sc">&amp;</span> test <span class="sc">==</span> <span class="st">&quot;Lib digital&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10 × 4
-   test_year test        provisional    pct
-       &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;        &lt;dbl&gt;
- 1      2025 Lib digital pro            2.4
- 2      2025 Lib digital vmbo bb        6.2
- 3      2025 Lib digital vmbo bb/kb     5.9
- 4      2025 Lib digital vmbo kb        8.3
- 5      2025 Lib digital vmbo kb/gt     7.6
- 6      2025 Lib digital vmbo gt       13.5
- 7      2025 Lib digital vmbo gt/havo  12.3
- 8      2025 Lib digital havo          13.1
- 9      2025 Lib digital havo/vwo      13.4
-10      2025 Lib digital vwo           17.3</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">test</th>
+<th style="text-align: left;">provisional</th>
+<th style="text-align: right;">pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">pro</td>
+<td style="text-align: right;">2.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vmbo bb</td>
+<td style="text-align: right;">6.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vmbo bb/kb</td>
+<td style="text-align: right;">5.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vmbo kb</td>
+<td style="text-align: right;">8.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vmbo kb/gt</td>
+<td style="text-align: right;">7.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vmbo gt</td>
+<td style="text-align: right;">13.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vmbo gt/havo</td>
+<td style="text-align: right;">12.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo</td>
+<td style="text-align: right;">13.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">havo/vwo</td>
+<td style="text-align: right;">13.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: left;">vwo</td>
+<td style="text-align: right;">17.3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The number of pupils that have taken each test in a particular year is also provided.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cvte_pupils <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(test <span class="sc">==</span> <span class="st">&quot;Lib digital&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">test</th>
+<th style="text-align: right;">pupils</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: right;">31627</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2026</td>
+<td style="text-align: left;">Lib digital</td>
+<td style="text-align: right;">27140</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="duo-data" class="level3">
+<h3 class="anchored" data-anchor-id="duo-data">DUO data</h3>
+<p>DUO provides a table that shows the test provider used by each school for each year and the share of pupils that took that test.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>main_provider <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(provider, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(test_year, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;00AP&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 20%">
+<col style="width: 14%">
+<col style="width: 22%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: left;">location_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">provider</th>
+<th style="text-align: right;">main_share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">00AP</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2011</td>
+<td style="text-align: left;">Cito Eindtoets</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00AP</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">CET</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00AP</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2024</td>
+<td style="text-align: left;">LIB</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>They also provide a table that shows, for each school and year, the number of pupils that took each test. For some results, we do not have the number of pupils, but we do have a lower and upper bound (for <span class="math inline">\(n &lt; 5\)</span>).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>test_scores <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;00CD&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(provider, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 20%">
+<col style="width: 14%">
+<col style="width: 21%">
+<col style="width: 4%">
+<col style="width: 7%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: left;">location_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">provider</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">n_lo</th>
+<th style="text-align: right;">n_hi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">00CD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2011</td>
+<td style="text-align: left;">Cito Eindtoets</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00CD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: left;">CET</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00CD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">ROUTE 8</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00CD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2025</td>
+<td style="text-align: left;">LIB</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">26</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>DUO also provides a table that shows, for each school, year, and test provider, the share of pupils that were had their reading skills tested at the 2F level. It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for <span class="math inline">\(n &lt; 5\)</span>).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>reading_2f <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;00BA&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 10%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: left;">location_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">provider</th>
+<th style="text-align: right;">tested</th>
+<th style="text-align: right;">share_2f</th>
+<th style="text-align: right;">share_2f_lo</th>
+<th style="text-align: right;">share_2f_hi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">00BA</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">IEP</td>
+<td style="text-align: right;">24.0</td>
+<td style="text-align: right;">0.6666667</td>
+<td style="text-align: right;">0.6666667</td>
+<td style="text-align: right;">0.6666667</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00BA</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: left;">IEP</td>
+<td style="text-align: right;">25.0</td>
+<td style="text-align: right;">0.8000000</td>
+<td style="text-align: right;">0.8000000</td>
+<td style="text-align: right;">0.8000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00BA</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: left;">IEP</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00BA</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2019</td>
+<td style="text-align: left;">IEP</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">0.8484848</td>
+<td style="text-align: right;">0.7777778</td>
+<td style="text-align: right;">0.9333333</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>We also have a table that shows, for each school and year, the number of pupils whose test advice was higher/lower than the the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for <span class="math inline">\(n &lt; 5\)</span>). The table also shows the derived shares of the same numbers relative to the total number of pupils, the difference between the shares of pupils with higher and lower test advice, and the total disagreement share (sum).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>advice_reconsiderations <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;00DD&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 7%">
+<col style="width: 6%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: left;">location_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">higher</th>
+<th style="text-align: right;">higher_lo</th>
+<th style="text-align: right;">higher_hi</th>
+<th style="text-align: right;">lower</th>
+<th style="text-align: right;">lower_lo</th>
+<th style="text-align: right;">lower_hi</th>
+<th style="text-align: right;">raised</th>
+<th style="text-align: right;">raised_lo</th>
+<th style="text-align: right;">raised_hi</th>
+<th style="text-align: right;">up</th>
+<th style="text-align: right;">down</th>
+<th style="text-align: right;">raised_share</th>
+<th style="text-align: right;">lean</th>
+<th style="text-align: right;">disagreement</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">16.0</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.3555556</td>
+<td style="text-align: right;">0.2444444</td>
+<td style="text-align: right;">0.0555556</td>
+<td style="text-align: right;">0.1111111</td>
+<td style="text-align: right;">0.6000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">14.0</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">5.0</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.4375000</td>
+<td style="text-align: right;">0.1562500</td>
+<td style="text-align: right;">0.0781250</td>
+<td style="text-align: right;">0.2812500</td>
+<td style="text-align: right;">0.5937500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">23.0</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">13.0</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">0.6571429</td>
+<td style="text-align: right;">0.0714286</td>
+<td style="text-align: right;">0.3714286</td>
+<td style="text-align: right;">0.5857143</td>
+<td style="text-align: right;">0.7285714</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">16.0</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">5.0</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">11.0</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">0.4705882</td>
+<td style="text-align: right;">0.1470588</td>
+<td style="text-align: right;">0.3235294</td>
+<td style="text-align: right;">0.3235294</td>
+<td style="text-align: right;">0.6176471</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2019</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">8.0</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.2285714</td>
+<td style="text-align: right;">0.5142857</td>
+<td style="text-align: right;">0.0714286</td>
+<td style="text-align: right;">-0.2857143</td>
+<td style="text-align: right;">0.7428571</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">7.0</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.1944444</td>
+<td style="text-align: right;">0.5000000</td>
+<td style="text-align: right;">0.0694444</td>
+<td style="text-align: right;">-0.3055556</td>
+<td style="text-align: right;">0.6944444</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2022</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">9.0</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">15.0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">9.0</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0.2727273</td>
+<td style="text-align: right;">0.4545455</td>
+<td style="text-align: right;">0.2727273</td>
+<td style="text-align: right;">-0.1818182</td>
+<td style="text-align: right;">0.7272727</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2023</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">9.0</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">7.0</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">5.0</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.3600000</td>
+<td style="text-align: right;">0.2800000</td>
+<td style="text-align: right;">0.2000000</td>
+<td style="text-align: right;">0.0800000</td>
+<td style="text-align: right;">0.6400000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2024</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">15.0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.0806452</td>
+<td style="text-align: right;">0.4838710</td>
+<td style="text-align: right;">0.0806452</td>
+<td style="text-align: right;">-0.4032258</td>
+<td style="text-align: right;">0.5645161</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00DD</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2025</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">10.0</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.1388889</td>
+<td style="text-align: right;">0.5555556</td>
+<td style="text-align: right;">0.1388889</td>
+<td style="text-align: right;">-0.4166667</td>
+<td style="text-align: right;">0.6944444</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>DUO also supplies the table with final advice after revisions, which shows the number of pupils (with lower and upper bounds for <span class="math inline">\(n &lt; 5\)</span>) that received each final advice for each school and year.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>final_advice <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;00BB&quot;</span> <span class="sc">&amp;</span> advice <span class="sc">==</span> <span class="st">&quot;vmbo gt&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="fl">2.5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: left;">location_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: left;">advice</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">n_lo</th>
+<th style="text-align: right;">n_hi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">00BB</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2011</td>
+<td style="text-align: left;">vmbo gt</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00BB</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2012</td>
+<td style="text-align: left;">vmbo gt</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00BB</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: left;">vmbo gt</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00BB</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: left;">vmbo gt</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>We summarize the final advice table for a single school per year, showing the total number of pupils, mean advice, and shares of VWO and combined advice.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>advice_summary <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;31LH&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 16%">
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: left;">location_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: right;">pupils</th>
+<th style="text-align: right;">mean_advice</th>
+<th style="text-align: right;">share_vwo</th>
+<th style="text-align: right;">share_combined</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">31LH</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2020</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">2.000000</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">31LH</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">7.5</td>
+<td style="text-align: right;">3.666667</td>
+<td style="text-align: right;">0.3333333</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">31LH</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2022</td>
+<td style="text-align: right;">12.5</td>
+<td style="text-align: right;">3.100000</td>
+<td style="text-align: right;">0.2000000</td>
+<td style="text-align: right;">0.2000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">31LH</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2023</td>
+<td style="text-align: right;">12.5</td>
+<td style="text-align: right;">3.700000</td>
+<td style="text-align: right;">0.2000000</td>
+<td style="text-align: right;">0.2000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">31LH</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2024</td>
+<td style="text-align: right;">12.5</td>
+<td style="text-align: right;">3.400000</td>
+<td style="text-align: right;">0.2000000</td>
+<td style="text-align: right;">0.8000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">31LH</td>
+<td style="text-align: left;">00</td>
+<td style="text-align: right;">2025</td>
+<td style="text-align: right;">25.5</td>
+<td style="text-align: right;">3.715686</td>
+<td style="text-align: right;">0.0980392</td>
+<td style="text-align: right;">0.6078431</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="cito-data" class="level3">
+<h3 class="anchored" data-anchor-id="cito-data">Cito data</h3>
+<p>The simulated data from Cito shows how measurement uncertainty could change test advice. For each original test advice, they show the percentage of pupils that would receive a different or unchanged advice if the test was repeated.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cito_misclassification <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">test_advice</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">lower</th>
+<th style="text-align: right;">equal</th>
+<th style="text-align: right;">higher</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">pro/vmbo bb</td>
+<td style="text-align: right;">154</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">67.9</td>
+<td style="text-align: right;">32.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vmbo bb/kb</td>
+<td style="text-align: right;">6582</td>
+<td style="text-align: right;">2.3</td>
+<td style="text-align: right;">85.1</td>
+<td style="text-align: right;">12.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vmbo kb/gt</td>
+<td style="text-align: right;">11475</td>
+<td style="text-align: right;">9.6</td>
+<td style="text-align: right;">76.9</td>
+<td style="text-align: right;">13.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vmbo gt/havo</td>
+<td style="text-align: right;">15092</td>
+<td style="text-align: right;">12.3</td>
+<td style="text-align: right;">74.8</td>
+<td style="text-align: right;">12.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">havo/vwo</td>
+<td style="text-align: right;">11215</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">67.1</td>
+<td style="text-align: right;">14.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vwo</td>
+<td style="text-align: right;">10088</td>
+<td style="text-align: right;">15.5</td>
+<td style="text-align: right;">84.5</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">total</td>
+<td style="text-align: right;">54606</td>
+<td style="text-align: right;">12.3</td>
+<td style="text-align: right;">76.7</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="inspectorate-data" class="level3">
+<h3 class="anchored" data-anchor-id="inspectorate-data">Inspectorate data</h3>
+<p>The Inspectorate provides the data on socioeconomic weighting of schools. The higher the weighting, the more disadvantaged pupils are in that school. The table also supplies the spread of the socioeconomic weighting along with the number of pupils in that school.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>school_weighting <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(institution_code <span class="sc">==</span> <span class="st">&quot;00DN&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">institution_code</th>
+<th style="text-align: right;">test_year</th>
+<th style="text-align: right;">school_weighting</th>
+<th style="text-align: right;">spread</th>
+<th style="text-align: right;">pupils</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">00DN</td>
+<td style="text-align: right;">2023</td>
+<td style="text-align: right;">25.58</td>
+<td style="text-align: right;">5.81</td>
+<td style="text-align: right;">198</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">00DN</td>
+<td style="text-align: right;">2024</td>
+<td style="text-align: right;">26.00</td>
+<td style="text-align: right;">6.24</td>
+<td style="text-align: right;">193</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">00DN</td>
+<td style="text-align: right;">2025</td>
+<td style="text-align: right;">25.51</td>
+<td style="text-align: right;">5.96</td>
+<td style="text-align: right;">182</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </section>
@@ -4629,6 +5525,7 @@ window.Quarto = {
 <section id="exploratory-process" class="level2">
 <h2 class="anchored" data-anchor-id="exploratory-process">Exploratory process</h2>
 <p><em>Describe how you explored the data before settling on your final visualization. Include at least one exploratory plot below (this can be the one from Part 1, or an updated one), and a short note on what it told you and how it influenced your final visualization.</em></p>
+<p>For the pupils that got a test advice that differed from the provisional advice, we can check the share of pupils that got their advice raised / lowered. This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies and the overall compliance with that policy across the country.</p>
 </section>
 <section id="final-visualization" class="level2">
 <h2 class="anchored" data-anchor-id="final-visualization">Final visualization</h2>
