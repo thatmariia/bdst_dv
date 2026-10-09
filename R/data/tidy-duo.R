@@ -91,15 +91,15 @@ tidy_test_scores <- function(path) {
         transmute(
             across(all_of(school_year_key)),
             grade = as.integer(LEERJAAR),
-            provider = toupper(trimws(DOORSTROOMTOETS_PO)),
-            provider = recode(provider, "CITO EINDTOETS" = "CITO"),
+            provider = trimws(DOORSTROOMTOETS_PO),
             mean_score = as.numeric(GEMIDDELDE_UITSLAG),
             n_exempted = as.numeric(AANTAL_ONTHEFFINGEN),
             suppressed, n_lo, n_mid, n_hi
         )
 }
 
-#' Main provider per school-year: the one with most grade-8 pupils.
+#' Main provider per school-year: the one with most grade-8 pupils, ties
+#' broken alphabetically; main_share is its fraction of tested pupils.
 #' @param test_scores Output of tidy_test_scores().
 #' @return One row per school-year with provider and main_share.
 main_providers <- function(test_scores) {
@@ -107,7 +107,8 @@ main_providers <- function(test_scores) {
         filter(grade == 8L) |>
         group_by(across(all_of(school_year_key))) |>
         mutate(n_tested = sum(n_mid), main_share = n_mid / n_tested) |>
-        slice_max(n_mid, n = 1, with_ties = FALSE) |>
+        arrange(desc(n_mid), provider, .by_group = TRUE) |>
+        slice_head(n = 1) |>
         ungroup() |>
         select(all_of(school_year_key), provider, n_tested, main_share)
 }

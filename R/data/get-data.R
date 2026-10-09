@@ -11,7 +11,9 @@ library(tidyr)
 source("R/data/download.R")
 source("R/data/tidy-duo.R")
 source("R/data/check-sources.R")
-source("R/data/select-columns.R")
+source("R/data/filter-data.R")
+source("R/data/measures.R")
+source("R/data/sources.R")
 
 raw_dir <- "data/raw"
 
@@ -64,11 +66,19 @@ final_advice <- tidy_final_advice(paths[["final_advice"]])
 reference_levels <- tidy_reference_levels(paths[["reference_levels"]])
 school_weighting <- tidy_school_weighting(paths[["school_weighting"]])
 
-# Keep only what the study uses (main_provider needs the full test_scores).
-test_scores <- select_test_scores(test_scores)
-final_advice <- select_final_advice(final_advice)
-reference_levels <- select_reference_levels(reference_levels)
-school_weighting <- select_school_weighting(school_weighting)
+# ---- Conventions D1-D8 (R/data/filter-data.R, R/data/measures.R) ----
+# main_provider needs the unfiltered test_scores.
+advice_reconsiderations <- advice_reconsiderations |>
+    filter_reconsiderations(main_provider) |>
+    add_revision_shares()
+test_scores <- filter_test_scores(test_scores)
+main_provider <- regular_only(main_provider)
+final_advice <- filter_final_advice(final_advice)
+advice_summary <- summarise_final_advice(final_advice)
+reading_levels <- filter_reading_levels(reference_levels)
+reading_2f <- summarise_reading_2f(reading_levels)
+school_weighting <- filter_school_weighting(school_weighting)
+rm(reference_levels)
 
 # ---- Report tables (CvTE Terugblik 2025/2026, Cito 2022, DUO gap matrix) ----
 read_report_table <- function(name) {
@@ -79,7 +89,7 @@ read_report_table <- function(name) {
 }
 cvte_conditional <- read_report_table("cvte_conditional")
 cvte_provisional <- read_report_table("cvte_provisional")
-cvte_pupils <- read_report_table("cvte_pupils")
+cvte_pupils <- read_report_table("cvte_pupils") |> filter(test_year >= 2025)
 cvte_agreement <- read_report_table("cvte_agreement")
 cito_misclassification <- read_report_table("cito_misclassification")
 gap_cells <- read_report_table("gap_matrix")
@@ -93,9 +103,20 @@ stopifnot(!anyNA(gap_matrix))
 
 # ---- Checks between sources ----
 source_checks <- check_sources(
-    final_advice, advice_reconsiderations, main_provider, cvte_conditional,
+    advice_summary, advice_reconsiderations, cvte_conditional,
     cvte_provisional, cvte_pupils, cvte_agreement, cito_misclassification,
     gap_matrix
 )
 print(source_checks, n = Inf)
 if (!all(source_checks$ok)) stop("Sources disagree; see source_checks.")
+
+# ---- Source registry (data/sources.csv) ----
+sources <- read_sources()
+datasets <- unlist(sources$datasets)
+misclassified <- with(
+    filter(cito_misclassification, test_advice == "total"), lower + higher
+)
+sources_overview <- sources_table(
+    sources, mget(datasets),
+    values = list(misclassified = misclassified)
+)

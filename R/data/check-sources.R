@@ -45,8 +45,7 @@ cvte_test_shares <- function(year, conditional, provisional, pupils, gap) {
 
 #' Compare the sources against each other and against published figures.
 #' @return Tibble with one row per comparison, the two values, and ok.
-check_sources <- function(final_advice, reconsiderations, providers,
-                          conditional,
+check_sources <- function(advice_summary, reconsiderations, conditional,
                           provisional, pupils, agreement, misclassification,
                           gap) {
     check <- function(name, ours, reference, tolerance) {
@@ -56,13 +55,19 @@ check_sources <- function(final_advice, reconsiderations, providers,
         )
     }
 
-    # Combined advices jump when advice raising becomes mandatory (reference
-    # year 2023): regular-school pupils, all advice codes, suppressed cells
-    # at midpoint.
-    combined <- final_advice |>
-        filter(school_type == "regular", reference_year %in% 2022:2023) |>
-        group_by(reference_year) |>
-        summarise(pct = 100 * sum(n_mid[grepl("/", advice)]) / sum(n_mid))
+    # Year coding (D2): combined advices and raised advices should both
+    # jump most in reference year 2023, when raising became mandatory.
+    largest_jump <- function(data, value, weight) {
+        yearly <- data |>
+            summarise(
+                share = weighted.mean({{ value }}, {{ weight }}),
+                .by = reference_year
+            ) |>
+            arrange(reference_year)
+        yearly$reference_year[which.max(diff(yearly$share)) + 1]
+    }
+    combined_jump <- largest_jump(advice_summary, share_combined, pupils)
+    raised_jump <- largest_jump(reconsiderations, raised_share, total)
 
     # Gap matrix on CvTE's national 2026 table, with the provisional
     # distribution weighted by pupils per test and mode.
@@ -84,17 +89,11 @@ check_sources <- function(final_advice, reconsiderations, providers,
         group_by(provider) |>
         summarise(across(c(lower, higher), ~ weighted.mean(.x, pupils)))
     duo_2025 <- reconsiderations |>
-        filter(
-            school_type == "regular", reference_year == 2024L, total_mid > 0
-        ) |>
-        inner_join(
-            filter(providers, main_share >= 0.9),
-            by = school_year_key
-        ) |>
-        group_by(provider) |>
+        filter(reference_year == 2024L, main_share >= 0.9) |>
         summarise(
-            lower = 100 * sum(lower_mid) / sum(total_mid),
-            higher = 100 * sum(higher_mid) / sum(total_mid)
+            lower = 100 * sum(lower_mid) / sum(total),
+            higher = 100 * sum(higher_mid) / sum(total),
+            .by = provider
         )
     cross <- cvte_2025 |>
         inner_join(duo_2025, by = "provider", suffix = c("_cvte", "_duo")) |>
@@ -102,13 +101,13 @@ check_sources <- function(final_advice, reconsiderations, providers,
 
     total <- filter(misclassification, test_advice == "total")
     bind_rows(
-        check("DUO combined advices, reference year 2022 (%)",
-            combined$pct[1], 33.3,
-            tolerance = 0.1
+        check("Largest rise in combined advices (reference year)",
+            combined_jump, 2023,
+            tolerance = 0
         ),
-        check("DUO combined advices, reference year 2023 (%)",
-            combined$pct[2], 43.0,
-            tolerance = 0.1
+        check("Largest rise in raised advices (reference year)",
+            raised_jump, 2023,
+            tolerance = 0
         ),
         lapply(names(published), function(side) {
             check(

@@ -1,0 +1,9 @@
+source,content,years,unit,datasets
+DUO brin6_heroverweging (wpoheroverweging-v1),pupils with test advice higher / lower than the original advice; total pupils with advice and test score; advices raised,,school location × year,advice_reconsiderations
+DUO brin6_eindscores (wpo-eindscores),test used and pupils tested per test,,school × year × test,test_scores main_provider
+DUO brin6_advies (wpoadvies-v1),final advice (after revisions) per category,,school × year × advice,final_advice advice_summary
+DUO brin6_referentieniveau (wporeferentieniveau-v1),reading level reached (conventional outcome),,school × year × test,reading_levels reading_2f
+"Inspectorate, schoolweging 2022–2025",school composition index,,school × year,school_weighting
+"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",provisional × test advice per test and mode (row %); provisional advice per test; pupils per test,,national × test,cvte_conditional cvte_provisional cvte_pupils cvte_agreement
+"Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D",share of test advices that change when the score is redrawn with its standard error: {misclassified}%,2022,national (paper CET),cito_misclassification
+"DUO, conversion table (toelichting bestand nr. 11)",definition of “higher” and “lower”,–,matrix,gap_matrix

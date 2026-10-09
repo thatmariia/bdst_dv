@@ -4131,6 +4131,34 @@ vertical-align: -.125em;
 
 <section id="research-question" class="level2">
 <h2 class="anchored" data-anchor-id="research-question">Research question</h2>
+<p>At the end of the primary school, Dutch pupils receive judgements about the suitability of different secondary school levels. This recommendation is based on two sources:</p>
+<ul>
+<li>the advice of the primary school teacher <em>(voorlopig schooladvies)</em>,</li>
+<li>the results of a standardized test <em>(doorstroomtoets)</em>, which arrives about a month later.</li>
+</ul>
+<p>Dutch secondary schools are ordinally divided into four main tracks:</p>
+<ul>
+<li>PRO <em>(praktijkonderwijs)</em>,</li>
+<li>VMBO-B <em>(basisberoepsgerichte leerweg)</em></li>
+<li>VMBO-K <em>(kaderberoepsgerichte leerweg)</em>,</li>
+<li>VMBO-GT <em>(gemengde/theoretische leerweg)</em>,</li>
+<li>HAVO <em>(hoger algemeen voortgezet onderwijs)</em>,</li>
+<li>VWO <em>(voorbereidend wetenschappelijk onderwijs)</em>.</li>
+</ul>
+<p>The teacher’s provisional advice can be a single track or a combination of two tracks (nine options). In contrast, the test results are always reported as a combination of two tracks or single VWO (six options). When the two sources disagree, the final advice is normally determined as follows:</p>
+<ul>
+<li>if the teacher’s advice is higher than the test result, nothing changes;</li>
+<li>if the teacher’s advice is lower than the test result, the teacher should raise their advice.</li>
+</ul>
+<p>This asymmetrical up-only method has been implemented since the academic year 2023/2024. Before that year, the raising of the advice was optional.</p>
+<p>Each school can choose which test provider to use, and the test is administered by the school itself. Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8. Furthermore, IEP and Lib are available in both paper and digital versions. The College voor Toetsen en Examens (CvTE) provides a framework for matching the results of the different test providers to the same reference levels. However, the CvTE has also published a report that shows that pupils with the same provisional advice receive different different test results depending on the test provider. It is unclear whether this is due to differences in the test providers, or due to differences in the schools that use those providers.</p>
+<p>There are three main sources of potential disagreement between the teacher’s advice and the test result:</p>
+<ul>
+<li>the teachers’ advice is based on different rubrics,</li>
+<li>the tests have different providers,</li>
+<li>both teachers and tests make mistakes.</li>
+</ul>
+<p>The present research question is to attempt to quantify the impact of each source of disagreement.</p>
 <p><em>What are you investigating, and why does it matter? Who is the target audience for your final visualization, and how does that shape your choices? You can start from what you wrote in Part 1.</em></p>
 </section>
 <section id="getting-data" class="level2">
@@ -4138,29 +4166,97 @@ vertical-align: -.125em;
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;advice_reconsiderations&quot;</span>, <span class="st">&quot;test_scores&quot;</span>, <span class="st">&quot;main_provider&quot;</span>, <span class="st">&quot;final_advice&quot;</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;reference_levels&quot;</span>, <span class="st">&quot;school_weighting&quot;</span>, <span class="st">&quot;cvte_conditional&quot;</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;cvte_provisional&quot;</span>, <span class="st">&quot;cvte_pupils&quot;</span>, <span class="st">&quot;cvte_agreement&quot;</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;cito_misclassification&quot;</span>, <span class="st">&quot;gap_matrix&quot;</span>, <span class="st">&quot;source_checks&quot;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>describe <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">get</span>(x))</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    types <span class="ot">&lt;-</span> <span class="fu">vapply</span>(x, pillar<span class="sc">::</span>type_sum, <span class="st">&quot;&quot;</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="fu">names</span>(x), <span class="st">&quot; (&quot;</span>, types, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> datasets,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vapply</span>(datasets, \(x) <span class="fu">NROW</span>(<span class="fu">get</span>(x)), <span class="dv">0</span>),</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">vapply</span>(datasets, describe, <span class="st">&quot;&quot;</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>), <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sources_overview)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 7%">
-<col style="width: 2%">
-<col style="width: 90%">
+<col style="width: 24%">
+<col style="width: 51%">
+<col style="width: 13%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">source</th>
+<th style="text-align: left;">content</th>
+<th style="text-align: left;">years</th>
+<th style="text-align: left;">unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DUO brin6_heroverweging (wpoheroverweging-v1)</td>
+<td style="text-align: left;">pupils with test advice higher / lower than the original advice; total pupils with advice and test score; advices raised</td>
+<td style="text-align: left;">test years 2015–2025 (no 2020)</td>
+<td style="text-align: left;">school location × year</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DUO brin6_eindscores (wpo-eindscores)</td>
+<td style="text-align: left;">test used and pupils tested per test</td>
+<td style="text-align: left;">test years 2011–2025 (no 2020)</td>
+<td style="text-align: left;">school × year × test</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DUO brin6_advies (wpoadvies-v1)</td>
+<td style="text-align: left;">final advice (after revisions) per category</td>
+<td style="text-align: left;">test years 2011–2025</td>
+<td style="text-align: left;">school × year × advice</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DUO brin6_referentieniveau (wporeferentieniveau-v1)</td>
+<td style="text-align: left;">reading level reached (conventional outcome)</td>
+<td style="text-align: left;">test years 2016–2025 (no 2020)</td>
+<td style="text-align: left;">school × year × test</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Inspectorate, schoolweging 2022–2025</td>
+<td style="text-align: left;">school composition index</td>
+<td style="text-align: left;">test years 2023–2025</td>
+<td style="text-align: left;">school × year</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026</td>
+<td style="text-align: left;">provisional × test advice per test and mode (row %); provisional advice per test; pupils per test</td>
+<td style="text-align: left;">test years 2025–2026</td>
+<td style="text-align: left;">national × test</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D</td>
+<td style="text-align: left;">share of test advices that change when the score is redrawn with its standard error: 23.3%</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">national (paper CET)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DUO, conversion table (toelichting bestand nr. 11)</td>
+<td style="text-align: left;">definition of “higher” and “lower”</td>
+<td style="text-align: left;">–</td>
+<td style="text-align: left;">matrix</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>describe <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">get</span>(x))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    types <span class="ot">&lt;-</span> <span class="fu">vapply</span>(x, pillar<span class="sc">::</span>type_sum, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="fu">names</span>(x), <span class="st">&quot; (&quot;</span>, types, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> datasets,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vapply</span>(datasets, \(x) <span class="fu">NROW</span>(<span class="fu">get</span>(x)), <span class="dv">0</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">vapply</span>(datasets, describe, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>), <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 1%">
+<col style="width: 93%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -4172,32 +4268,42 @@ vertical-align: -.125em;
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">advice_reconsiderations</td>
-<td style="text-align: right;">64,534</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), total_lo (dbl), total_mid (dbl), total_hi (dbl), higher_lo (dbl), higher_mid (dbl), higher_hi (dbl), lower_lo (dbl), lower_mid (dbl), lower_hi (dbl), raised_lo (dbl), raised_mid (dbl), raised_hi (dbl)</td>
+<td style="text-align: right;">61,108</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), total (dbl), higher_lo (dbl), higher_mid (dbl), higher_hi (dbl), lower_lo (dbl), lower_mid (dbl), lower_hi (dbl), raised_lo (dbl), raised_mid (dbl), raised_hi (dbl), provider (chr), main_share (dbl), in_provider_analysis (lgl), up (dbl), up_lo (dbl), up_hi (dbl), down (dbl), down_lo (dbl), down_hi (dbl), raised_share (dbl), raised_share_lo (dbl), raised_share_hi (dbl), lean (dbl), disagreement (dbl)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">test_scores</td>
-<td style="text-align: right;">92,554</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), provider (chr), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+<td style="text-align: right;">89,897</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">main_provider</td>
-<td style="text-align: right;">90,118</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), provider (chr), n_tested (dbl), main_share (dbl)</td>
+<td style="text-align: right;">87,596</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), n_tested (dbl), main_share (dbl)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">final_advice</td>
-<td style="text-align: right;">647,750</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), advice (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+<td style="text-align: right;">619,698</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), advice (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">reference_levels</td>
-<td style="text-align: right;">436,809</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), provider (chr), subject (chr), level (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+<td style="text-align: left;">advice_summary</td>
+<td style="text-align: right;">96,221</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), pupils (dbl), mean_advice (dbl), share_vwo (dbl), share_combined (dbl)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reading_levels</td>
+<td style="text-align: right;">128,354</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), level (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">reading_2f</td>
+<td style="text-align: right;">56,943</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), tested (dbl), share_2f (dbl), share_2f_lo (dbl), share_2f_hi (dbl)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">school_weighting</td>
-<td style="text-align: right;">18,936</td>
+<td style="text-align: right;">17,040</td>
 <td style="text-align: left;">institution_code (chr), reference_year (int), test_year (int), school_weighting (dbl), spread (dbl), pupils (dbl)</td>
 </tr>
 <tr class="odd">
@@ -4212,7 +4318,7 @@ vertical-align: -.125em;
 </tr>
 <tr class="odd">
 <td style="text-align: left;">cvte_pupils</td>
-<td style="text-align: right;">28</td>
+<td style="text-align: right;">21</td>
 <td style="text-align: left;">test_year (dbl), test (chr), pupils (dbl)</td>
 </tr>
 <tr class="even">
@@ -4229,11 +4335,6 @@ vertical-align: -.125em;
 <td style="text-align: left;">gap_matrix</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: left;">pro/vmbo bb (dbl), vmbo bb/kb (dbl), vmbo kb/gt (dbl), vmbo gt/havo (dbl), havo/vwo (dbl), vwo (dbl)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">source_checks</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: left;">check (chr), ours (dbl), reference (dbl), tolerance (dbl), ok (lgl)</td>
 </tr>
 </tbody>
 </table>
