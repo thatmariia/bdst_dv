@@ -82,11 +82,18 @@ The present research question is to attempt to quantify the impact of each sourc
 ## Getting data
 
 We use and derive the following tables from the mentioned sources:
+CvTE, DUO, the Inspectorate, and Cito.
 
+::: {.callout-note collapse="true" appearance="minimal"}
+## Data sources
 ```{r}
 #| label: data-overview
 knitr::kable(data_overview, format.args = list(big.mark = ","))
 ```
+:::
+
+::: {.callout-note collapse="true" appearance="minimal"}
+## Data tables
 
 ### DUO gap matrix
 
@@ -110,6 +117,8 @@ $$
 $$
 w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
 $$
+
+The mismatch between the provisional advice and the test result is what constitutes the category design source of disagreement.
 
 ### CvTE data
 
@@ -239,16 +248,9 @@ school_weighting |>
     filter(institution_code == "00DN") |>
     knitr::kable()
 ```
-
+:::
 
 ## Exploratory process
-
-*Describe how you explored the data before settling on your final visualization. Include at least one exploratory plot below (this can be the one from Part 1, or an updated one), and a short note on what it told you and how it influenced your final visualization.*
-
-For the pupils that got a test advice that differed from the provisional advice,
-we can check the share of pupils that got their advice raised.
-This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies
-and the overall compliance with that policy across the country.
 
 ```{r}
 #| label: exploratory-setup
@@ -256,6 +258,11 @@ and the overall compliance with that policy across the country.
 # plot functions, plus the datasets compliance, joint, and standardized
 source("R/exploratory/setup.R")
 ```
+
+For the pupils that got a test advice that differed from the provisional advice,
+we can check the share of pupils that got their advice raised.
+This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies
+and the overall compliance with that policy across the country.
 
 ```{r}
 #| label: compliance-values
@@ -269,6 +276,18 @@ compliance_heatmap(compliance)
 #| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
 compliance_plot(compliance)
 ```
+
+```{r}
+#| label: compliance-measures
+#| include: false
+comp_m <- compliance_measures(compliance)
+filter(comp_m, type == "higher")
+```
+
+There is a substantial disagreement between the teacher's provisional advice and the test result in both directions.
+Throughout the recorded years, the minimum percentage of pupils with a higher test advice than the provisional advice is
+`{r} sprintf("%.1f", min(filter(comp_m, type == "higher")$lo) * 100)`%, and a lower test advice than the provisional advice is
+`{r} sprintf("%.1f", min(filter(comp_m, type == "lower")$lo) * 100)`%.
 
 ---
 
