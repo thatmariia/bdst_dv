@@ -44,3 +44,22 @@ country_joint <- function(year) {
         inner_join(gap_long, by = c("provisional", "test_advice")) |>
         mutate(share = m * p)
 }
+
+#' Revision shares per test and mode, standardised to the national
+#' provisional advice distribution: h = sum m(i) P(j | i) over cells where the
+#' test advice is higher (gap > 0), l the same for lower, leniency = h - l,
+#' and disagreement = h + l.
+standardized <- cvte_conditional |>
+    filter(test %in% unlist(tests)) |>
+    group_by(test_year, test, provisional) |>
+    mutate(p = pct / sum(pct)) |>
+    ungroup() |>
+    inner_join(country_provisional, by = c("test_year", "provisional")) |>
+    inner_join(gap_long, by = c("provisional", "test_advice")) |>
+    group_by(test_year, test) |>
+    summarise(
+        higher = sum(m * p * (gap > 0)),
+        lower = sum(m * p * (gap < 0)),
+        .groups = "drop"
+    ) |>
+    mutate(leniency = higher - lower, disagreement = higher + lower)

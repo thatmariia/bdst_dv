@@ -255,6 +255,7 @@ and the overall compliance with that policy across the country.
 source("R/exploratory/data.R")
 source("R/exploratory/plots_compliance.R")
 source("R/exploratory/plots_joint.R")
+source("R/exploratory/plots_standard.R")
 ```
 
 ```{r}
@@ -269,11 +270,45 @@ compliance_heatmap
 compliance_plot
 ```
 
+---
+
 ```{r}
 #| label: joint-plot
 #| fig-cap: "Distributions of provisional and test advice by test year (use the slider to switch years)."  # nolint: line_length_linter
 joint_plot()
 ```
+
+---
+
+Standardise for a test $p$:
+
+$$
+h_p = \sum_{i, j : G(i, j) > 0} \bar{m}(i) P_p (j | i),
+$$
+
+$$
+\ell_p = \sum_{i, j : G(i, j) < 0} \bar{m}(i) P_p (j | i),
+$$
+
+where $\bar{m}(i)$ is the share of pupils with provisional advice $i$ and
+$P_p (j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$ for test $p$.
+Then we can define
+
+$$
+\text{leniency}_p = h_p - \ell_p,
+$$
+
+$$
+\text{diff}_p = h_p + \ell_p.
+$$
+
+```{r}
+#| label: standardized
+#| fig-cap: "Standardised leniency and disagreement per test (2025 to 2026)."
+standardized_plot
+```
+
+
 
 ## Final visualization
 
