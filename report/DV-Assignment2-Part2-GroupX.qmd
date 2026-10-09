@@ -252,23 +252,21 @@ and the overall compliance with that policy across the country.
 ```{r}
 #| label: exploratory-setup
 #| include: false
-source("R/exploratory/data.R")
-source("R/exploratory/plots_compliance.R")
-source("R/exploratory/plots_joint.R")
-source("R/exploratory/plots_standard.R")
+# plot functions, plus the datasets compliance, joint, and standardized
+source("R/exploratory/setup.R")
 ```
 
 ```{r}
 #| label: compliance-values
-#| fig-height: 1.6
-#| fig-cap: "Compliance with the policy of raising the advice with a higher test result."  # nolint: line_length_linter
-compliance_heatmap
+#| fig-height: 2
+#| fig-cap: "Compliance with raising the advice after a higher test result, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
+compliance_heatmap(compliance)
 ```
 
 ```{r}
 #| label: compliance-plot
-#| fig-cap: "Shares of pupils with a lower/higher test advice and with a raised advice. Bands: bounds for n < 5."  # nolint: line_length_linter
-compliance_plot
+#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
+compliance_plot(compliance)
 ```
 
 ---
@@ -276,9 +274,20 @@ compliance_plot
 ```{r}
 #| label: joint-plot
 #| fig-height: 9
-#| fig-cap: "Distributions of provisional and test advice by test year (use the slider to switch years)."  # nolint: line_length_linter
-joint_plot()
+#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (use the slider to switch years). Source: CvTE Terugblik normering doorstroomtoetsen 2025 and 2026; DUO conversion table."  # nolint: line_length_linter
+joint_plot(joint)
 ```
+
+::: {.callout-note collapse="true" appearance="minimal"}
+## Data table
+
+```{r}
+#| label: joint-table
+joint |>
+    select(test_year, provisional, test_advice, gap, share) |>
+    knitr::kable(digits = 4)
+```
+:::
 
 ---
 
@@ -306,9 +315,18 @@ $$
 
 ```{r}
 #| label: standardized
-#| fig-cap: "Standardised leniency and disagreement per test: open circles 2025, filled 2026, arrows from 2025 to 2026."  # nolint: line_length_linter
-standardized_plot
+#| fig-cap: "Standardised leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE Terugblik normering doorstroomtoetsen 2025 and 2026; DUO conversion table."  # nolint: line_length_linter
+standardized_plot(standardized)
 ```
+
+::: {.callout-note collapse="true" appearance="minimal"}
+## Data table
+
+```{r}
+#| label: standardized-table
+knitr::kable(standardized, digits = 4)
+```
+:::
 
 
 
