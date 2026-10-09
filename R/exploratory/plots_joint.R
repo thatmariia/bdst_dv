@@ -19,11 +19,13 @@ comparison_colours <- c(
     "test higher" = pal[["red"]]
 )
 
-#' Interactive joint distribution of provisional and test advice in one test
-#' year: dot area is the share of pupils; cells under 0.05% of pupils are left
-#' out. Hover shows both advices and the shares.
-joint_plot <- function(year) {
-    joint <- country_joint(year)
+#' Interactive joint distribution of provisional and test advice: dot area is
+#' the share of pupils (same scale in every year); cells under 0.05% of pupils
+#' are left out. Hover shows both advices and the shares; a slider selects the
+#' test year.
+#' @param years Test years to include; defaults to all with CvTE tables.
+joint_plot <- function(years = sort(unique(cvte_conditional$test_year))) {
+    joint <- bind_rows(lapply(years, country_joint))
     unknown <- c(
         setdiff(joint$provisional, provisional_levels),
         setdiff(joint$test_advice, test_advice_levels)
@@ -58,7 +60,8 @@ joint_plot <- function(year) {
         # text is for the plotly tooltip; ggplot2 only checks layer aesthetics.
         ggplot(aes(
             test_advice, provisional,
-            size = share, colour = comparison, text = tooltip
+            size = share, colour = comparison, text = tooltip,
+            frame = test_year, ids = paste(provisional, test_advice)
         )) +
         geom_point() +
         scale_x_discrete(labels = short_advice) +
@@ -77,9 +80,13 @@ joint_plot <- function(year) {
             legend.position = "bottom"
         )
 
-    # plotly ignores legend.position, so the legend is moved below here.
+    # plotly ignores legend.position, so the legend is moved below here. The
+    # frames act as a year selector: no play button, no transition.
     plotly::ggplotly(plot, tooltip = "text") |>
         plotly::layout(legend = list(
             orientation = "h", x = 0.5, xanchor = "center", y = -0.3
-        ))
+        )) |>
+        plotly::animation_opts(frame = 0, transition = 0, redraw = TRUE) |>
+        plotly::animation_button(visible = FALSE) |>
+        plotly::animation_slider(currentvalue = list(prefix = "Test year: "))
 }

@@ -270,9 +270,9 @@ compliance_plot
 ```
 
 ```{r}
-#| label: joint-2026
-#| fig-cap: "Distributions of provisional and conditional advice for 2026."  # nolint: line_length_linter
-joint_plot(2026)
+#| label: joint-plot
+#| fig-cap: "Distributions of provisional and test advice by test year (use the slider to switch years)."  # nolint: line_length_linter
+joint_plot()
 ```
 
 ## Final visualization
