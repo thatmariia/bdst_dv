@@ -272,7 +272,7 @@ compliance_heatmap(compliance)
 ```
 
 ```{r}
-#| label: compliance-plot
+#| label: fig-compliance-plot
 #| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
 compliance_plot(compliance)
 ```
@@ -338,6 +338,8 @@ $$
 $$
 \text{disagreement}_p = h_p + \ell_p.
 $$
+
+The measure of disagreement matches that of @fig-compliance-plot.
 
 ```{r}
 #| label: standardized
