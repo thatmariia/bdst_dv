@@ -1,7 +1,7 @@
-# Downloads the DUO and schoolweging files into data/raw/ (skipping files that
-# are already there), tidies them, reads the report tables in data/reports/
-# (made once by the gitignored R/data/one-off/), and checks the sources
-# against each other. Run from the project root.
+# Downloads the DUO and school weighting (schoolweging) files into data/raw/
+# (skipping files that are already there), tidies them, reads the report
+# tables in data/reports/ (made once by the gitignored R/data/one-off/), and
+# checks the sources against each other. Run from the project root.
 library(dplyr)
 library(jsonlite)
 library(readr)
@@ -23,12 +23,12 @@ duo_resource_url <- function(id) {
 }
 
 duo_datasets <- c(
-    heroverwegingen = "wpoheroverweging-v1",
-    eindscores = "wpo-eindscores",
-    schooladviezen = "wpoadvies-v1",
-    referentieniveaus = "wporeferentieniveau-v1"
+    advice_reconsiderations = "wpoheroverweging-v1",
+    test_scores = "wpo-eindscores",
+    final_advice = "wpoadvies-v1",
+    reference_levels = "wporeferentieniveau-v1"
 )
-schoolweging_url <- paste0(
+school_weighting_url <- paste0(
     "https://www.onderwijsinspectie.nl/site/binaries/site-content/",
     "collections/documents/2026/02/09/",
     "schoolweging-2022-2023---2023-2024---2024-2025/",
@@ -36,13 +36,13 @@ schoolweging_url <- paste0(
 )
 
 paths <- file.path(raw_dir, c(
-    heroverwegingen = "brin6_heroverweging.csv",
-    eindscores = "brin6_eindscores.csv",
-    schooladviezen = "brin6_advies.csv",
-    referentieniveaus = "brin6_referentieniveau.csv",
-    schoolweging = "schoolweging_2022-2025.ods"
+    advice_reconsiderations = "brin6_heroverweging.csv",
+    test_scores = "brin6_eindscores.csv",
+    final_advice = "brin6_advies.csv",
+    reference_levels = "brin6_referentieniveau.csv",
+    school_weighting = "schoolweging_2022-2025.ods"
 ))
-names(paths) <- c(names(duo_datasets), "schoolweging")
+names(paths) <- c(names(duo_datasets), "school_weighting")
 
 # Only ask the DUO API for a URL when the file still needs downloading.
 for (name in names(duo_datasets)) {
@@ -50,16 +50,18 @@ for (name in names(duo_datasets)) {
         download_file(duo_resource_url(duo_datasets[[name]]), paths[[name]])
     }
 }
-download_file(schoolweging_url, paths[["schoolweging"]])
+download_file(school_weighting_url, paths[["school_weighting"]])
 
-# ---- DUO school files and schoolweging ----
-# test_year = PEILJAAR + 1; suppressed counts carry n_lo/n_mid/n_hi.
-heroverwegingen <- tidy_heroverwegingen(paths[["heroverwegingen"]])
-eindscores <- tidy_eindscores(paths[["eindscores"]])
-main_provider <- main_providers(eindscores)
-schooladviezen <- tidy_advies(paths[["schooladviezen"]])
-referentieniveaus <- tidy_referentieniveaus(paths[["referentieniveaus"]])
-schoolweging <- tidy_schoolweging(paths[["schoolweging"]])
+# ---- DUO school files and school weighting ----
+# test_year = reference_year + 1; suppressed counts carry n_lo/n_mid/n_hi.
+advice_reconsiderations <- tidy_advice_reconsiderations(
+    paths[["advice_reconsiderations"]]
+)
+test_scores <- tidy_test_scores(paths[["test_scores"]])
+main_provider <- main_providers(test_scores)
+final_advice <- tidy_final_advice(paths[["final_advice"]])
+reference_levels <- tidy_reference_levels(paths[["reference_levels"]])
+school_weighting <- tidy_school_weighting(paths[["school_weighting"]])
 
 # ---- Report tables (CvTE Terugblik 2025/2026, Cito 2022, DUO gap matrix) ----
 read_report_table <- function(name) {
@@ -84,7 +86,7 @@ stopifnot(!anyNA(gap_matrix))
 
 # ---- Checks between sources ----
 source_checks <- check_sources(
-    schooladviezen, heroverwegingen, main_provider, cvte_conditional,
+    final_advice, advice_reconsiderations, main_provider, cvte_conditional,
     cvte_provisional, cvte_pupils, cvte_agreement, cito_misclassification,
     gap_matrix
 )

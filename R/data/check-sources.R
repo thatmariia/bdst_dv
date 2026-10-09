@@ -27,7 +27,7 @@ cvte_matrix <- function(table, year, name) {
 #' @return Tibble with test, pupils, lower, equal, and higher.
 cvte_test_shares <- function(year, conditional, provisional, pupils, gap) {
     tests <- unique(conditional$test[conditional$test_year == year])
-    tests <- setdiff(tests, "Landelijk")
+    tests <- setdiff(tests, "national")
     bind_rows(lapply(tests, function(name) {
         shares <- gap_shares(
             cvte_matrix(provisional, year, name),
@@ -45,7 +45,8 @@ cvte_test_shares <- function(year, conditional, provisional, pupils, gap) {
 
 #' Compare the sources against each other and against published figures.
 #' @return Tibble with one row per comparison, the two values, and ok.
-check_sources <- function(advies, heroverwegingen, providers, conditional,
+check_sources <- function(final_advice, reconsiderations, providers,
+                          conditional,
                           provisional, pupils, agreement, misclassification,
                           gap) {
     check <- function(name, ours, reference, tolerance) {
@@ -55,11 +56,12 @@ check_sources <- function(advies, heroverwegingen, providers, conditional,
         )
     }
 
-    # Combined advices jump when advice raising becomes mandatory (PEILJAAR
-    # 2023): BO pupils, all advice codes, suppressed cells at midpoint.
-    combined <- advies |>
-        filter(type_po == "BO", peiljaar %in% 2022:2023) |>
-        group_by(peiljaar) |>
+    # Combined advices jump when advice raising becomes mandatory (reference
+    # year 2023): regular-school pupils, all advice codes, suppressed cells
+    # at midpoint.
+    combined <- final_advice |>
+        filter(school_type == "regular", reference_year %in% 2022:2023) |>
+        group_by(reference_year) |>
         summarise(pct = 100 * sum(n_mid[grepl("/", advice)]) / sum(n_mid))
 
     # Gap matrix on CvTE's national 2026 table, with the provisional
@@ -69,7 +71,7 @@ check_sources <- function(advies, heroverwegingen, providers, conditional,
         n * cvte_matrix(provisional, 2026, name) / 100
     }, tests_2026$test, tests_2026$pupils))
     national <- gap_shares(
-        national_marginal, cvte_matrix(conditional, 2026, "Landelijk"), gap
+        national_marginal, cvte_matrix(conditional, 2026, "national"), gap
     )
     published <- setNames(agreement$pct, agreement$comparison)
 
@@ -81,8 +83,10 @@ check_sources <- function(advies, heroverwegingen, providers, conditional,
         mutate(provider = toupper(sub(" .*$", "", test))) |>
         group_by(provider) |>
         summarise(across(c(lower, higher), ~ weighted.mean(.x, pupils)))
-    duo_2025 <- heroverwegingen |>
-        filter(type_po == "BO", peiljaar == 2024L, total_mid > 0) |>
+    duo_2025 <- reconsiderations |>
+        filter(
+            school_type == "regular", reference_year == 2024L, total_mid > 0
+        ) |>
         inner_join(
             filter(providers, main_share >= 0.9),
             by = school_year_key
@@ -96,12 +100,14 @@ check_sources <- function(advies, heroverwegingen, providers, conditional,
         inner_join(duo_2025, by = "provider", suffix = c("_cvte", "_duo")) |>
         filter(provider %in% c("LIB", "IEP"))
 
-    total <- filter(misclassification, test_advice == "totaal")
+    total <- filter(misclassification, test_advice == "total")
     bind_rows(
-        check("DUO combined advices, PEILJAAR 2022 (%)", combined$pct[1], 33.3,
+        check("DUO combined advices, reference year 2022 (%)",
+            combined$pct[1], 33.3,
             tolerance = 0.1
         ),
-        check("DUO combined advices, PEILJAAR 2023 (%)", combined$pct[2], 43.0,
+        check("DUO combined advices, reference year 2023 (%)",
+            combined$pct[2], 43.0,
             tolerance = 0.1
         ),
         lapply(names(published), function(side) {
