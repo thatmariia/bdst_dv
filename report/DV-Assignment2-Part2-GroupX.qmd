@@ -80,6 +80,8 @@ The present research question is to attempt to quantify the impact of each sourc
 
 ## Getting data
 
+We use and derive the following tables from the mentioned sources:
+
 ```{r}
 #| label: data-overview
 knitr::kable(data_overview, format.args = list(big.mark = ","))
