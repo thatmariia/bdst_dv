@@ -29,7 +29,7 @@ library(ggplot2)
 source("R/data/get-data.R")
 ```
 
-## Research question
+## Introduction
 
 At the end of the primary school, Dutch pupils receive judgements about the suitability of different secondary school levels.
 This recommendation is based on two sources:
@@ -46,7 +46,7 @@ Dutch secondary schools are ordinally divided into four main tracks:
 - HAVO *(hoger algemeen voortgezet onderwijs)*,
 - VWO *(voorbereidend wetenschappelijk onderwijs)*.
 
-The teacher's provisional advice can be a single track or a combination of two tracks (nine options).
+The teacher's provisional advice can be a single track or a combination of two tracks (ten options).
 In contrast, the test results are always reported as a combination of two tracks or single VWO (six options).
 When the two sources disagree, the final advice is normally determined as follows:
 
@@ -66,11 +66,12 @@ advice receive different different test results depending on the test provider.
 It is unclear whether this is due to differences in the test providers, or due to
 differences in the schools that use those providers.
 
-There are three main sources of potential disagreement between the teacher's advice and the test result:
+There are four main sources of potential disagreement between the teacher's advice and the test result:
 
-- the teachers' advice is based on different rubrics,
+- the teacher's advice has a different scale than the test result,
 - the tests have different providers,
-- both teachers and tests make mistakes.
+- teachers can make mistakes, and
+- the tests have measurement uncertainty.
 
 The present research question is to attempt to quantify the impact of each source of disagreement.
 
