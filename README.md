@@ -29,3 +29,5 @@ Architecture:
 - `R/`: download, prepare, and plot the data.
 - `report/`: the R Markdown notebook.
 - `data/raw/`: downloaded data, excluded from Git.
+- `data/reports/`: tables parsed from the CvTE, Cito, and DUO PDF reports,
+  kept in Git. They were made once by the (gitignored) code in `R/one-off/`.

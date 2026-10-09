@@ -1,10 +1,16 @@
-# Downloads the doorstroomtoets sources into data/raw/ (skipping files that are
-# already there) and loads them. Run from the project root.
+# Downloads the DUO and schoolweging files into data/raw/ (skipping files that
+# are already there), tidies them, reads the report tables in data/reports/
+# (made once by the gitignored R/one-off/), and checks the sources against each
+# other. Run from the project root.
+library(dplyr)
 library(jsonlite)
 library(readr)
 library(readODS)
+library(tidyr)
 
 source("R/download.R")
+source("R/tidy-duo.R")
+source("R/check-sources.R")
 
 raw_dir <- "data/raw"
 
@@ -22,18 +28,11 @@ duo_datasets <- c(
     schooladviezen = "wpoadvies-v1",
     referentieniveaus = "wporeferentieniveau-v1"
 )
-other_sources <- c(
-    schoolweging = paste0(
-        "https://www.onderwijsinspectie.nl/site/binaries/site-content/",
-        "collections/documents/2026/02/09/",
-        "schoolweging-2022-2023---2023-2024---2024-2025/",
-        "schoolweging-2022-2023-2024.ods"
-    ),
-    toetsadvies_tabellen = paste0(
-        "https://duo.nl/open_onderwijsdata/images/",
-        "tabellen-toetsscore-naar-toetsadvies-heroverwegingen-en-bijgestelde-",
-        "adviezen.pdf"
-    )
+schoolweging_url <- paste0(
+    "https://www.onderwijsinspectie.nl/site/binaries/site-content/",
+    "collections/documents/2026/02/09/",
+    "schoolweging-2022-2023---2023-2024---2024-2025/",
+    "schoolweging-2022-2023-2024.ods"
 )
 
 paths <- file.path(raw_dir, c(
@@ -41,10 +40,9 @@ paths <- file.path(raw_dir, c(
     eindscores = "brin6_eindscores.csv",
     schooladviezen = "brin6_advies.csv",
     referentieniveaus = "brin6_referentieniveau.csv",
-    schoolweging = "schoolweging_2022-2025.ods",
-    toetsadvies_tabellen = "duo_tabellen_toetsadvies.pdf"
+    schoolweging = "schoolweging_2022-2025.ods"
 ))
-names(paths) <- c(names(duo_datasets), names(other_sources))
+names(paths) <- c(names(duo_datasets), "schoolweging")
 
 # Only ask the DUO API for a URL when the file still needs downloading.
 for (name in names(duo_datasets)) {
@@ -52,25 +50,43 @@ for (name in names(duo_datasets)) {
         download_file(duo_resource_url(duo_datasets[[name]]), paths[[name]])
     }
 }
-for (name in names(other_sources)) {
-    download_file(other_sources[[name]], paths[[name]])
-}
+download_file(schoolweging_url, paths[["schoolweging"]])
 
-# DUO files hold every year in long format; -1 marks a suppressed count.
-read_duo_csv <- function(path) {
-    read_csv(path, na = c("", "NA"), show_col_types = FALSE, progress = FALSE)
-}
-heroverwegingen <- read_duo_csv(paths[["heroverwegingen"]])
-eindscores <- read_duo_csv(paths[["eindscores"]])
-schooladviezen <- read_duo_csv(paths[["schooladviezen"]])
-referentieniveaus <- read_duo_csv(paths[["referentieniveaus"]])
+# ---- DUO school files and schoolweging ----
+# test_year = PEILJAAR + 1; suppressed counts carry n_lo/n_mid/n_hi.
+heroverwegingen <- tidy_heroverwegingen(paths[["heroverwegingen"]])
+eindscores <- tidy_eindscores(paths[["eindscores"]])
+main_provider <- main_providers(eindscores)
+schooladviezen <- tidy_advies(paths[["schooladviezen"]])
+referentieniveaus <- tidy_referentieniveaus(paths[["referentieniveaus"]])
+schoolweging <- tidy_schoolweging(paths[["schoolweging"]])
 
-# One sheet per school year; OVT ("00AP|C1") starts with INSTELLINGSCODE, but
-# the part after "|" does not match VESTIGINGSCODE.
-schoolweging <- read_ods(paths[["schoolweging"]], sheet = "2024-2025")
-
-for (name in c(names(duo_datasets), "schoolweging")) {
-    table <- get(name)
-    stopifnot(nrow(table) > 0)
-    message(name, ": ", nrow(table), " rows, ", ncol(table), " columns")
+# ---- Report tables (CvTE Terugblik 2025/2026, Cito 2022, DUO gap matrix) ----
+read_report_table <- function(name) {
+    read_csv(
+        file.path("data/reports", paste0(name, ".csv")),
+        show_col_types = FALSE, progress = FALSE
+    )
 }
+cvte_conditional <- read_report_table("cvte_conditional")
+cvte_provisional <- read_report_table("cvte_provisional")
+cvte_pupils <- read_report_table("cvte_pupils")
+cvte_agreement <- read_report_table("cvte_agreement")
+cito_misclassification <- read_report_table("cito_misclassification")
+gap_cells <- read_report_table("gap_matrix")
+gap_matrix <- matrix(
+    NA_real_,
+    nrow = length(provisional_levels), ncol = length(test_advice_levels),
+    dimnames = list(provisional_levels, test_advice_levels)
+)
+gap_matrix[cbind(gap_cells$provisional, gap_cells$test_advice)] <- gap_cells$gap
+stopifnot(!anyNA(gap_matrix))
+
+# ---- Checks between sources ----
+source_checks <- check_sources(
+    schooladviezen, heroverwegingen, main_provider, cvte_conditional,
+    cvte_provisional, cvte_pupils, cvte_agreement, cito_misclassification,
+    gap_matrix
+)
+print(source_checks, n = Inf)
+if (!all(source_checks$ok)) stop("Sources disagree; see source_checks.")

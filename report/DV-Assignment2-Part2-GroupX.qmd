@@ -31,9 +31,13 @@ library(ggplot2)
 ```{r}
 #| label: get-data
 #| include: false
-# downloads the data into data/raw/ if you don't already have it, then loads
-# heroverwegingen, eindscores, schooladviezen, referentieniveaus and
-# schoolweging into this session - see R/get-data.R
+# downloads the DUO files into data/raw/ if needed, tidies them, reads the
+# report tables in data/reports/, and stops if the sources disagree (see
+# R/get-data.R for details).
+# DUO/schoolweging: heroverwegingen, eindscores, main_provider,
+# schooladviezen, referentieniveaus, schoolweging.
+# Reports: cvte_conditional, cvte_provisional, cvte_pupils, cvte_agreement,
+# cito_misclassification, gap_matrix. Checks: source_checks.
 source("R/get-data.R")
 ```
 

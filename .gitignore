@@ -19,3 +19,6 @@
 .DS_Store
 
 **/*.quarto_ipynb
+
+# One-off parsing code; its outputs in data/reports/ are tracked
+/R/one-off/

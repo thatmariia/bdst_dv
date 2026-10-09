@@ -1,0 +1,211 @@
+test_year,test,provisional,pct
+2025,Landelijk,pro,2.3
+2025,Landelijk,vmbo bb,5.5
+2025,Landelijk,vmbo bb/kb,5.2
+2025,Landelijk,vmbo kb,7.9
+2025,Landelijk,vmbo kb/gt,7.7
+2025,Landelijk,vmbo gt,13.7
+2025,Landelijk,vmbo gt/havo,12.4
+2025,Landelijk,havo,13.6
+2025,Landelijk,havo/vwo,13.5
+2025,Landelijk,vwo,18.1
+2025,AMN,pro,12.7
+2025,AMN,vmbo bb,12.1
+2025,AMN,vmbo bb/kb,6.7
+2025,AMN,vmbo kb,8.5
+2025,AMN,vmbo kb/gt,9
+2025,AMN,vmbo gt,10
+2025,AMN,vmbo gt/havo,12.7
+2025,AMN,havo,9
+2025,AMN,havo/vwo,10.3
+2025,AMN,vwo,9.1
+2025,Dia,pro,1.9
+2025,Dia,vmbo bb,5.4
+2025,Dia,vmbo bb/kb,5.4
+2025,Dia,vmbo kb,8.7
+2025,Dia,vmbo kb/gt,8.7
+2025,Dia,vmbo gt,15.1
+2025,Dia,vmbo gt/havo,12
+2025,Dia,havo,13.9
+2025,Dia,havo/vwo,12.1
+2025,Dia,vwo,16.9
+2025,DOE,pro,3
+2025,DOE,vmbo bb,7.9
+2025,DOE,vmbo bb/kb,6.9
+2025,DOE,vmbo kb,8.3
+2025,DOE,vmbo kb/gt,8.5
+2025,DOE,vmbo gt,12.6
+2025,DOE,vmbo gt/havo,10.7
+2025,DOE,havo,15.1
+2025,DOE,havo/vwo,13
+2025,DOE,vwo,14
+2025,IEP,pro,1.1
+2025,IEP,vmbo bb,4.7
+2025,IEP,vmbo bb/kb,4.8
+2025,IEP,vmbo kb,7.8
+2025,IEP,vmbo kb/gt,8
+2025,IEP,vmbo gt,14.1
+2025,IEP,vmbo gt/havo,12.7
+2025,IEP,havo,13.5
+2025,IEP,havo/vwo,13.9
+2025,IEP,vwo,19.3
+2025,IEP digitaal,pro,1.9
+2025,IEP digitaal,vmbo bb,5.6
+2025,IEP digitaal,vmbo bb/kb,5.5
+2025,IEP digitaal,vmbo kb,7.7
+2025,IEP digitaal,vmbo kb/gt,7.8
+2025,IEP digitaal,vmbo gt,12.8
+2025,IEP digitaal,vmbo gt/havo,12.5
+2025,IEP digitaal,havo,12.3
+2025,IEP digitaal,havo/vwo,13.6
+2025,IEP digitaal,vwo,20.2
+2025,IEP papier,pro,0.7
+2025,IEP papier,vmbo bb,4.3
+2025,IEP papier,vmbo bb/kb,4.5
+2025,IEP papier,vmbo kb,7.8
+2025,IEP papier,vmbo kb/gt,8.1
+2025,IEP papier,vmbo gt,14.7
+2025,IEP papier,vmbo gt/havo,12.7
+2025,IEP papier,havo,14.1
+2025,IEP papier,havo/vwo,14
+2025,IEP papier,vwo,19
+2025,Lib,pro,1.5
+2025,Lib,vmbo bb,4.8
+2025,Lib,vmbo bb/kb,5.2
+2025,Lib,vmbo kb,7.6
+2025,Lib,vmbo kb/gt,7.4
+2025,Lib,vmbo gt,13.7
+2025,Lib,vmbo gt/havo,12.8
+2025,Lib,havo,14.1
+2025,Lib,havo/vwo,14.1
+2025,Lib,vwo,18.8
+2025,Lib digitaal,pro,2.4
+2025,Lib digitaal,vmbo bb,6.2
+2025,Lib digitaal,vmbo bb/kb,5.9
+2025,Lib digitaal,vmbo kb,8.3
+2025,Lib digitaal,vmbo kb/gt,7.6
+2025,Lib digitaal,vmbo gt,13.5
+2025,Lib digitaal,vmbo gt/havo,12.3
+2025,Lib digitaal,havo,13.1
+2025,Lib digitaal,havo/vwo,13.4
+2025,Lib digitaal,vwo,17.3
+2025,Lib papier,pro,0.8
+2025,Lib papier,vmbo bb,3.7
+2025,Lib papier,vmbo bb/kb,4.8
+2025,Lib papier,vmbo kb,7.1
+2025,Lib papier,vmbo kb/gt,7.3
+2025,Lib papier,vmbo gt,13.8
+2025,Lib papier,vmbo gt/havo,13.1
+2025,Lib papier,havo,14.8
+2025,Lib papier,havo/vwo,14.7
+2025,Lib papier,vwo,19.9
+2025,ROUTE 8,pro,12.2
+2025,ROUTE 8,vmbo bb,13.4
+2025,ROUTE 8,vmbo bb/kb,6.6
+2025,ROUTE 8,vmbo kb,9.7
+2025,ROUTE 8,vmbo kb/gt,7.2
+2025,ROUTE 8,vmbo gt,11.5
+2025,ROUTE 8,vmbo gt/havo,9.4
+2025,ROUTE 8,havo,11.4
+2025,ROUTE 8,havo/vwo,8.6
+2025,ROUTE 8,vwo,10
+2026,Landelijk,pro,2.1
+2026,Landelijk,vmbo bb,5.4
+2026,Landelijk,vmbo bb/kb,5.5
+2026,Landelijk,vmbo kb,7.9
+2026,Landelijk,vmbo kb/gt,8.1
+2026,Landelijk,vmbo gt,13.6
+2026,Landelijk,vmbo gt/havo,12.5
+2026,Landelijk,havo,13.4
+2026,Landelijk,havo/vwo,13.6
+2026,Landelijk,vwo,17.8
+2026,AMN,pro,14.3
+2026,AMN,vmbo bb,15.1
+2026,AMN,vmbo bb/kb,6.8
+2026,AMN,vmbo kb,8.9
+2026,AMN,vmbo kb/gt,6.1
+2026,AMN,vmbo gt,11.3
+2026,AMN,vmbo gt/havo,9.2
+2026,AMN,havo,9.5
+2026,AMN,havo/vwo,9.7
+2026,AMN,vwo,9.2
+2026,Dia,pro,2
+2026,Dia,vmbo bb,5.3
+2026,Dia,vmbo bb/kb,5.4
+2026,Dia,vmbo kb,8.7
+2026,Dia,vmbo kb/gt,8
+2026,Dia,vmbo gt,14.4
+2026,Dia,vmbo gt/havo,11.2
+2026,Dia,havo,15
+2026,Dia,havo/vwo,12.2
+2026,Dia,vwo,17.9
+2026,IEP,pro,1.1
+2026,IEP,vmbo bb,4.8
+2026,IEP,vmbo bb/kb,5.1
+2026,IEP,vmbo kb,8
+2026,IEP,vmbo kb/gt,8.2
+2026,IEP,vmbo gt,14.3
+2026,IEP,vmbo gt/havo,12.5
+2026,IEP,havo,13.6
+2026,IEP,havo/vwo,13.7
+2026,IEP,vwo,18.7
+2026,IEP digitaal,pro,2.1
+2026,IEP digitaal,vmbo bb,5.9
+2026,IEP digitaal,vmbo bb/kb,5.3
+2026,IEP digitaal,vmbo kb,7.6
+2026,IEP digitaal,vmbo kb/gt,7.7
+2026,IEP digitaal,vmbo gt,13.1
+2026,IEP digitaal,vmbo gt/havo,11.6
+2026,IEP digitaal,havo,12.6
+2026,IEP digitaal,havo/vwo,14.1
+2026,IEP digitaal,vwo,20
+2026,IEP papier,pro,0.8
+2026,IEP papier,vmbo bb,4.5
+2026,IEP papier,vmbo bb/kb,5
+2026,IEP papier,vmbo kb,8.2
+2026,IEP papier,vmbo kb/gt,8.4
+2026,IEP papier,vmbo gt,14.6
+2026,IEP papier,vmbo gt/havo,12.8
+2026,IEP papier,havo,13.9
+2026,IEP papier,havo/vwo,13.5
+2026,IEP papier,vwo,18.3
+2026,Lib,pro,1.2
+2026,Lib,vmbo bb,4.6
+2026,Lib,vmbo bb/kb,5.7
+2026,Lib,vmbo kb,7.5
+2026,Lib,vmbo kb/gt,8.2
+2026,Lib,vmbo gt,13.4
+2026,Lib,vmbo gt/havo,13.2
+2026,Lib,havo,13.7
+2026,Lib,havo/vwo,14.3
+2026,Lib,vwo,18.3
+2026,Lib digitaal,pro,2.4
+2026,Lib digitaal,vmbo bb,6.4
+2026,Lib digitaal,vmbo bb/kb,6.7
+2026,Lib digitaal,vmbo kb,7.9
+2026,Lib digitaal,vmbo kb/gt,8.2
+2026,Lib digitaal,vmbo gt,12.6
+2026,Lib digitaal,vmbo gt/havo,12.6
+2026,Lib digitaal,havo,12.8
+2026,Lib digitaal,havo/vwo,13.3
+2026,Lib digitaal,vwo,17.2
+2026,Lib papier,pro,0.7
+2026,Lib papier,vmbo bb,3.8
+2026,Lib papier,vmbo bb/kb,5.3
+2026,Lib papier,vmbo kb,7.4
+2026,Lib papier,vmbo kb/gt,8.2
+2026,Lib papier,vmbo gt,13.8
+2026,Lib papier,vmbo gt/havo,13.5
+2026,Lib papier,havo,14
+2026,Lib papier,havo/vwo,14.7
+2026,Lib papier,vwo,18.7
+2026,ROUTE 8,pro,17.9
+2026,ROUTE 8,vmbo bb,16.9
+2026,ROUTE 8,vmbo bb/kb,7.1
+2026,ROUTE 8,vmbo kb,9.6
+2026,ROUTE 8,vmbo kb/gt,6.9
+2026,ROUTE 8,vmbo gt,11.1
+2026,ROUTE 8,vmbo gt/havo,7.1
+2026,ROUTE 8,havo,8.8
+2026,ROUTE 8,havo/vwo,7.3
+2026,ROUTE 8,vwo,7.2
