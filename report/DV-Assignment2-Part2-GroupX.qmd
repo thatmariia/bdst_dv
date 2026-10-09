@@ -281,13 +281,19 @@ compliance_plot(compliance)
 #| label: compliance-measures
 #| include: false
 comp_m <- compliance_measures(compliance)
-filter(comp_m, type == "higher")
+comp_m_sum <- comp_m |>
+    filter(type == "higher" | type == "lower") |>
+    summarise(lo = sum(lo), hi = sum(hi), .by = test_year)
 ```
 
 There is a substantial disagreement between the teacher's provisional advice and the test result in both directions.
 Throughout the recorded years, the minimum percentage of pupils with a higher test advice than the provisional advice is
-`{r} sprintf("%.1f", min(filter(comp_m, type == "higher")$lo) * 100)`%, and a lower test advice than the provisional advice is
+`{r} sprintf("%.1f", min(filter(comp_m, type == "higher")$lo) * 100)`%,
+and a lower test advice than the provisional advice is
 `{r} sprintf("%.1f", min(filter(comp_m, type == "lower")$lo) * 100)`%.
+In total, the portion of pupils with a disagreement between the two sources is between
+`{r} sprintf("%.1f", min(comp_m_sum$lo) * 100)`% and
+`{r} sprintf("%.1f", max(comp_m_sum$hi) * 100)`%.
 
 ---
 
