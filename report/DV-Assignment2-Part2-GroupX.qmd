@@ -58,6 +58,7 @@ When the two sources disagree, the final advice is normally determined as follow
 This asymmetrical up-only method has been implemented since the academic year 2023/2024.
 Before that year, the raising of the advice was optional.
 
+Each school can choose which test provider to use, and the test is administered by the school itself.
 Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8.
 Furthermore, IEP and Lib are available in both paper and digital versions.
 The College voor Toetsen en Examens (CvTE) provides a framework for matching the results of
