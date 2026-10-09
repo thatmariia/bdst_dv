@@ -253,7 +253,8 @@ and the overall compliance with that policy across the country.
 #| label: exploratory-setup
 #| include: false
 source("R/exploratory/data.R")
-source("R/exploratory/plots.R")
+source("R/exploratory/plots_compliance.R")
+source("R/exploratory/plots_joint.R")
 ```
 
 ```{r}
@@ -266,6 +267,12 @@ compliance_heatmap
 #| label: compliance-plot
 #| fig-cap: "Shares of pupils with a lower/higher test advice and with a raised advice. Bands: bounds for n < 5."  # nolint: line_length_linter
 compliance_plot
+```
+
+```{r}
+#| label: joint-2026
+#| fig-cap: "Distributions of provisional and conditional advice for 2026."  # nolint: line_length_linter
+joint_plot(2026)
 ```
 
 ## Final visualization
