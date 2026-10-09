@@ -304,7 +304,7 @@ $$
 
 ```{r}
 #| label: standardized
-#| fig-cap: "Standardised leniency and disagreement per test (2025 to 2026)."
+#| fig-cap: "Standardised leniency and disagreement per test: open circles 2025, filled 2026, arrows from 2025 to 2026."  # nolint: line_length_linter
 standardized_plot
 ```
 
