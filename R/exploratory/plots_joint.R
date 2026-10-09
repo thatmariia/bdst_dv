@@ -16,11 +16,12 @@ short_advice <- function(x) {
 
 comparison_colours <- c(
     "test lower" = pal[["blue"]], "equal" = pal[["grey"]],
-    "test higher (eligible)" = pal[["red"]]
+    "test higher" = pal[["red"]]
 )
 
-#' Joint distribution of provisional and test advice in one test year: dot
-#' area is the share of pupils; cells under 0.05% of pupils are left out.
+#' Interactive joint distribution of provisional and test advice in one test
+#' year: dot area is the share of pupils; cells under 0.05% of pupils are left
+#' out. Hover shows both advices and the shares.
 joint_plot <- function(year) {
     joint <- country_joint(year)
     unknown <- c(
@@ -34,7 +35,7 @@ joint_plot <- function(year) {
             ". Restart R or re-source R/data/tidy-duo.R."
         )
     }
-    joint |>
+    plot <- joint |>
         filter(share > 0.0005) |>
         mutate(
             provisional = factor(provisional, levels = rev(provisional_levels)),
@@ -46,11 +47,18 @@ joint_plot <- function(year) {
                     gap > 0 ~ "test higher"
                 ),
                 levels = names(comparison_colours)
+            ),
+            tooltip = sprintf(
+                "provisional: %s<br>test: %s<br>%s of all pupils<br>%s of pupils with this provisional advice", # nolint: line_length_linter.
+                short_advice(provisional), short_advice(test_advice),
+                scales::percent(share, accuracy = 0.1),
+                scales::percent(p, accuracy = 0.1)
             )
         ) |>
+        # text is for the plotly tooltip; ggplot2 only checks layer aesthetics.
         ggplot(aes(
             test_advice, provisional,
-            size = share, colour = comparison
+            size = share, colour = comparison, text = tooltip
         )) +
         geom_point() +
         scale_x_discrete(labels = short_advice) +
@@ -68,4 +76,10 @@ joint_plot <- function(year) {
             axis.text.x = element_text(angle = 25, hjust = 1),
             legend.position = "bottom"
         )
+
+    # plotly ignores legend.position, so the legend is moved below here.
+    plotly::ggplotly(plot, tooltip = "text") |>
+        plotly::layout(legend = list(
+            orientation = "h", x = 0.5, xanchor = "center", y = -0.3
+        ))
 }
