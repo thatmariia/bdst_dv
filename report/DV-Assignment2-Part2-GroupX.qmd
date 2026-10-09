@@ -85,7 +85,7 @@ The present research question is to attempt to quantify the impact of each sourc
 knitr::kable(data_overview, format.args = list(big.mark = ","))
 ```
 
-**DUO gap matrix**
+### DUO gap matrix
 
 The following table shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO.
 The rows correspond to the provisional advice, and the columns correspond to the test result.
@@ -96,6 +96,57 @@ Then $G(i, j)$ is the indication of how much higher the track $i$ is valued than
 #| label: duo-gap-matrix
 knitr::kable(gap_matrix, format.args = list(big.mark = ","))
 ```
+
+To compare the recommendations, we define two weight vectors $v$ and $w$ for the provisional advice $i$ and the test result $j$, respectively.
+The weight vectors are defined as follows:
+
+$$
+v_i = (0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0),
+$$
+
+$$
+w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
+$$
+
+```{r}
+#| label: duo-weight-vectors
+#| include: false
+weight_prov <- c(0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0)
+weight_test <- c(0.5, 1.5, 2.5, 3.5, 4.5, 5.0)
+```
+
+### CvTE data
+
+For each test (separating the paper and digital versions), CvTE provides a table that shows the distribution of
+a test result $j$ for each provisional advice $i$.
+A sample table is shown below.
+
+```{r}
+#| label: cvte-conditional
+cvte_conditional |>
+    filter(test_year == 2025 & test == "Lib digital" & provisional == "havo") |>
+    knitr::kable()
+```
+
+CvTE also provides a table showing the distribution of provisional advice $i$ for each test.
+
+```{r}
+#| label: cvte-provisional
+cvte_provisional |>
+    filter(test_year == 2025 & test == "Lib digital") |>
+    knitr::kable()
+```
+
+The number of pupils that have taken each test is also provided.
+
+```{r}
+#| label: cvte-pupils
+cvte_pupils |>
+    filter(test == "Lib digital") |>
+    knitr::kable()
+```
+
+
 
 ## Exploratory process
 
