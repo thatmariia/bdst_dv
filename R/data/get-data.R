@@ -67,16 +67,16 @@ reference_levels <- tidy_reference_levels(paths[["reference_levels"]])
 school_weighting <- tidy_school_weighting(paths[["school_weighting"]])
 
 # ---- Conventions D1-D8 (R/data/filter-data.R, R/data/measures.R) ----
-# main_provider needs the unfiltered test_scores.
+# Only the columns the study uses; main_provider needs the unfiltered
+# test_scores. Join main_provider with provider_sample() when needed.
 advice_reconsiderations <- advice_reconsiderations |>
-    filter_reconsiderations(main_provider) |>
+    filter_reconsiderations() |>
     add_revision_shares()
+main_provider <- filter_main_provider(main_provider)
 test_scores <- filter_test_scores(test_scores)
-main_provider <- regular_only(main_provider)
 final_advice <- filter_final_advice(final_advice)
 advice_summary <- summarise_final_advice(final_advice)
-reading_levels <- filter_reading_levels(reference_levels)
-reading_2f <- summarise_reading_2f(reading_levels)
+reading_2f <- summarise_reading_2f(filter_reading_levels(reference_levels))
 school_weighting <- filter_school_weighting(school_weighting)
 rm(reference_levels)
 
@@ -85,7 +85,8 @@ read_report_table <- function(name) {
     read_csv(
         file.path("data/reports", paste0(name, ".csv")),
         show_col_types = FALSE, progress = FALSE
-    )
+    ) |>
+        mutate(across(any_of("test_year"), as.integer))
 }
 cvte_conditional <- read_report_table("cvte_conditional")
 cvte_provisional <- read_report_table("cvte_provisional")
@@ -103,20 +104,20 @@ stopifnot(!anyNA(gap_matrix))
 
 # ---- Checks between sources ----
 source_checks <- check_sources(
-    advice_summary, advice_reconsiderations, cvte_conditional,
+    advice_summary, advice_reconsiderations, main_provider, cvte_conditional,
     cvte_provisional, cvte_pupils, cvte_agreement, cito_misclassification,
     gap_matrix
 )
 print(source_checks, n = Inf)
 if (!all(source_checks$ok)) stop("Sources disagree; see source_checks.")
 
-# ---- Source registry (data/sources.csv) ----
+# ---- Data overview: provenance (data/sources.csv) and loaded data ----
 sources <- read_sources()
-datasets <- unlist(sources$datasets)
+datasets <- sources$dataset
 misclassified <- with(
     filter(cito_misclassification, test_advice == "total"), lower + higher
 )
-sources_overview <- sources_table(
+data_overview <- overview_table(
     sources, mget(datasets),
     values = list(misclassified = misclassified)
 )

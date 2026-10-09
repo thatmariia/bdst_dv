@@ -4166,101 +4166,26 @@ vertical-align: -.125em;
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sources_overview)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(data_overview, <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 24%">
-<col style="width: 51%">
-<col style="width: 13%">
+<col style="width: 3%">
 <col style="width: 9%">
+<col style="width: 29%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 1%">
+<col style="width: 47%">
 </colgroup>
 <thead>
 <tr class="header">
+<th style="text-align: left;">dataset</th>
 <th style="text-align: left;">source</th>
 <th style="text-align: left;">content</th>
 <th style="text-align: left;">years</th>
 <th style="text-align: left;">unit</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">DUO brin6_heroverweging (wpoheroverweging-v1)</td>
-<td style="text-align: left;">pupils with test advice higher / lower than the original advice; total pupils with advice and test score; advices raised</td>
-<td style="text-align: left;">test years 2015–2025 (no 2020)</td>
-<td style="text-align: left;">school location × year</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">DUO brin6_eindscores (wpo-eindscores)</td>
-<td style="text-align: left;">test used and pupils tested per test</td>
-<td style="text-align: left;">test years 2011–2025 (no 2020)</td>
-<td style="text-align: left;">school × year × test</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">DUO brin6_advies (wpoadvies-v1)</td>
-<td style="text-align: left;">final advice (after revisions) per category</td>
-<td style="text-align: left;">test years 2011–2025</td>
-<td style="text-align: left;">school × year × advice</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">DUO brin6_referentieniveau (wporeferentieniveau-v1)</td>
-<td style="text-align: left;">reading level reached (conventional outcome)</td>
-<td style="text-align: left;">test years 2016–2025 (no 2020)</td>
-<td style="text-align: left;">school × year × test</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Inspectorate, schoolweging 2022–2025</td>
-<td style="text-align: left;">school composition index</td>
-<td style="text-align: left;">test years 2023–2025</td>
-<td style="text-align: left;">school × year</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026</td>
-<td style="text-align: left;">provisional × test advice per test and mode (row %); provisional advice per test; pupils per test</td>
-<td style="text-align: left;">test years 2025–2026</td>
-<td style="text-align: left;">national × test</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D</td>
-<td style="text-align: left;">share of test advices that change when the score is redrawn with its standard error: 23.3%</td>
-<td style="text-align: left;">2022</td>
-<td style="text-align: left;">national (paper CET)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">DUO, conversion table (toelichting bestand nr. 11)</td>
-<td style="text-align: left;">definition of “higher” and “lower”</td>
-<td style="text-align: left;">–</td>
-<td style="text-align: left;">matrix</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>describe <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">get</span>(x))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    types <span class="ot">&lt;-</span> <span class="fu">vapply</span>(x, pillar<span class="sc">::</span>type_sum, <span class="st">&quot;&quot;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="fu">names</span>(x), <span class="st">&quot; (&quot;</span>, types, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> datasets,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vapply</span>(datasets, \(x) <span class="fu">NROW</span>(<span class="fu">get</span>(x)), <span class="dv">0</span>),</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">vapply</span>(datasets, describe, <span class="st">&quot;&quot;</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>), <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<colgroup>
-<col style="width: 4%">
-<col style="width: 1%">
-<col style="width: 93%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">data</th>
 <th style="text-align: right;">rows</th>
 <th style="text-align: left;">columns</th>
 </tr>
@@ -4268,71 +4193,118 @@ vertical-align: -.125em;
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">advice_reconsiderations</td>
+<td style="text-align: left;">DUO brin6_heroverweging (wpoheroverweging-v1)</td>
+<td style="text-align: left;">pupils with test advice higher / lower than the original advice; total pupils with advice and test score; advices raised; shares up / down / raised and lean / disagreement (D4)</td>
+<td style="text-align: left;">test years 2015–2025 (no 2020)</td>
+<td style="text-align: left;">school location × year</td>
 <td style="text-align: right;">61,108</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), total (dbl), higher_lo (dbl), higher_mid (dbl), higher_hi (dbl), lower_lo (dbl), lower_mid (dbl), lower_hi (dbl), raised_lo (dbl), raised_mid (dbl), raised_hi (dbl), provider (chr), main_share (dbl), in_provider_analysis (lgl), up (dbl), up_lo (dbl), up_hi (dbl), down (dbl), down_lo (dbl), down_hi (dbl), raised_share (dbl), raised_share_lo (dbl), raised_share_hi (dbl), lean (dbl), disagreement (dbl)</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), test_year (int), total (dbl), higher (dbl), higher_lo (dbl), higher_hi (dbl), lower (dbl), lower_lo (dbl), lower_hi (dbl), raised (dbl), raised_lo (dbl), raised_hi (dbl), up (dbl), down (dbl), raised_share (dbl), lean (dbl), disagreement (dbl)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">test_scores</td>
+<td style="text-align: left;">DUO brin6_eindscores (wpo-eindscores)</td>
+<td style="text-align: left;">test used and pupils tested per test (group 8)</td>
+<td style="text-align: left;">test years 2011–2025 (no 2020)</td>
+<td style="text-align: left;">school × year × test</td>
 <td style="text-align: right;">89,897</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), test_year (int), provider (chr), n (dbl), n_lo (dbl), n_hi (dbl)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">main_provider</td>
+<td style="text-align: left;">DUO brin6_eindscores (wpo-eindscores)</td>
+<td style="text-align: left;">main test and its share of tested pupils (D5)</td>
+<td style="text-align: left;">test years 2011–2025 (no 2020)</td>
+<td style="text-align: left;">school × year</td>
 <td style="text-align: right;">87,596</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), n_tested (dbl), main_share (dbl)</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), test_year (int), provider (chr), main_share (dbl)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">final_advice</td>
+<td style="text-align: left;">DUO brin6_advies (wpoadvies-v1)</td>
+<td style="text-align: left;">final advice (after revisions) per category</td>
+<td style="text-align: left;">test years 2011–2025</td>
+<td style="text-align: left;">school × year × advice</td>
 <td style="text-align: right;">619,698</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), advice (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), test_year (int), advice (fct), n (dbl), n_lo (dbl), n_hi (dbl)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">advice_summary</td>
+<td style="text-align: left;">DUO brin6_advies (wpoadvies-v1)</td>
+<td style="text-align: left;">mean advice, share vwo, and share combined advice (D6)</td>
+<td style="text-align: left;">test years 2011–2025</td>
+<td style="text-align: left;">school × year</td>
 <td style="text-align: right;">96,221</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), pupils (dbl), mean_advice (dbl), share_vwo (dbl), share_combined (dbl)</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), test_year (int), pupils (dbl), mean_advice (dbl), share_vwo (dbl), share_combined (dbl)</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">reading_levels</td>
-<td style="text-align: right;">128,354</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), level (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">reading_2f</td>
+<td style="text-align: left;">DUO brin6_referentieniveau (wporeferentieniveau-v1)</td>
+<td style="text-align: left;">reading level reached (conventional outcome): share of tested pupils at 2F (D8)</td>
+<td style="text-align: left;">test years 2016–2025 (no 2020)</td>
+<td style="text-align: left;">school × year × test</td>
 <td style="text-align: right;">56,943</td>
-<td style="text-align: left;">institution_code (chr), location_code (chr), reference_year (int), test_year (int), provider (chr), tested (dbl), share_2f (dbl), share_2f_lo (dbl), share_2f_hi (dbl)</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), test_year (int), provider (chr), tested (dbl), share_2f (dbl), share_2f_lo (dbl), share_2f_hi (dbl)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">school_weighting</td>
+<td style="text-align: left;">Inspectorate, schoolweging 2022–2025</td>
+<td style="text-align: left;">school composition index: mean, spread, and pupil count (D7)</td>
+<td style="text-align: left;">test years 2023–2025</td>
+<td style="text-align: left;">school × year</td>
 <td style="text-align: right;">17,040</td>
-<td style="text-align: left;">institution_code (chr), reference_year (int), test_year (int), school_weighting (dbl), spread (dbl), pupils (dbl)</td>
+<td style="text-align: left;">institution_code (chr), test_year (int), school_weighting (dbl), spread (dbl), pupils (dbl)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">cvte_conditional</td>
+<td style="text-align: left;">CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026</td>
+<td style="text-align: left;">provisional × test advice per test and mode (row %)</td>
+<td style="text-align: left;">test years 2025–2026</td>
+<td style="text-align: left;">national × test</td>
 <td style="text-align: right;">1,020</td>
-<td style="text-align: left;">test_year (dbl), test (chr), provisional (chr), test_advice (chr), pct (dbl), note (chr)</td>
+<td style="text-align: left;">test_year (int), test (chr), provisional (chr), test_advice (chr), pct (dbl), note (chr)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">cvte_provisional</td>
+<td style="text-align: left;">CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026</td>
+<td style="text-align: left;">provisional advice per test</td>
+<td style="text-align: left;">test years 2025–2026</td>
+<td style="text-align: left;">national × test</td>
 <td style="text-align: right;">210</td>
-<td style="text-align: left;">test_year (dbl), test (chr), provisional (chr), pct (dbl)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">cvte_pupils</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: left;">test_year (dbl), test (chr), pupils (dbl)</td>
+<td style="text-align: left;">test_year (int), test (chr), provisional (chr), pct (dbl)</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">cvte_agreement</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: left;">test_year (dbl), comparison (chr), pct (dbl)</td>
+<td style="text-align: left;">cvte_pupils</td>
+<td style="text-align: left;">CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026</td>
+<td style="text-align: left;">pupils per test</td>
+<td style="text-align: left;">test years 2025–2026</td>
+<td style="text-align: left;">national × test</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: left;">test_year (int), test (chr), pupils (dbl)</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">cvte_agreement</td>
+<td style="text-align: left;">CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026</td>
+<td style="text-align: left;">published shares of lower / equal / higher test advice (validation)</td>
+<td style="text-align: left;">test years 2026</td>
+<td style="text-align: left;">national</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">test_year (int), comparison (chr), pct (dbl)</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">cito_misclassification</td>
+<td style="text-align: left;">Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D</td>
+<td style="text-align: left;">share of test advices that change when the score is redrawn with its standard error: 23.3%</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">national (paper CET)</td>
 <td style="text-align: right;">7</td>
 <td style="text-align: left;">test_advice (chr), n (dbl), lower (dbl), equal (dbl), higher (dbl)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">gap_matrix</td>
+<td style="text-align: left;">DUO, conversion table (toelichting bestand nr. 11)</td>
+<td style="text-align: left;">definition of “higher” and “lower”</td>
+<td style="text-align: left;">–</td>
+<td style="text-align: left;">matrix</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: left;">pro/vmbo bb (dbl), vmbo bb/kb (dbl), vmbo kb/gt (dbl), vmbo gt/havo (dbl), havo/vwo (dbl), vwo (dbl)</td>
 </tr>

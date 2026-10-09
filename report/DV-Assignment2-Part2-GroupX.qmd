@@ -24,8 +24,8 @@ library(ggplot2)
 # downloads the DUO files into data/raw/ if needed, applies conventions
 # D1-D8, reads the report tables in data/reports/, and stops if the sources
 # disagree (see R/data/get-data.R). `datasets` lists the resulting tables,
-# `sources_overview` describes them (from data/sources.csv), and
-# `source_checks` holds the checks.
+# `data_overview` describes them (provenance from data/sources.csv plus
+# rows and columns), and `source_checks` holds the checks.
 source("R/data/get-data.R")
 ```
 
@@ -81,22 +81,8 @@ The present research question is to attempt to quantify the impact of each sourc
 ## Getting data
 
 ```{r}
-#| label: data-sources
-knitr::kable(sources_overview)
-```
-
-```{r}
-#| label: data-columns
-describe <- function(x) {
-    x <- as.data.frame(get(x))
-    types <- vapply(x, pillar::type_sum, "")
-    paste0(names(x), " (", types, ")", collapse = ", ")
-}
-knitr::kable(data.frame(
-    data = datasets,
-    rows = vapply(datasets, \(x) NROW(get(x)), 0),
-    columns = vapply(datasets, describe, "")
-), row.names = FALSE, format.args = list(big.mark = ","))
+#| label: data-overview
+knitr::kable(data_overview, format.args = list(big.mark = ","))
 ```
 
 ## Exploratory process
