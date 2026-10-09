@@ -258,11 +258,13 @@ source("R/exploratory/plots.R")
 
 ```{r}
 #| label: compliance-values
+#| fig-cap: "Compliance with the policy of raising the advice with a higher test result."  # nolint: line_length_linter
 compliance_heatmap
 ```
 
 ```{r}
 #| label: compliance-plot
+#| fig-cap: "Shares of pupils with a lower/higher test advice and with a raised advice. Bands: bounds for n < 5."  # nolint: line_length_linter
 compliance_plot
 ```
 
