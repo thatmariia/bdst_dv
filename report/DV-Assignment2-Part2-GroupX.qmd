@@ -55,7 +55,8 @@ When the two sources disagree, the final advice is normally determined as follow
 - if the teacher's advice is higher than the test result, nothing changes;
 - if the teacher's advice is lower than the test result, the teacher should raise their advice.
 
-This asymmetrical method has been implemented since the academic year 2023/2024.
+This asymmetrical up-only method has been implemented since the academic year 2023/2024.
+Before that year, the raising of the advice was optional.
 
 Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8.
 Furthermore, IEP and Lib are available in both paper and digital versions.
