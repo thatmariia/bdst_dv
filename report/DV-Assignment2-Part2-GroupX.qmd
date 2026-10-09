@@ -108,16 +108,9 @@ $$
 w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
 $$
 
-```{r}
-#| label: duo-weight-vectors
-#| include: false
-weight_prov <- c(0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0)
-weight_test <- c(0.5, 1.5, 2.5, 3.5, 4.5, 5.0)
-```
-
 ### CvTE data
 
-For each test (separating the paper and digital versions), CvTE provides a table that shows the distribution of
+For each test (separating the paper and digital versions) and year, CvTE provides a table that shows the distribution of
 a test result $j$ for each provisional advice $i$.
 A sample table is shown below.
 
@@ -128,7 +121,7 @@ cvte_conditional |>
     knitr::kable()
 ```
 
-CvTE also provides a table showing the distribution of provisional advice $i$ for each test.
+CvTE also provides a table showing the distribution of provisional advice $i$ for each test and year.
 
 ```{r}
 #| label: cvte-provisional
@@ -137,7 +130,7 @@ cvte_provisional |>
     knitr::kable()
 ```
 
-The number of pupils that have taken each test is also provided.
+The number of pupils that have taken each test in a particular year is also provided.
 
 ```{r}
 #| label: cvte-pupils
@@ -146,6 +139,103 @@ cvte_pupils |>
     knitr::kable()
 ```
 
+### DUO data
+
+DUO provides a table that shows the test provider used by each school for each year
+and the share of pupils that took that test.
+
+```{r}
+#| label: main_provider
+main_provider |>
+    distinct(provider, .keep_all = TRUE) |>
+    distinct(test_year, .keep_all = TRUE) |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+They also provide a table that shows, for each school and year, the number of pupils that took each test.
+For some results, we do not have the number of pupils, but we do have a lower and upper bound (for $n < 5$).
+
+```{r}
+#| label: test_scores
+test_scores |>
+    filter(institution_code == "00CD") |>
+    distinct(provider, .keep_all = TRUE) |>
+    knitr::kable()
+```
+
+DUO also provides a table that shows, for each school, year, and test provider,
+the share of pupils that were had their reading skills tested at the 2F level.
+It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for $n < 5$).
+
+```{r}
+#| label: reading_2f
+reading_2f |>
+    filter(institution_code == "00BA") |>
+    knitr::kable()
+```
+
+We also have a table that shows, for each school and year, the number of pupils whose test advice was higher/lower than
+the the provisional advice, and the number of pupils whose provisional advice was raised/lowered
+(including the lower and upper bounds for $n < 5$).
+The table also shows the derived shares of the same numbers relative to the total number of pupils,
+the difference between the shares of pupils with higher and lower test advice, and
+the total disagreement share (sum).
+
+```{r}
+#| label: advice_reconsiderations
+advice_reconsiderations |>
+    filter(institution_code == "00DD") |>
+    knitr::kable()
+```
+
+DUO also supplies the table with final advice after revisions, which shows the number of pupils
+(with lower and upper bounds for $n < 5$)
+that received each final advice for each school and year.
+
+```{r}
+#| label: final_advice
+final_advice |>
+    filter(institution_code == "00BB" & advice == "vmbo gt") |>
+    filter(n > 2.5) |>
+    knitr::kable()
+```
+
+We summarize the final advice table for a single school per year,
+showing the total number of pupils, mean advice, and shares of VWO and combined advice.
+
+```{r}
+#| label: advice_summary
+advice_summary |>
+    filter(institution_code == "31LH") |>
+    knitr::kable()
+```
+
+### Cito data
+
+The simulated data from Cito shows how measurement uncertainty could change test advice.
+For each original test advice, they show the percentage of pupils that would receive a
+different or unchanged advice if the test was repeated.
+
+```{r}
+#| label: cito_misclassification
+cito_misclassification |>
+    knitr::kable()
+```
+
+### Inspectorate data
+
+The Inspectorate provides the data on socioeconomic weighting of schools.
+The higher the weighting, the more disadvantaged pupils are in that school.
+The table also supplies the spread of the socioeconomic weighting along with
+the number of pupils in that school.
+
+```{r}
+#| label: school_weighting
+school_weighting |>
+    filter(institution_code == "00DN") |>
+    knitr::kable()
+```
 
 
 ## Exploratory process
