@@ -3,5 +3,5 @@ library(jsonlite)
 library(readr)
 library(dplyr)
 
-source("R/download.R")
+source("R/data/download.R")
 paths <- download_data()

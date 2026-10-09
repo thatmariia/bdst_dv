@@ -21,7 +21,7 @@ Rendering downloads four public DUO/CBS files if needed, creates the website in
 `build/`, and writes each report HTML beside its `.Rmd` or `.qmd` in `report/`.
 
 To download data separately, run `Rscript scripts/download.R`. The notebook
-also calls this script; reusable download functions stay in `R/download.R`.
+also calls this script; reusable download functions stay in `R/data/download.R`.
 Existing downloads are reused.
 
 Architecture:
@@ -30,4 +30,4 @@ Architecture:
 - `report/`: the R Markdown notebook.
 - `data/raw/`: downloaded data, excluded from Git.
 - `data/reports/`: tables parsed from the CvTE, Cito, and DUO PDF reports,
-  kept in Git. They were made once by the (gitignored) code in `R/one-off/`.
+  kept in Git. They were made once by the (gitignored) code in `R/data/one-off/`.

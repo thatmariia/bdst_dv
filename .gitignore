@@ -21,4 +21,4 @@
 **/*.quarto_ipynb
 
 # One-off parsing code; its outputs in data/reports/ are tracked
-/R/one-off/
+/R/data/one-off/

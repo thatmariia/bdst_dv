@@ -1,16 +1,16 @@
 # Downloads the DUO and schoolweging files into data/raw/ (skipping files that
 # are already there), tidies them, reads the report tables in data/reports/
-# (made once by the gitignored R/one-off/), and checks the sources against each
-# other. Run from the project root.
+# (made once by the gitignored R/data/one-off/), and checks the sources
+# against each other. Run from the project root.
 library(dplyr)
 library(jsonlite)
 library(readr)
 library(readODS)
 library(tidyr)
 
-source("R/download.R")
-source("R/tidy-duo.R")
-source("R/check-sources.R")
+source("R/data/download.R")
+source("R/data/tidy-duo.R")
+source("R/data/check-sources.R")
 
 raw_dir <- "data/raw"
 
