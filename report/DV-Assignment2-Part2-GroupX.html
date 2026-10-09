@@ -25,6 +25,41 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -4100,6 +4135,110 @@ vertical-align: -.125em;
 </section>
 <section id="getting-data" class="level2">
 <h2 class="anchored" data-anchor-id="getting-data">Getting data</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;advice_reconsiderations&quot;</span>, <span class="st">&quot;test_scores&quot;</span>, <span class="st">&quot;main_provider&quot;</span>, <span class="st">&quot;final_advice&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;reference_levels&quot;</span>, <span class="st">&quot;school_weighting&quot;</span>, <span class="st">&quot;cvte_conditional&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;cvte_provisional&quot;</span>, <span class="st">&quot;cvte_pupils&quot;</span>, <span class="st">&quot;cvte_agreement&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;cito_misclassification&quot;</span>, <span class="st">&quot;gap_matrix&quot;</span>, <span class="st">&quot;source_checks&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>describe <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">get</span>(x))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    types <span class="ot">&lt;-</span> <span class="fu">vapply</span>(x, pillar<span class="sc">::</span>type_sum, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="fu">names</span>(x), <span class="st">&quot; (&quot;</span>, types, <span class="st">&quot;)&quot;</span>, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> datasets,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">rows =</span> <span class="fu">vapply</span>(datasets, \(x) <span class="fu">NROW</span>(<span class="fu">get</span>(x)), <span class="dv">0</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">vapply</span>(datasets, describe, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>), <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 2%">
+<col style="width: 90%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">data</th>
+<th style="text-align: right;">rows</th>
+<th style="text-align: left;">columns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">advice_reconsiderations</td>
+<td style="text-align: right;">64,534</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), total_lo (dbl), total_mid (dbl), total_hi (dbl), higher_lo (dbl), higher_mid (dbl), higher_hi (dbl), lower_lo (dbl), lower_mid (dbl), lower_hi (dbl), raised_lo (dbl), raised_mid (dbl), raised_hi (dbl)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">test_scores</td>
+<td style="text-align: right;">92,554</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), provider (chr), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">main_provider</td>
+<td style="text-align: right;">90,118</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), provider (chr), n_tested (dbl), main_share (dbl)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">final_advice</td>
+<td style="text-align: right;">647,750</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), advice (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">reference_levels</td>
+<td style="text-align: right;">436,809</td>
+<td style="text-align: left;">institution_code (chr), location_code (chr), school_type (chr), reference_year (int), test_year (int), provider (chr), subject (chr), level (fct), n_lo (dbl), n_mid (dbl), n_hi (dbl)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">school_weighting</td>
+<td style="text-align: right;">18,936</td>
+<td style="text-align: left;">institution_code (chr), reference_year (int), test_year (int), school_weighting (dbl), spread (dbl), pupils (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cvte_conditional</td>
+<td style="text-align: right;">1,020</td>
+<td style="text-align: left;">test_year (dbl), test (chr), provisional (chr), test_advice (chr), pct (dbl), note (chr)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cvte_provisional</td>
+<td style="text-align: right;">210</td>
+<td style="text-align: left;">test_year (dbl), test (chr), provisional (chr), pct (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cvte_pupils</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: left;">test_year (dbl), test (chr), pupils (dbl)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cvte_agreement</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">test_year (dbl), comparison (chr), pct (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cito_misclassification</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">test_advice (chr), n (dbl), lower (dbl), equal (dbl), higher (dbl)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gap_matrix</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">pro/vmbo bb (dbl), vmbo bb/kb (dbl), vmbo kb/gt (dbl), vmbo gt/havo (dbl), havo/vwo (dbl), vwo (dbl)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">source_checks</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">check (chr), ours (dbl), reference (dbl), tolerance (dbl), ok (lgl)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="exploratory-process" class="level2">
 <h2 class="anchored" data-anchor-id="exploratory-process">Exploratory process</h2>

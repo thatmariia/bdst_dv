@@ -41,6 +41,26 @@ library(ggplot2)
 source("R/data/get-data.R")
 ```
 
+```{r}
+#| label: data-columns
+datasets <- c(
+    "advice_reconsiderations", "test_scores", "main_provider", "final_advice",
+    "reference_levels", "school_weighting", "cvte_conditional",
+    "cvte_provisional", "cvte_pupils", "cvte_agreement",
+    "cito_misclassification", "gap_matrix", "source_checks"
+)
+describe <- function(x) {
+    x <- as.data.frame(get(x))
+    types <- vapply(x, pillar::type_sum, "")
+    paste0(names(x), " (", types, ")", collapse = ", ")
+}
+knitr::kable(data.frame(
+    data = datasets,
+    rows = vapply(datasets, \(x) NROW(get(x)), 0),
+    columns = vapply(datasets, describe, "")
+), row.names = FALSE, format.args = list(big.mark = ","))
+```
+
 ## Exploratory process
 
 *Describe how you explored the data before settling on your final visualization. Include at least one exploratory plot below (this can be the one from Part 1, or an updated one), and a short note on what it told you and how it influenced your final visualization.*

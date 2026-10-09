@@ -11,6 +11,7 @@ library(tidyr)
 source("R/data/download.R")
 source("R/data/tidy-duo.R")
 source("R/data/check-sources.R")
+source("R/data/select-columns.R")
 
 raw_dir <- "data/raw"
 
@@ -62,6 +63,12 @@ main_provider <- main_providers(test_scores)
 final_advice <- tidy_final_advice(paths[["final_advice"]])
 reference_levels <- tidy_reference_levels(paths[["reference_levels"]])
 school_weighting <- tidy_school_weighting(paths[["school_weighting"]])
+
+# Keep only what the study uses (main_provider needs the full test_scores).
+test_scores <- select_test_scores(test_scores)
+final_advice <- select_final_advice(final_advice)
+reference_levels <- select_reference_levels(reference_levels)
+school_weighting <- select_school_weighting(school_weighting)
 
 # ---- Report tables (CvTE Terugblik 2025/2026, Cito 2022, DUO gap matrix) ----
 read_report_table <- function(name) {
