@@ -68,10 +68,10 @@ differences in the schools that use those providers.
 
 There are four main sources of potential disagreement between the teacher's advice and the test result:
 
-- the teacher's advice has a different scale than the test result,
-- the tests have different providers,
-- teachers can make mistakes, and
-- the tests have measurement uncertainty.
+- **category design**: the teacher's advice has a different scale than the test result,
+- **test menu**: the tests have different providers and modes,
+- **teacher error**: teachers can make mistakes, and
+- **test error**: the tests have measurement uncertainty.
 
 The present research question is to attempt to quantify the impact of each source of disagreement.
 
