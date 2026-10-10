@@ -27,6 +27,11 @@ knitr:
     root.dir: ".."
 ---
 
+<!-- define latex operators -->
+$\newcommand{\Var}{\operatorname{Var}}$
+$\newcommand{\PP}{\mathbb{P}}$
+$\newcommand{\EE}{\mathbb{E}}$
+
 ```{r}
 #| label: setup
 #| include: false
@@ -272,10 +277,10 @@ There is a substantial disagreement between the teacher's provisional advice and
 Let $J_t(i, j)$ be the joint distribution of provisional advice $i$ and test advice $j$ for test $t$, defined as
 
 $$
-J_t(i, j) = m_t(i) P_t(j | i),
+J_t(i, j) = m_t(i) \PP_t(j | i),
 $$ {#eq-joint}
 
-where $m_t(i)$ is the share of pupils with provisional advice $i$, and $P_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
+where $m_t(i)$ is the share of pupils with provisional advice $i$, and $\PP_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
 
 @fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year. The slider allows switching between years.
 A large portion of the of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower that the test result)
@@ -316,7 +321,7 @@ where $N_t(i)$ is the number of pupils with provisional advice $i$ for test $t$.
 Then we can define the standardized eligibility $h_t$ as follows:
 
 $$
-h_t = \sum_{i, j : G(i, j) > 0} \bar{m}(i) P_t (j | i).
+h_t = \sum_{i, j : G(i, j) > 0} \bar{m}(i) \PP_t (j | i).
 $$
 
 This value represents the share of pupils that are eligible for a higher test advice than their provisional advice,
@@ -324,7 +329,7 @@ given the national distribution of provisional advice.
 We also define $\ell_t$ as the standardized share of pupils that have scored lower on the test than their provisional advice:
 
 $$
-\ell_t = \sum_{i, j : G(i, j) < 0} \bar{m}(i) P_t (j | i).
+\ell_t = \sum_{i, j : G(i, j) < 0} \bar{m}(i) \PP_t (j | i).
 $$
 
 Now, we define the leniency index for a test $t$, which encodes the tendency of a test to give higher or lower advice
@@ -408,31 +413,36 @@ knitr::kable(standardized, digits = 4)
 
 ## Modeling
 
+### Measurement model
+
 Suppose a pupil $p$ is up for an evaluation.
 They will receive a provisional advice from their teacher, and a test advice from the test provider $t$.
-Both measurements attempt to measure the pupil's suitability for suitability for secondary tracks $\theta_p$,
-which is the deviation of the pupil's ability from the national average.
+Both measurements attempt to estimate the common factor: the pupil's suitability for secondary tracks $\theta_p$.
+
+Since the test is administered by schools, and schools choose their test, pupils taking different tests come from different populations.
 We assume that $\theta$ is normally distributed within each test population with mean $\mu_t$ and variance $\sigma^2_{\theta, t}$:
 
 $$
-\theta \sim \mathcal{N}(\mu_p, \sigma^2_{\theta, p}).
+\theta \sim \mathcal{N}(\mu_t, \sigma^2_{\theta, t}).
 $$
 
-Then we can model the teacher's provisional advice $\hat{L}$ as follows:
+Then we can model the teacher's provisional advice $L^*$ as follows:
 
 $$
-\hat{L} = \theta + \epsilon_L, \quad \epsilon_L \sim \mathcal{N}(0, \sigma^2_L),
+L^* = \alpha_\ell \theta + \beta_\ell + \epsilon_L = \theta + \epsilon_L, \quad \epsilon_L \sim \mathcal{N}(0, \sigma^2_L),
+$$ {#eq-teacher}
+
+A latent scale is normalized with respect to the teacher's advice, by setting $\alpha_\ell = 1$ and $\beta_\ell = 0$.
+Thus, $\theta$ is measured in units of the teacher's advice.
+We also set the mean of the teacher's judgement to zero $\mu_{L^*} = 0$ and variance $\Var(L^*) = \sigma^2_\theta + \sigma^2_L = 1$.
+These scaling choices are made to simplify the model; they do not affect the conclusions, as they can be reversed by rescaling the latent scale.
+$\epsilon_L$ is the teacher's error, which can be attributed to the lack of information about the pupil or the misjudgements based
+on subjective characteristics such as motivation, work ethic, or behavior.
+
+Now, we model the test advice $T^*$ as follows:
+
 $$
-
-where $\epsilon_L$ is the teacher's error, which can be attributed to the lack of information about the pupil or the misjudgements based
-on sucjective characteristics such as motivation, work ethic, or behavior.
-We set the mean of the teacher's error to 0 to use as a baseline for the test's error, which we define below.
-The variance $\sigma^2_L$ is assumed to be the same for all teachers, independent of the test their school uses.
-
-Now, we model the test advice $\hat{T}$ as follows:
-
-$$
-\hat{T} = \alpha_t \theta + \beta_t + \epsilon_T, \quad \epsilon_T \sim \mathcal{N}(\mu_T, \sigma^2_T).
+T^* = \alpha_t \theta + \beta_t + \epsilon_T, \quad \epsilon_T \sim \mathcal{N}(0, \sigma^2_{T, t}).
 $$
 
 The loading factor $\alpha_t$ and the intercept $\beta_t$ are specific to the test provider $t$.
@@ -442,8 +452,23 @@ This sensitivity can be affected by factors such as the the design, length, and 
 The intercept $\beta_t$ encodes the test's leniency:
 a higher $\beta_t$ shifts the test results to a higher track.
 The test error $\epsilon_T$ can be attributed to the test's measurement uncertainty and
-is assumed to be normally distributed with mean $\mu_T$ and variance $\sigma^2_T$.
+is assumed to be normally distributed.
+We set the mean of the error to zero so that every systematic bias is captured by the intercept $\beta_t$,
+and we set the variance $\sigma^2_T$ to be specific to the test provider $t$.
 
+Neither the teacher's advice nor the test result is directly observed;
+instead, we observe the provisional advice $L$ and the test result $T$ as ordinal variables.
+When $L^*$ falls into the interval between the thresholds of $i$ and $i + 1$, the teacher assigns a provisional advice $i$ to the pupil.
+When $T^*$ falls into the interval between the thresholds of $j$ and $j + 1$, the test assigns a test result $j$ to the pupil.
+This makes our model a one-factor ($\theta$) measurement model with two congeneric indicators ($L, T$),
+with the teacher's advice as the reference indicator.
+
+Assumptions made:
+
+- the teacher error variance $\sigma^2_L$ is the same for all pupils and the provisional advice thresholds are the same for all pupils in every test population,
+- the test result thresholds are the same for all tests (CvTE provides a framework for matching the results),
+- the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are all mutually independent,
+- the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are normally distributed.
 
 ## Final visualization
 
