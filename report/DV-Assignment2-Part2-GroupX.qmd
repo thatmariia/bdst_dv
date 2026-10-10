@@ -408,6 +408,41 @@ knitr::kable(standardized, digits = 4)
 
 ## Modeling
 
+Suppose a pupil $p$ is up for an evaluation.
+They will receive a provisional advice from their teacher, and a test advice from the test provider $t$.
+Both measurements attempt to measure the pupil's suitability for suitability for secondary tracks $\theta_p$,
+which is the deviation of the pupil's ability from the national average.
+We assume that $\theta$ is normally distributed within each test population with mean $\mu_t$ and variance $\sigma^2_{\theta, t}$:
+
+$$
+\theta \sim \mathcal{N}(\mu_p, \sigma^2_{\theta, p}).
+$$
+
+Then we can model the teacher's provisional advice $\hat{L}$ as follows:
+
+$$
+\hat{L} = \theta + \epsilon_L, \quad \epsilon_L \sim \mathcal{N}(0, \sigma^2_L),
+$$
+
+where $\epsilon_L$ is the teacher's error, which can be attributed to the lack of information about the pupil or the misjudgements based
+on sucjective characteristics such as motivation, work ethic, or behavior.
+We set the mean of the teacher's error to 0 to use as a baseline for the test's error, which we define below.
+The variance $\sigma^2_L$ is assumed to be the same for all teachers, independent of the test their school uses.
+
+Now, we model the test advice $\hat{T}$ as follows:
+
+$$
+\hat{T} = \alpha_t \theta + \beta_t + \epsilon_T, \quad \epsilon_T \sim \mathcal{N}(\mu_T, \sigma^2_T).
+$$
+
+The loading factor $\alpha_t$ and the intercept $\beta_t$ are specific to the test provider $t$.
+$\alpha_t$ encodes the test's sensitivity to the pupil's ability:
+a higher $\alpha_t$ distributes the test results more widely for different $\theta$ value (pupils' abilities).
+This sensitivity can be affected by factors such as the the design, length, and difficulty of the test.
+The intercept $\beta_t$ encodes the test's leniency:
+a higher $\beta_t$ shifts the test results to a higher track.
+The test error $\epsilon_T$ can be attributed to the test's measurement uncertainty and
+is assumed to be normally distributed with mean $\mu_T$ and variance $\sigma^2_T$.
 
 
 ## Final visualization
