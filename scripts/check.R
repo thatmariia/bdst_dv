@@ -8,6 +8,9 @@ files <- list.files(
 )
 files <- c(files, "index.qmd")
 stopifnot(length(files) > 0)
+# lintr only skips chunks whose engine knitr knows; Quarto renders these
+# itself, so register no-op engines to keep them out of the R lints.
+knitr::knit_engines$set(mermaid = function(options) NULL)
 styler::cache_deactivate()
 style <- styler::style_file(
     files,

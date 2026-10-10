@@ -16,12 +16,16 @@ format:
             text-align: justify;
           }
         </style>
+    mermaid:
+      theme: neutral
     fontsize: 11pt
     theme: cosmo
     mainfont: "Optima"
     toc: true
     toc-location: left
     code-fold: true
+execute:
+  echo: false
 knitr:
   opts_knit:
     root.dir: ".."
@@ -403,7 +407,7 @@ The differences in leniency and disagreement constitute the source of disagreeme
 standardized_plot(standardized)
 ```
 
-::: {.callout-note collapse="true" appearance="minimal", title="Data table"}
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
 
 ```{r}
 #| label: tbl-standardized
@@ -466,22 +470,62 @@ instead, we observe the provisional advice $L$ and the test result $T$ as ordina
 When $L^*$ falls into the interval between the thresholds of $i$ and $i + 1$, the teacher assigns a provisional advice $i$ to the pupil.
 When $T^*$ falls into the interval between the thresholds of $j$ and $j + 1$, the test assigns a test result $j$ to the pupil.
 
-Let $\lambda_1, \ldots, \lambda_9$ be the thresholds for the teacher's advice
-and $\tau_1, \ldots, \tau_5$ be the thresholds for the test result,
+Let $\lambda_1 < \ldots < \lambda_9$ be the thresholds for the teacher's advice
+and $\tau_1 < \ldots < \tau_5$ be the thresholds for the test result,
 with $\lambda_0 = \tau_0 = -\infty$, $\lambda_{10} = \tau_6 = \infty$.
 Then we can write:
 
 $$
-L_p = i \quad \text{if } \lambda_{i} < L^*_p \leq \lambda_{i+1}, \; i = 1, \ldots, 9 \\
-T_p = j \quad \text{if } \tau_{j} < T^*_p \leq \tau_{j+1}, \; j = 1, \ldots, 5.
+\begin{aligned}
+L_p = i \Leftrightarrow \lambda_{i} < L^*_p \leq \lambda_{i+1}, \quad &i = 1, \ldots, 9 \\
+T_p = j \Leftrightarrow \tau_{j} < T^*_p \leq \tau_{j+1}, \quad &j = 1, \ldots, 5.
+\end{aligned}
 $$
 
 This makes our model a one-factor ($\theta$) measurement model with two congeneric indicators ($L, T$),
 with the teacher's advice as the reference indicator.
 
+A pupil is eligible for a higher track if $G(L_p, T_p) > 0$.
+Let $\pi \in [0, 1]$ be the compliance -- the probability that a teacher raises the advice when
+the test result is higher than the provisional advice.
+We can then define $U_p \sim \mathcal{U}(0, 1)$ as the indicator of whether the pupil's advice is raised.
+Then if $U_p \leq \pi$, the pupil's advice is raised.
+Now, we can define the final advice $F_p$ as follows:
+
+$$
+F_p = \begin{cases}
+    W_{T_p} \quad &\text{if } G(L_p, T_p) > 0 \text{ and } U_p \leq \pi, \\
+    V_{L_p} \quad &\text{otherwise}.
+\end{cases}
+$$
+
+@fig-measurement-model shows the structure of the described model.
+
+```{mermaid}
+%%| echo: false
+%%| label: fig-measurement-model
+%%| fig-cap: "Structure of the measurement model"
+flowchart LR
+    theta(["`Common factor &nbsp $$\theta_p$$`"])
+    lstar(["`Latent provisional advice &nbsp $$L^*_p$$`"])
+    l(["`Provisional advice &nbsp $$L_p$$`"])
+    tstar(["`Latent test result &nbsp $$T^*_p$$`"])
+    t(["`Test result &nbsp $$T_p$$`"])
+    gap(["`Advice gap &nbsp $$G(L_p, T_p)$$`"])
+    f(["`Final advice &nbsp $$F_p$$`"])
+
+    theta --> lstar
+    theta --> tstar
+    lstar --> l
+    tstar --> t
+    l --> gap
+    t --> gap
+    gap --> f
+```
+
 Assumptions made:
 
-- the teacher error variance $\sigma^2_L$ is the same for all pupils and the provisional advice thresholds are the same for all pupils in every test population,
+- the teacher error variance $\sigma^2_L$ and the provisional advice thresholds are the same for all pupils in every test population,
 - the test result thresholds are the same for all tests (CvTE provides a framework for matching the results),
 - pupils are independent of each other,
 - the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are all mutually independent,
