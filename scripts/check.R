@@ -6,7 +6,6 @@ files <- list.files(
     c("R", "scripts", "report"),
     pattern = "\\.(R|Rmd|qmd)$", full.names = TRUE, recursive = TRUE
 )
-files <- c(files, "index.qmd")
 stopifnot(length(files) > 0)
 # lintr only skips chunks whose engine knitr knows; Quarto renders these
 # itself, so register no-op engines to keep them out of the R lints.

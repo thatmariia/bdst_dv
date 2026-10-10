@@ -1,0 +1,7 @@
+## Final visualization
+
+*Your final, explanatory visualization goes below. Include a short write-up: what does it communicate, why is this the best way to communicate it, and how robust is the finding?*
+
+```{r}
+#| label: final-plot
+```

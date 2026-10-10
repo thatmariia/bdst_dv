@@ -1,0 +1,149 @@
+## Getting data
+
+We use and derive the following tables from the mentioned sources: CvTE, DUO, the Inspectorate, and Cito. @tbl-data-overview in @sec-data-sources shows the provenance of each table, and Tables [-@tbl-duo-gap-matrix]-[-@tbl-school-weighting]
+in @sec-data-tables shows the glimpses of the tables themselves, with a short description of their contents.
+
+### Data sources {#sec-data-sources}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data sources"}
+```{r}
+#| label: tbl-data-overview
+knitr::kable(data_overview, format.args = list(big.mark = ","))
+```
+:::
+
+
+### Data tables {#sec-data-tables}
+::: {.callout-note collapse="true" appearance="minimal" title="Data tables"}
+
+#### DUO gap matrix
+
+@tbl-duo-gap-matrix shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO. The rows correspond to the provisional advice, and the columns correspond to the test result. Let $G(i, j)$ be the entry in row $i$ and column $j$ of this matrix. Then $G(i, j)$ is the indication of how much higher the track $i$ is valued than track $j$.
+
+```{r}
+#| label: tbl-duo-gap-matrix
+knitr::kable(gap_matrix, format.args = list(big.mark = ","))
+```
+
+To compare the recommendations, we define two weight vectors $v$ and $w$ for the provisional advice $i$ and the test result $j$, respectively. The weight vectors are defined as follows:
+
+$$
+v_i = (0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0),
+$$
+
+$$
+w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
+$$
+
+The mismatch between the provisional advice and the test result is what constitutes the category design source of disagreement.
+
+#### CvTE data
+
+For each test (separating the paper and digital versions) and year, CvTE provides a table that shows the distribution of a test result $j$ for each provisional advice $i$. A sample is shown in @tbl-cvte-conditional.
+
+```{r}
+#| label: tbl-cvte-conditional
+cvte_conditional |>
+    filter(test_year == 2025 & test == "Lib digital" & provisional == "havo") |>
+    knitr::kable()
+```
+
+CvTE also provides a table showing the distribution of provisional advice $i$ for each test and year (@tbl-cvte-provisional).
+
+```{r}
+#| label: tbl-cvte-provisional
+cvte_provisional |>
+    filter(test_year == 2025 & test == "Lib digital") |>
+    knitr::kable()
+```
+
+The number of pupils that have taken each test in a particular year is also provided, example shown in @tbl-cvte-pupils.
+
+```{r}
+#| label: tbl-cvte-pupils
+cvte_pupils |>
+    filter(test == "Lib digital") |>
+    knitr::kable()
+```
+
+#### DUO data
+
+DUO provides a table (@tbl-main-provider) that shows the test provider used by each school for each year and the share of pupils that took that test.
+
+```{r}
+#| label: tbl-main-provider
+main_provider |>
+    distinct(provider, .keep_all = TRUE) |>
+    distinct(test_year, .keep_all = TRUE) |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+They also provide a table that shows, for each school and year, the number of pupils that took each test. For some results, we do not have the number of pupils, but we do have a lower and upper bound (for $n < 5$). The example is shown in @tbl-test-scores.
+
+```{r}
+#| label: tbl-test-scores
+test_scores |>
+    filter(institution_code == "00CD") |>
+    distinct(provider, .keep_all = TRUE) |>
+    knitr::kable()
+```
+
+DUO also provides a table (@tbl-reading-2f) that shows, for each school, year, and test provider, the share of pupils that were had their reading skills tested at the 2F level. It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for $n < 5$).
+
+```{r}
+#| label: tbl-reading-2f
+reading_2f |>
+    filter(institution_code == "00BA") |>
+    knitr::kable()
+```
+
+We also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the derived shares of the same numbers relative to the total number of pupils, the difference between the shares of pupils with higher and lower test advice, and the total disagreement share (sum).
+
+```{r}
+#| label: tbl-advice-reconsiderations
+advice_reconsiderations |>
+    filter(institution_code == "00DD") |>
+    knitr::kable()
+```
+
+DUO also supplies the table (@tbl-final-advice) with final advice after revisions, which shows the number of pupils (with lower and upper bounds for $n < 5$) that received each final advice for each school and year.
+
+```{r}
+#| label: tbl-final-advice
+final_advice |>
+    filter(institution_code == "00BB" & advice == "vmbo gt") |>
+    filter(n > 2.5) |>
+    knitr::kable()
+```
+
+We summarize the final advice table (@tbl-advice-summary) for a single school per year, showing the total number of pupils, mean advice, and shares of VWO and combined advice.
+
+```{r}
+#| label: tbl-advice-summary
+advice_summary |>
+    filter(institution_code == "31LH") |>
+    knitr::kable()
+```
+
+#### Cito data
+
+The simulated data from Cito (@tbl-cito-misclassification) shows how measurement uncertainty could change test advice. For each original test advice, they show the percentage of pupils that would receive a different or unchanged advice if the test was repeated.
+
+```{r}
+#| label: tbl-cito-misclassification
+cito_misclassification |>
+    knitr::kable()
+```
+
+#### Inspectorate data
+
+The Inspectorate provides the data on socioeconomic weighting of schools (see @tbl-school-weighting). The higher the weighting, the more disadvantaged pupils are in that school. The table also supplies the spread of the socioeconomic weighting along with the number of pupils in that school.
+
+```{r}
+#| label: tbl-school-weighting
+school_weighting |>
+    filter(institution_code == "00DN") |>
+    knitr::kable()
+```
+:::

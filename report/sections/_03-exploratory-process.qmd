@@ -1,0 +1,175 @@
+## Exploratory process
+
+```{r}
+#| label: exploratory-setup
+#| include: false
+# plot functions, plus the datasets compliance, joint, and standardized
+source("R/exploratory/setup.R")
+```
+
+### Compliance with raising the advice
+
+For the pupils that got a test advice that differed from the provisional advice, we can check the share of pupils that got their advice raised. This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies and the overall compliance with that policy across the country.
+
+```{r}
+#| label: compliance-values
+#| fig-height: 2
+#| fig-cap: "Compliance with raising the advice after a higher test result, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
+compliance_heatmap(compliance)
+```
+
+```{r}
+#| label: fig-compliance-plot
+#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
+compliance_plot(compliance)
+```
+
+```{r}
+#| label: compliance-measures
+#| include: false
+comp_m <- compliance_measures(compliance)
+comp_m_sum <- comp_m |>
+    filter(type == "higher" | type == "lower") |>
+    summarise(lo = sum(lo), hi = sum(hi), .by = test_year)
+```
+
+There is a substantial disagreement between the teacher's provisional advice and the test result in both directions. Throughout the recorded years, the minimum percentage of pupils with a higher test advice than the provisional advice is `{r} sprintf("%.1f", min(filter(comp_m, type == "higher")$lo) * 100)`%, and a lower test advice than the provisional advice is `{r} sprintf("%.1f", min(filter(comp_m, type == "lower")$lo) * 100)`%. In total, the portion of pupils with a disagreement between the two sources is between `{r} sprintf("%.1f", min(comp_m_sum$lo) * 100)`% and `{r} sprintf("%.1f", max(comp_m_sum$hi) * 100)`%.
+
+### Category design
+
+Let $J_t(i, j)$ be the joint distribution of provisional advice $i$ and test advice $j$ for test $t$, defined as
+
+$$
+J_t(i, j) = m_t(i) \PP_t(j | i),
+$$ {#eq-joint}
+
+where $m_t(i)$ is the share of pupils with provisional advice $i$, and $\PP_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
+
+@fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year. The slider allows switching between years.
+A large portion of the of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower that the test result)
+is located in the single-track provisional advice (larger red circles). They correspond to the test results that combine that track with the next higher one (e.g., provisional HAVO vs test result HAVO/VWO). While the test results contain the provisionally advised track, their values differ.
+According to @tbl-duo-gap-matrix, the mismatch between them is 0.5.
+That mismatch is the source of disagreement that we call *category design*.
+
+```{r}
+#| label: fig-joint-plot
+#| fig-height: 9
+#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (use the slider to switch years). Source: CvTE Terugblik normering doorstroomtoetsen 2025 and 2026; DUO conversion table."  # nolint: line_length_linter
+joint_plot(joint)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-joint-table
+joint |>
+    select(test_year, provisional, test_advice, gap, share) |>
+    knitr::kable(digits = 4)
+```
+:::
+
+### Test menu
+
+Different schools use different test providers, and those schools consist of different populations of pupils.
+To account for the differences in the populations, we can standardize the test results to a common distribution of provisional advice.
+This allows us to compare the test providers and modes.
+The standardization is applied by replacing the share of pupils with provisional advice $i$ for test $t$, $m_t(i)$ in @eq-joint,
+with the national share $\bar{m}(i)$, which is the average of $m_t(i)$ over all tests $t$:
+
+$$
+\bar{m}(i) = \frac{\sum_t N_t(i) m_t(i)}{\sum_t N_t(i)},
+$$
+
+where $N_t(i)$ is the number of pupils with provisional advice $i$ for test $t$.
+Then we can define the standardized eligibility $h_t$ as follows:
+
+$$
+h_t = \sum_{i, j : G(i, j) > 0} \bar{m}(i) \PP_t (j | i).
+$$
+
+This value represents the share of pupils that are eligible for a higher test advice than their provisional advice,
+given the national distribution of provisional advice.
+We also define $\ell_t$ as the standardized share of pupils that have scored lower on the test than their provisional advice:
+
+$$
+\ell_t = \sum_{i, j : G(i, j) < 0} \bar{m}(i) \PP_t (j | i).
+$$
+
+Now, we define the leniency index for a test $t$, which encodes the tendency of a test to give higher or lower advice
+than the provisional advice.
+Positive leniency indicates that the test is more likely to give a higher advice, and vice versa.
+We also define the disagreement index, which encodes the overall disagreement between the two sources:
+
+$$
+\text{leniency}_t = h_t - \ell_t, \quad \text{disagreement}_t = h_t + \ell_t.
+$$
+
+```{r}
+#| label: standardized-values
+#| include: false
+stat <- function(s) {
+    if (s == "min") {
+        return(min)
+    } else if (s == "max") {
+        return(max)
+    }
+    function(x) max(x) - min(x)
+}
+
+std_val <- function(y, s, c) {
+    standardized |>
+        filter(test_year == y) |>
+        summarise(
+            value = stat(s)(get(c))
+        ) |>
+        pull(value) * 100
+}
+```
+
+@fig-standardized shows the standardized leniency and disagreement per test assuming a common distribution of provisional advice,
+with arrows from 2025 to 2026, indicating the change in the indices.
+If all pupils in the Netherlands took the same test in 2026, between
+`{r} sprintf("%.1f", std_val(2026, "min", "higher"))`% and
+`{r} sprintf("%.1f", std_val(2026, "max", "higher"))`%
+would be eligible for a higher track; in 2025 -- between
+`{r} sprintf("%.1f", std_val(2025, "min", "higher"))`% and
+`{r} sprintf("%.1f", std_val(2025, "max", "higher"))`%.
+
+The disagreements range from
+`{r} sprintf("%.1f", std_val(2026, "min", "disagreement"))`% to
+`{r} sprintf("%.1f", std_val(2026, "max", "disagreement"))`%,
+with
+$\Delta \text{disagreement}$ = `{r} sprintf("%.1f", std_val(2026, "diff", "disagreement"))`%
+in 2026; in 2025, the spread of disagreement was the same:
+`{r} sprintf("%.1f", std_val(2025, "max", "disagreement"))`% -
+`{r} sprintf("%.1f", std_val(2025, "min", "disagreement"))`% =
+`{r} sprintf("%.1f", std_val(2025, "diff", "disagreement"))`$%.
+
+The leniency range in 2026 was from
+`{r} sprintf("%.1f", std_val(2026, "min", "leniency"))`% to
+`{r} sprintf("%.1f", std_val(2026, "max", "leniency"))`%,
+with
+$\Delta \text{leniency}$ = `{r} sprintf("%.1f", std_val(2026, "diff", "leniency"))`%,
+down from 2025, when the leniency range was
+`{r} sprintf("%.1f", std_val(2025, "max", "leniency"))`% -
+(`{r} sprintf("%.1f", std_val(2025, "min", "leniency"))`%) =
+`{r} sprintf("%.1f", std_val(2025, "diff", "leniency"))`%.
+
+The tests differ more in their leniency than in their disagreement.
+Even the differences between modes of the same test providers are considerable.
+Among the providers who offer both modes (IEP and Lib), the paper versions are more lenient than digital.
+The differences in leniency and disagreement constitute the source of disagreement that we call *test menu*.
+
+```{r}
+#| label: fig-standardized
+#| fig-cap: "Standardised leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE Terugblik normering doorstroomtoetsen 2025 and 2026; DUO conversion table."  # nolint: line_length_linter
+standardized_plot(standardized)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-standardized
+knitr::kable(standardized, digits = 4)
+```
+:::

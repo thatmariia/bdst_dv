@@ -1,0 +1,7 @@
+## Conclusion
+
+*What can you conclude from your visualization? What are the limitations of this analysis?*
+
+------------------------------------------------------------------------
+
+**Before submitting:** run the lintr check on this file, and re-render from a clean environment (`rm(list = ls())`, already done above) to make sure everything reproduces from scratch.
