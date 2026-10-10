@@ -2,7 +2,8 @@
 #' its provenance. An empty years cell is computed from the dataset's
 #' test_year; {name} in content is filled from `values`.
 #' @param path Registry CSV path.
-#' @return Tibble with dataset, source, content, years, and unit.
+#' @return Tibble with dataset, source, citation (Pandoc keys), content,
+#'   years, and unit.
 read_sources <- function(path = "data/sources.csv") {
     read_csv(
         path,

@@ -1,14 +1,14 @@
-dataset,source,content,years,unit
-advice_reconsiderations,DUO brin6_heroverweging (wpoheroverweging-v1),pupils with test advice higher / lower than the original advice; total pupils with advice and test score; advices raised; shares up / down / raised and lean / disagreement (D4),,school location × year
-test_scores,DUO brin6_eindscores (wpo-eindscores),test used and pupils tested per test (group 8),,school × year × test
-main_provider,DUO brin6_eindscores (wpo-eindscores),main test and its share of tested pupils (D5),,school × year
-final_advice,DUO brin6_advies (wpoadvies-v1),final advice (after revisions) per category,,school × year × advice
-advice_summary,DUO brin6_advies (wpoadvies-v1),"mean advice, share vwo, and share combined advice (D6)",,school × year
-reading_2f,DUO brin6_referentieniveau (wporeferentieniveau-v1),reading level reached (conventional outcome): share of tested pupils at 2F (D8),,school × year × test
-school_weighting,"Inspectorate, schoolweging 2022–2025","school composition index: mean, spread, and pupil count (D7)",,school × year
-cvte_conditional,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",provisional × test advice per test and mode (row %),,national × test
-cvte_provisional,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",provisional advice per test,,national × test
-cvte_pupils,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",pupils per test,,national × test
-cvte_agreement,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",published shares of lower / equal / higher test advice (validation),,national
-cito_misclassification,"Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D",simulated share of changing test advices if the test was repeated with its standard error,2022,national (paper CET)
-gap_matrix,"DUO, conversion table (toelichting bestand nr. 11)",definition of “higher” and “lower”,–,matrix
+dataset,source,citation,content,years,unit
+advice_reconsiderations,DUO brin6_heroverweging (wpoheroverweging-v1),[@duo_heroverweging],pupils with test advice higher / lower than the original advice; total pupils with advice and test score; advices raised; shares up / down / raised and lean / disagreement (D4),,school location × year
+test_scores,DUO brin6_eindscores (wpo-eindscores),[@duo_eindscores],test used and pupils tested per test (group 8),,school × year × test
+main_provider,DUO brin6_eindscores (wpo-eindscores),[@duo_eindscores],main test and its share of tested pupils (D5),,school × year
+final_advice,DUO brin6_advies (wpoadvies-v1),[@duo_advies],final advice (after revisions) per category,,school × year × advice
+advice_summary,DUO brin6_advies (wpoadvies-v1),[@duo_advies],"mean advice, share vwo, and share combined advice (D6)",,school × year
+reading_2f,DUO brin6_referentieniveau (wporeferentieniveau-v1),[@duo_referentieniveau],reading level reached (conventional outcome): share of tested pupils at 2F (D8),,school × year × test
+school_weighting,"Inspectorate, schoolweging 2022–2025",[@inspectie_schoolweging],"school composition index: mean, spread, and pupil count (D7)",,school × year
+cvte_conditional,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2025; @cvte2026],provisional × test advice per test and mode (row %),,national × test
+cvte_provisional,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2025; @cvte2026],provisional advice per test,,national × test
+cvte_pupils,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2026],pupils per test,,national × test
+cvte_agreement,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2026],published shares of lower / equal / higher test advice (validation),,national
+cito_misclassification,"Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D",[@cito2026],simulated share of changing test advices if the test was repeated with its standard error,2022,national (paper CET)
+gap_matrix,"DUO, conversion table (toelichting bestand nr. 11)",[@duo_conversion],definition of “higher” and “lower”,–,matrix

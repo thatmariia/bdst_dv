@@ -19,16 +19,16 @@ The teacher's provisional advice can be a single track or a combination of two t
 - if the teacher's advice is higher than the test result, nothing changes;
 - if the teacher's advice is lower than the test result, the teacher should raise their advice.
 
-This asymmetrical up-only method has been implemented since the academic year 2023/2024. Before that year, the raising of the advice was optional.
+This asymmetrical up-only method has been implemented since the academic year 2023/2024 [@cvte2026]. Before that year, the raising of the advice was optional.
 
-Each school can choose which test provider to use, and the test is administered by the school itself. Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8. Furthermore, IEP and Lib are available in both paper and digital versions. The College voor Toetsen en Examens (CvTE) provides a framework for matching the results of the different test providers to the same reference levels. However, the CvTE has also published a report that shows that pupils with the same provisional advice receive different different test results depending on the test provider. It is unclear whether this is due to differences in the test providers, or due to differences in the schools that use those providers.
+Each school can choose which test provider to use, and the test is administered by the school itself. Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8. Furthermore, IEP and Lib are available in both paper and digital versions. The College voor Toetsen en Examens (CvTE) provides a framework for matching the results of the different test providers to the same reference levels [@cvte2026]. However, the CvTE has also published reports showing that pupils with the same provisional advice receive different test results depending on the test provider [@cvte2025; @cvte2026]. It is unclear whether this is due to differences in the test providers, or due to differences in the schools that use those providers.
 
 There are four main sources of potential disagreement between the teacher's advice and the test result:
 
 - **category design**: the teacher's advice has a different scale than the test result,
 - **test menu**: the tests have different providers and modes,
 - **teacher error**: teachers can make mistakes, and
-- **test error**: the tests have measurement uncertainty.
+- **test error**: the tests have measurement uncertainty [@cito2026].
 
 The present research question is to attempt to quantify the impact of each source of disagreement.
 

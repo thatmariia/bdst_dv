@@ -2,6 +2,9 @@
 title: "DV Assignment 2: [Your Title Here]"
 author: "Mariia Steeghs-Turchina"
 date: today
+bibliography: references.bib
+csl: https://www.zotero.org/styles/apa
+link-citations: true
 format:
   html:
     number-sections: true
@@ -64,3 +67,5 @@ source("R/data/get-data.R")
 {{< include sections/_05-final-visualization.qmd >}}
 
 {{< include sections/_06-conclusion.qmd >}}
+
+{{< include sections/_07-references.qmd >}}

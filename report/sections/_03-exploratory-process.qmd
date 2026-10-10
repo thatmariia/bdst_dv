@@ -9,18 +9,18 @@ source("R/exploratory/setup.R")
 
 ### Compliance with raising the advice
 
-For the pupils that got a test advice that differed from the provisional advice, we can check the share of pupils that got their advice raised. This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies and the overall compliance with that policy across the country.
+For the pupils that got a test advice that differed from the provisional advice, DUO's revision data [@duo_heroverweging] lets us check the share of pupils that got their advice raised. This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies and the overall compliance with that policy across the country.
 
 ```{r}
 #| label: compliance-values
 #| fig-height: 2
-#| fig-cap: "Compliance with raising the advice after a higher test result, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
+#| fig-cap: "Compliance with raising the advice after a higher test result, per test year. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
 compliance_heatmap(compliance)
 ```
 
 ```{r}
 #| label: fig-compliance-plot
-#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO brin6_heroverweging, regular primary schools."  # nolint: line_length_linter
+#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
 compliance_plot(compliance)
 ```
 
@@ -48,13 +48,13 @@ where $m_t(i)$ is the share of pupils with provisional advice $i$, and $\PP_t(j 
 @fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year. The slider allows switching between years.
 A large portion of the of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower that the test result)
 is located in the single-track provisional advice (larger red circles). They correspond to the test results that combine that track with the next higher one (e.g., provisional HAVO vs test result HAVO/VWO). While the test results contain the provisionally advised track, their values differ.
-According to @tbl-duo-gap-matrix, the mismatch between them is 0.5.
+According to DUO's conversion table [@duo_conversion] in @tbl-duo-gap-matrix, the mismatch between them is 0.5.
 That mismatch is the source of disagreement that we call *category design*.
 
 ```{r}
 #| label: fig-joint-plot
 #| fig-height: 9
-#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (use the slider to switch years). Source: CvTE Terugblik normering doorstroomtoetsen 2025 and 2026; DUO conversion table."  # nolint: line_length_linter
+#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (use the slider to switch years). Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
 joint_plot(joint)
 ```
 
@@ -72,7 +72,7 @@ joint |>
 
 Different schools use different test providers, and those schools consist of different populations of pupils.
 To account for the differences in the populations, we can standardize the test results to a common distribution of provisional advice.
-This allows us to compare the test providers and modes.
+Applied to CvTE's per-test tables [@cvte2025; @cvte2026], this allows us to compare the test providers and modes.
 The standardization is applied by replacing the share of pupils with provisional advice $i$ for test $t$, $m_t(i)$ in @eq-joint,
 with the national share $\bar{m}(i)$, which is the average of $m_t(i)$ over all tests $t$:
 
@@ -162,7 +162,7 @@ The differences in leniency and disagreement constitute the source of disagreeme
 
 ```{r}
 #| label: fig-standardized
-#| fig-cap: "Standardised leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE Terugblik normering doorstroomtoetsen 2025 and 2026; DUO conversion table."  # nolint: line_length_linter
+#| fig-cap: "Standardised leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
 standardized_plot(standardized)
 ```
 

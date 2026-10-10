@@ -43,7 +43,7 @@ The intercept $\beta_t$ encodes the test's leniency:
 a higher $\beta_t$ shifts the test results to a higher track.
 The test scale is normalized with respect to the teacher's scale,
 by setting $\alpha_{\text{ref}} = 1$ and $\beta_{\text{ref}} = 0$ for the reference test.
-The test error $\epsilon_{T, p}$ can be attributed to the test's measurement uncertainty and
+The test error $\epsilon_{T, p}$ can be attributed to the test's measurement uncertainty [@cito2026] and
 is assumed to be normally distributed.
 We set the mean of the error to zero so that every systematic bias is captured by the intercept $\beta_t$,
 and we set the variance $\sigma^2_{T, t}$ to be specific to the test provider $t$.
@@ -109,7 +109,7 @@ flowchart LR
 Assumptions made:
 
 - the teacher error variance $\sigma^2_L$ and the provisional advice thresholds are the same for all pupils in every test population,
-- the test result thresholds are the same for all tests (CvTE provides a framework for matching the results),
+- the test result thresholds are the same for all tests (CvTE provides a framework for matching the results, see @cvte2026),
 - pupils are independent of each other,
 - the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are all mutually independent,
 - the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are normally distributed.
