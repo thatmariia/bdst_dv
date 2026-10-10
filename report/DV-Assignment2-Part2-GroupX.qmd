@@ -446,7 +446,7 @@ Now, we model the latent test advice $T^*_p$ as follows:
 
 $$
 T^*_p = \alpha_t \theta_p + \beta_t + \epsilon_{T, p}, \quad \epsilon_{T, p} \sim \mathcal{N}(0, \sigma^2_{T, t}).
-$$
+$$ {#eq-test}
 
 The loading factor $\alpha_t$ and the intercept $\beta_t$ are specific to the test provider $t$.
 $\alpha_t$ encodes the test's sensitivity to the common factor:
@@ -465,6 +465,17 @@ Neither the teacher's advice nor the test result is directly observed;
 instead, we observe the provisional advice $L$ and the test result $T$ as ordinal variables.
 When $L^*$ falls into the interval between the thresholds of $i$ and $i + 1$, the teacher assigns a provisional advice $i$ to the pupil.
 When $T^*$ falls into the interval between the thresholds of $j$ and $j + 1$, the test assigns a test result $j$ to the pupil.
+
+Let $\lambda_1, \ldots, \lambda_9$ be the thresholds for the teacher's advice
+and $\tau_1, \ldots, \tau_5$ be the thresholds for the test result,
+with $\lambda_0 = \tau_0 = -\infty$, $\lambda_{10} = \tau_6 = \infty$.
+Then we can write:
+
+$$
+L_p = i \quad \text{if } \lambda_{i} < L^*_p \leq \lambda_{i+1}, \; i = 1, \ldots, 9 \\
+T_p = j \quad \text{if } \tau_{j} < T^*_p \leq \tau_{j+1}, \; j = 1, \ldots, 5.
+$$
+
 This makes our model a one-factor ($\theta$) measurement model with two congeneric indicators ($L, T$),
 with the teacher's advice as the reference indicator.
 
