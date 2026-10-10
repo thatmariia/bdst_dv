@@ -271,9 +271,9 @@ There is a substantial disagreement between the teacher's provisional advice and
 
 Let $J_p(i, j)$ be the joint distribution of provisional advice $i$ and test advice $j$ for test $p$, defined as
 
-$$ {#eq-joint}
-J_p(i, j) = m_p(i) P_p(j | i),
 $$
+J_p(i, j) = m_p(i) P_p(j | i),
+$$ {#eq-joint}
 
 where $m_p(i)$ is the share of pupils with provisional advice $i$, and $P_p(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
 
@@ -328,11 +328,69 @@ $$
 $$
 
 Now, we define the leniency index for a test $p$, which encodes the tendency of a test to give higher or lower advice
-than the provisional advice, and the disagreement index, which encodes the overall disagreement between the two sources:
+than the provisional advice.
+Positive leniency indicates that the test is more likely to give a higher advice, and vice versa.
+We also define the disagreement index, which encodes the overall disagreement between the two sources:
 
 $$
 \text{leniency}_p = h_p - \ell_p, \quad \text{disagreement}_p = h_p + \ell_p.
 $$
+
+```{r}
+#| label: standardized-values
+#| include: false
+stat <- function(s) {
+    if (s == "min") {
+        return(min)
+    } else if (s == "max") {
+        return(max)
+    }
+    function(x) max(x) - min(x)
+}
+
+std_val <- function(y, s, c) {
+    standardized |>
+        filter(test_year == y) |>
+        summarise(
+            value = stat(s)(get(c))
+        ) |>
+        pull(value) * 100
+}
+```
+
+@fig-standardized shows the standardized leniency and disagreement per test assuming a common distribution of provisional advice,
+with arrows from 2025 to 2026, indicating the change in the indices.
+If all pupils in the Netherlands took the same test in 2026, between
+`{r} sprintf("%.1f", std_val(2026, "min", "higher"))`% and
+`{r} sprintf("%.1f", std_val(2026, "max", "higher"))`%
+would be eligible for a higher track; in 2025 -- between
+`{r} sprintf("%.1f", std_val(2025, "min", "higher"))`% and
+`{r} sprintf("%.1f", std_val(2025, "max", "higher"))`%.
+
+The disagreements range from
+`{r} sprintf("%.1f", std_val(2026, "min", "disagreement"))`% to
+`{r} sprintf("%.1f", std_val(2026, "max", "disagreement"))`%,
+with
+$\Delta \text{disagreement}$ = `{r} sprintf("%.1f", std_val(2026, "diff", "disagreement"))`%
+in 2026; in 2025, the spread of disagreement was the same:
+`{r} sprintf("%.1f", std_val(2025, "max", "disagreement"))`% -
+`{r} sprintf("%.1f", std_val(2025, "min", "disagreement"))`% =
+`{r} sprintf("%.1f", std_val(2025, "diff", "disagreement"))`$%.
+
+The leniency range in 2026 was from
+`{r} sprintf("%.1f", std_val(2026, "min", "leniency"))`% to
+`{r} sprintf("%.1f", std_val(2026, "max", "leniency"))`%,
+with
+$\Delta \text{leniency}$ = `{r} sprintf("%.1f", std_val(2026, "diff", "leniency"))`%,
+down from 2025, when the leniency range was
+`{r} sprintf("%.1f", std_val(2025, "max", "leniency"))`% -
+(`{r} sprintf("%.1f", std_val(2025, "min", "leniency"))`%) =
+`{r} sprintf("%.1f", std_val(2025, "diff", "leniency"))`%.
+
+The tests differ more in their leniency than in their disagreement.
+Even the differences between modes of the same test providers are considerable.
+Among the providers who offer both modes (IEP and Lib), the paper versions are more lenient than digital.
+The differences in leniency and disagreement constitute the source of disagreement that we call *test menu*.
 
 ```{r}
 #| label: fig-standardized
