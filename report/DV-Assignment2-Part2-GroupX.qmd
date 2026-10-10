@@ -269,13 +269,13 @@ There is a substantial disagreement between the teacher's provisional advice and
 
 ### Category design
 
-Let $J_p(i, j)$ be the joint distribution of provisional advice $i$ and test advice $j$ for test $p$, defined as
+Let $J_t(i, j)$ be the joint distribution of provisional advice $i$ and test advice $j$ for test $t$, defined as
 
 $$
-J_p(i, j) = m_p(i) P_p(j | i),
+J_t(i, j) = m_t(i) P_t(j | i),
 $$ {#eq-joint}
 
-where $m_p(i)$ is the share of pupils with provisional advice $i$, and $P_p(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
+where $m_t(i)$ is the share of pupils with provisional advice $i$, and $P_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
 
 @fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year. The slider allows switching between years.
 A large portion of the of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower that the test result)
@@ -305,35 +305,35 @@ joint |>
 Different schools use different test providers, and those schools consist of different populations of pupils.
 To account for the differences in the populations, we can standardize the test results to a common distribution of provisional advice.
 This allows us to compare the test providers and modes.
-The standardization is applied by replacing the share of pupils with provisional advice $i$ for test $p$, $m_p(i)$ in @eq-joint,
-with the national share $\bar{m}(i)$, which is the average of $m_p(i)$ over all tests $p$:
+The standardization is applied by replacing the share of pupils with provisional advice $i$ for test $t$, $m_t(i)$ in @eq-joint,
+with the national share $\bar{m}(i)$, which is the average of $m_t(i)$ over all tests $t$:
 
 $$
-\bar{m}(i) = \frac{\sum_p N_p(i) m_p(i)}{\sum_p N_p(i)},
+\bar{m}(i) = \frac{\sum_t N_t(i) m_t(i)}{\sum_t N_t(i)},
 $$
 
-where $N_p(i)$ is the number of pupils with provisional advice $i$ for test $p$.
-Then we can define the standardized eligibility $h_p$ as follows:
+where $N_t(i)$ is the number of pupils with provisional advice $i$ for test $t$.
+Then we can define the standardized eligibility $h_t$ as follows:
 
 $$
-h_p = \sum_{i, j : G(i, j) > 0} \bar{m}(i) P_p (j | i).
+h_t = \sum_{i, j : G(i, j) > 0} \bar{m}(i) P_t (j | i).
 $$
 
 This value represents the share of pupils that are eligible for a higher test advice than their provisional advice,
 given the national distribution of provisional advice.
-We also define $\ell_p$ as the standardized share of pupils that have scored lower on the test than their provisional advice:
+We also define $\ell_t$ as the standardized share of pupils that have scored lower on the test than their provisional advice:
 
 $$
-\ell_p = \sum_{i, j : G(i, j) < 0} \bar{m}(i) P_p (j | i).
+\ell_t = \sum_{i, j : G(i, j) < 0} \bar{m}(i) P_t (j | i).
 $$
 
-Now, we define the leniency index for a test $p$, which encodes the tendency of a test to give higher or lower advice
+Now, we define the leniency index for a test $t$, which encodes the tendency of a test to give higher or lower advice
 than the provisional advice.
 Positive leniency indicates that the test is more likely to give a higher advice, and vice versa.
 We also define the disagreement index, which encodes the overall disagreement between the two sources:
 
 $$
-\text{leniency}_p = h_p - \ell_p, \quad \text{disagreement}_p = h_p + \ell_p.
+\text{leniency}_t = h_t - \ell_t, \quad \text{disagreement}_t = h_t + \ell_t.
 $$
 
 ```{r}
@@ -398,14 +398,17 @@ The differences in leniency and disagreement constitute the source of disagreeme
 standardized_plot(standardized)
 ```
 
-::: {.callout-note collapse="true" appearance="minimal"}
-## Data table
+::: {.callout-note collapse="true" appearance="minimal", title="Data table"}
 
 ```{r}
 #| label: tbl-standardized
 knitr::kable(standardized, digits = 4)
 ```
 :::
+
+## Modeling
+
+
 
 ## Final visualization
 
