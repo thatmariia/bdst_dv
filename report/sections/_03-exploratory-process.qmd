@@ -78,14 +78,14 @@ with the national share $\bar{m}(i)$, which is the average of $m_t(i)$ over all 
 
 $$
 \bar{m}(i) = \frac{\sum_t N_t(i) m_t(i)}{\sum_t N_t(i)},
-$$
+$$ {#eq-national-share}
 
 where $N_t(i)$ is the number of pupils with provisional advice $i$ for test $t$.
 Then we can define the standardized eligibility $h_t$ as follows:
 
 $$
 h_t = \sum_{i, j : G(i, j) > 0} \bar{m}(i) \PP_t (j | i).
-$$
+$$ {#eq-standardized-eligibility}
 
 This value represents the share of pupils that are eligible for a higher test advice than their provisional advice,
 given the national distribution of provisional advice.
@@ -93,7 +93,7 @@ We also define $\ell_t$ as the standardized share of pupils that have scored low
 
 $$
 \ell_t = \sum_{i, j : G(i, j) < 0} \bar{m}(i) \PP_t (j | i).
-$$
+$$ {#eq-standardized-ineligibility}
 
 Now, we define the leniency index for a test $t$, which encodes the tendency of a test to give higher or lower advice
 than the provisional advice.
@@ -102,7 +102,7 @@ We also define the disagreement index, which encodes the overall disagreement be
 
 $$
 \text{leniency}_t = h_t - \ell_t, \quad \text{disagreement}_t = h_t + \ell_t.
-$$
+$$ {#eq-standardized-indices}
 
 ```{r}
 #| label: standardized-values

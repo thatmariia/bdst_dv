@@ -10,7 +10,7 @@ We assume that $\theta_p$ is normally distributed within each test population wi
 
 $$
 \theta_p \mid t, p = t \sim \mathcal{N}(\mu_t, \sigma^2_{\theta, t}).
-$$
+$$ {#eq-common-factor}
 
 Then we can model the teacher's latent provisional advice $L^*_p$ for pupil $p$ as follows:
 
@@ -61,7 +61,7 @@ $$
 L_p = i \Leftrightarrow \lambda_{i} < L^*_p \leq \lambda_{i+1}, \quad &i = 1, \ldots, 9 \\
 T_p = j \Leftrightarrow \tau_{j} < T^*_p \leq \tau_{j+1}, \quad &j = 1, \ldots, 5.
 \end{aligned}
-$$
+$$ {#eq-thresholds}
 
 This makes our model a one-factor ($\theta$) measurement model with two congeneric indicators ($L, T$),
 with the teacher's advice as the reference indicator.
@@ -78,7 +78,7 @@ F_p = \begin{cases}
     W_{T_p} \quad &\text{if } G(L_p, T_p) > 0 \text{ and } U_p \leq \pi, \\
     V_{L_p} \quad &\text{otherwise}.
 \end{cases}
-$$
+$$ {#eq-final-advice}
 
 @fig-measurement-model shows the structure of the described model.
 
