@@ -37,3 +37,9 @@ The residual variance $\psi^2_t$ combines the test's measurement uncertainty $\s
 
 For a given test $t$, the reduced model in @eq-reduced-model is a bivariate normal distribution behind the polychoric correlation,
 with parameters $\mu_t, \sigma^2_t, a_t, b_t, \psi^2_t$.
+By the law of total variance, the variance of the latent test result and the correlation between the latent provisional advice and test result are given by:
+
+$$
+s^2_t = \Var(T^*_p) = b^2_t \sigma^2_t + \psi^2_t, \quad
+\rho_t = \frac{\Cov(L^*_p, T^*_p)}{\sigma_t s_t} = \frac{b_t \sigma_t}{s_t}.
+$$ {#eq-reduced-variance-correlation}

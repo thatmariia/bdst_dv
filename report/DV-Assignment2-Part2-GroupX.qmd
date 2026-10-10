@@ -39,6 +39,7 @@ $\newcommand{\Var}{\operatorname{Var}}$
 $\newcommand{\Cov}{\operatorname{Cov}}$
 $\newcommand{\PP}{\mathbb{P}}$
 $\newcommand{\EE}{\mathbb{E}}$
+$\newcommand{\indicator}{\mathbf{1}}$
 
 ```{r}
 #| label: setup
