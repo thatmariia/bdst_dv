@@ -60,3 +60,10 @@ filter_school_weighting <- function(school_weighting) {
         filter(n() == 1, .by = c(institution_code, test_year)) |>
         select(institution_code, test_year, school_weighting, spread, pupils)
 }
+
+#' D1: regular school locations only.
+filter_school_locations <- function(school_locations) {
+    school_locations |>
+        filter(school_type == "regular") |>
+        select(-school_type)
+}

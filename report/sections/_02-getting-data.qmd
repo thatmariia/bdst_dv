@@ -126,6 +126,23 @@ advice_summary |>
     knitr::kable()
 ```
 
+We also use DUO data that contains the name, place, municipality, province, and school board (with names) of each school location, spread over
+Tables [-@tbl-school-locations]-[-@tbl-school-boards] [@duo_schooladviezen; @duo_adressen].
+
+```{r}
+#| label: tbl-school-locations
+school_locations |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+```{r}
+#| label: tbl-school-boards
+school_boards |>
+    filter(board_number == "41646") |>
+    knitr::kable()
+```
+
 #### Cito data
 
 The simulated data from Cito [@cito2026] (@tbl-cito-misclassification) shows how measurement uncertainty could change test advice. For each original test advice, they show the percentage of pupils that would receive a different or unchanged advice if the test was repeated.

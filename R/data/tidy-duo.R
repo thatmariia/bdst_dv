@@ -185,3 +185,42 @@ tidy_school_weighting <- function(path) {
             pupils = as.numeric(aantal_leerlingen)
         )
 }
+
+#' Names and regions of the school locations, from the DUO file of school
+#' advices 2024-2025 that the course uses (semicolon-separated).
+#' PEILDATUM_LEERLINGEN 20241001 is school year 2024-25, test year 2025.
+#' @param path schooladviezen_2024-2025 CSV path.
+#' @return Tibble per school location with name, place, municipality,
+#'   province, and board number.
+tidy_school_locations <- function(path) {
+    read_delim(
+        path,
+        delim = ";", col_types = cols(.default = col_character()),
+        progress = FALSE
+    ) |>
+        transmute(
+            institution_code = INSTELLINGSCODE,
+            location_code = VESTIGINGSCODE,
+            school_type = recode(SOORT_PO, Bo = "regular", Sbo = "special"),
+            test_year = as.integer(substr(PEILDATUM_LEERLINGEN, 1, 4)) + 1L,
+            name = INSTELLINGSNAAM_VESTIGING,
+            place = tools::toTitleCase(tolower(PLAATSNAAM)),
+            municipality = GEMEENTENAAM,
+            province = PROVINCIE,
+            board_number = BEVOEGD_GEZAG_NUMMER
+        )
+}
+
+#' Names of the school boards (bevoegde gezagen) in DUO's address register.
+#' @param path besturenbo CSV path.
+#' @return Tibble with board_number and board.
+tidy_school_boards <- function(path) {
+    read_csv(
+        path,
+        col_types = cols(.default = col_character()), progress = FALSE
+    ) |>
+        transmute(
+            board_number = `BEVOEGD GEZAG NUMMER`,
+            board = `BEVOEGD GEZAG NAAM`
+        )
+}
