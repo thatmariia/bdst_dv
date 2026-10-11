@@ -1,5 +1,7 @@
 ### Fitting tables
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 #### Model predictions
 
 For each test $t$, the data provides the joint distribution $J_t(i, j)$ of the provisional advice and test result, as shown in @eq-joint.
@@ -126,4 +128,5 @@ The latter tests have more pupils with PrO advice in the published tables; this 
 #| label: tbl-fit-quality
 knitr::kable(fit_quality, digits = 3)
 ```
+:::
 :::

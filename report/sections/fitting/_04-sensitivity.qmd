@@ -1,5 +1,7 @@
 ### Anchor sensitivity {#sec-sensitivity}
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 ```{r}
 #| label: sensitivity-values
 #| include: false
@@ -51,3 +53,4 @@ the teacher error is larger than the test error only for $r$ below about `{r} sh
 Hence, the size of the teacher error relative to the test error should be read with the anchor in mind.
 Moreover, the tables bound the anchor:
 in 2025, only $r$ between `{r} share(robust_in(2025)$allowed_low)` and `{r} share(robust_in(2025)$allowed_high)` gives non-negative variances.
+:::

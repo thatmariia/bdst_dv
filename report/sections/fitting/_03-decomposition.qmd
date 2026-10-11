@@ -1,5 +1,7 @@
 ### Decomposition {#sec-decomposition}
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 With the original parameters in @tbl-original-parameters, we can switch each source of disagreement on and off,
 and see how the share of pupils that are eligible for a higher track changes.
 To compare the tests on the same pupils, we let the whole national population take each test.
@@ -88,6 +90,7 @@ ref_2025 <- decomposition_of(2025)
 ref_2026 <- decomposition_of(2026)
 year_2026 <- filter(decomposition, test_year == 2026)
 ```
+:::
 
 @fig-decomposition shows the decomposition per test, for the chosen year.
 If the whole national population took the reference test in 2026,

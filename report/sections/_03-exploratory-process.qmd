@@ -77,6 +77,8 @@ joint |>
 
 ### Test menu
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 Different schools use different test providers, and those schools consist of different populations of pupils.
 To account for the differences in the populations, we can standardize the test results to a common distribution of provisional advice.
 Applied to CvTE's per-test tables [@cvte2025; @cvte2026], this allows us to compare the test providers and modes.
@@ -132,6 +134,7 @@ std_val <- function(y, s, c) {
         pull(value) * 100
 }
 ```
+:::
 
 @fig-standardized shows the standardized leniency and disagreement per test assuming a common distribution of provisional advice,
 with arrows from 2025 to 2026, indicating the change in the indices.

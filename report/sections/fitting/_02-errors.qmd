@@ -1,5 +1,7 @@
 ### Separating errors {#sec-separating-errors}
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 We now reverse the reduced parameters in @eq-reduced-parameters back to the original parameters given $\sigma^2_L$:
 
 $$
@@ -94,3 +96,4 @@ so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (se
 #| tbl-cap: "Original parameters per test and year: the mean $\\mu_t$ and variance $\\sigma^2_{\\theta, t}$ of the common factor, the loading factor $\\alpha_t$, the intercept $\\beta_t$, and the test error $\\sigma_{T, t}$, with $\\alpha_{\\text{ref}} = 1$."  # nolint: line_length_linter
 knitr::kable(original_parameters(structural), digits = 3)
 ```
+:::

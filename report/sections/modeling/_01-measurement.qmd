@@ -5,6 +5,8 @@ They will receive a provisional advice from their teacher, and a test advice fro
 Both measurements attempt to estimate the common factor: the pupil's suitability for secondary tracks $\theta_p$.
 Subscript $p$ marks parameters that vary per pupil, subscript $t$ -- parameters that vary per test.
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 Since the test is administered by schools, and schools choose their test, pupils taking different tests come from different populations.
 We assume that $\theta_p$ is normally distributed within each test population with mean $\mu_t$ and variance $\sigma^2_{\theta, t}$:
 
@@ -79,6 +81,7 @@ F_p = \begin{cases}
     v_{L_p} \quad &\text{otherwise}.
 \end{cases}
 $$ {#eq-final-advice}
+:::
 
 @fig-measurement-model shows the structure of the described model.
 

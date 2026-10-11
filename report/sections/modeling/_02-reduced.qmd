@@ -1,5 +1,7 @@
 ### Reduced model
 
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
 We never observe the common factor $\theta_p$.
 The CvTE tables only provide the provisional advice and test results, and we can observe the final advice.
 Therefore, we need to eliminate the latent variable $\theta_p$ by integrating it out of the model, resulting in a reduced model.
@@ -43,3 +45,4 @@ $$
 s^2_t = \Var(T^*_p) = b^2_t \sigma^2_t + \psi^2_t, \quad
 \rho_t = \frac{\Cov(L^*_p, T^*_p)}{\sigma_t s_t} = \frac{b_t \sigma_t}{s_t}.
 $$ {#eq-reduced-variance-correlation}
+:::

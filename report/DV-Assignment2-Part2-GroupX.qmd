@@ -8,10 +8,10 @@ link-citations: true
 format:
   html:
     number-sections: true
+    css: styles.css
     include-in-header:
       text: |
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
           p {
             text-align: justify;
           }

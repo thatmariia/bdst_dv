@@ -1,0 +1,123 @@
+/* Style of the report: serif headings and figure titles, a sans for the
+   text, and quiet chrome. The colours are the ink of R/plotting/style.R. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300..700;1,300..700&family=Source+Serif+4:opsz,wght@8..60,400..700&display=swap');
+
+:root {
+  --ink: #1C1B19;
+  --ink-secondary: #55524C;
+  --ink-muted: #8E8C86;
+  --ink-axis: #D3D0C8;
+  --ink-grid: #ECE9E2;
+  --ink-shade: #F4F2ED;
+  --accent: #3D69DD;
+  --title-font: 'Source Serif 4', Georgia, serif;
+}
+
+body { color: var(--ink); }
+p, li { line-height: 1.6; }
+a { color: var(--accent); }
+
+h1, h2, h3, h4, .title, .quarto-title .title {
+  font-family: var(--title-font);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+h2 { margin-top: 2.75rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--ink-axis); }
+h3 { margin-top: 2rem; }
+
+/* every figure starts with a rule, with its caption small and grey below */
+.quarto-float > figure {
+  margin: 2rem 0;
+  padding-top: 0.8rem;
+  border-top: 2px solid var(--ink);
+}
+.quarto-float figcaption,
+.quarto-float .figure-caption {
+  margin-top: 0.4rem;
+  color: var(--ink-secondary);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* ---- figure controls (R/plotting/selectors.js, R/final/explorer.js) ---- */
+.fc { margin: 0.25rem 0 0.75rem; font-size: 0.92rem; text-align: left; }
+.fc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; margin: 0.4rem 0; }
+.fc-label {
+  min-width: 8.5rem;
+  color: var(--ink-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.fc-segmented { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 2px; border-radius: 999px; background: var(--ink-shade); }
+.fc-segmented button {
+  padding: 0.18rem 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-secondary);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.fc-segmented button:hover { color: var(--ink); }
+.fc-segmented button[aria-pressed="true"] { background: var(--ink); color: #fff; font-weight: 600; }
+.fc button:focus-visible, .fc input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.fc-search { position: relative; max-width: 36rem; }
+.fc-search input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.1rem;
+  border: 1px solid var(--ink-axis);
+  border-radius: 999px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238E8C86' stroke-width='1.6'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l4 4'/%3E%3C/svg%3E") no-repeat 0.8rem center / 1rem;
+  font: inherit;
+}
+.fc-search input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.fc-results {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 22rem;
+  overflow-y: auto;
+  border: 1px solid var(--ink-grid);
+  border-radius: 0.6rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(28, 27, 25, 0.12);
+}
+.fc-result { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0.85rem; cursor: pointer; }
+.fc-result[aria-selected="true"], .fc-result:hover { background: var(--ink-shade); }
+.fc-result small { color: var(--ink-muted); white-space: nowrap; }
+.fc-empty { padding: 0.45rem 0.85rem; color: var(--ink-muted); }
+
+.fc-path { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin: 0.6rem 0 0.2rem; font-size: 0.85rem; }
+.fc-path button { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; }
+.fc-path button:hover { text-decoration: underline; text-underline-offset: 2px; }
+.fc-path .fc-current { font-weight: 600; }
+.fc-path .fc-separator { color: var(--ink-axis); }
+
+.fc-card { margin: 0.5rem 0; padding: 0.65rem 0.9rem; border-left: 3px solid var(--ink); background: var(--ink-shade); }
+.fc-card .fc-name { font-family: var(--title-font); font-size: 1.05rem; font-weight: 600; }
+.fc-card .fc-detail { color: var(--ink-secondary); font-size: 0.86rem; }
+
+.fc-whatif { margin: 0.6rem 0; padding: 0.2rem 0 0.2rem 0.9rem; border-left: 3px solid var(--ink-axis); }
+.fc-whatif.fc-active { border-left-color: var(--accent); }
+.fc-whatif .fc-label { min-width: 0; }
+.fc-whatif .fc-search { flex: 1 1 16rem; max-width: 24rem; }
+.fc-whatif .fc-search input { padding-top: 0.3rem; padding-bottom: 0.3rem; font-size: 0.88rem; }
+.fc-button {
+  padding: 0.2rem 0.75rem;
+  border: 1px solid var(--ink-axis);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.fc-note { color: var(--ink-muted); font-size: 0.85rem; }
