@@ -6,13 +6,12 @@
 #' @param years Test years to include; defaults to all in `joint`.
 #' @param title,subtitle Plot title and subtitle; subtitle = NULL leaves
 #'   the subtitle out.
-joint_plot <- function(joint,
-                       years = sort(unique(joint$test_year)),
-                       title = paste(
-                           "Test advice is often lower than the teacher's",
-                           "advice"
-                       ),
-                       subtitle = NULL) {
+joint_plot <- function(
+    joint,
+    years = sort(unique(joint$test_year)),
+    title = "Test advice is often lower than the teacher's advice",
+    subtitle = NULL
+) {
     joint |>
         filter(test_year %in% years) |>
         mutate(
