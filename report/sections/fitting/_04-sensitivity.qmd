@@ -1,0 +1,53 @@
+### Sensitivity to the anchor {#sec-sensitivity}
+
+```{r}
+#| label: sensitivity-values
+#| include: false
+robustness <- sensitivity_summary(sensitivity, resit_flip)
+robust_in <- function(year) filter(robustness, test_year == year)
+share <- function(x) sprintf("%.0f%%", 100 * x)
+points <- function(x) sprintf("%.1f", 100 * x)
+```
+
+The separation of the teacher error and the test error rests on a single number from outside the CvTE tables:
+Cito's resit share $r$ = `{r} sprintf("%.1f", 100 * resit_flip)`% [@cito2026], as mentioned in @sec-separating-errors, which we assume for the reference test (@eq-resit-share).
+To see how much our results depend on this anchor, we repeat the separation of the errors and the decomposition for every resit share $r$ from 1% to 60%, in steps of one percent.
+The reduced model itself does not change, because it does not use the anchor.
+
+@fig-sensitivity shows the result.
+Each line is a national average over the tests, weighted by the number of pupils that took each test, in percentage points of all pupils:
+
+- the black line is the share of eligible pupils $\tilde{h}_t$ (@eq-eligibility), and
+- the grey, magenta, green, and violet lines are the Shapley values of category design, teacher error, test error, and test menu (@eq-decomposition).
+
+For the shaded resit shares, @eq-original-parameters gives a negative variance, so the model is not feasible:
+for a large $r$, the test error alone would explain more disagreement than the tables contain, and the teacher's error variance $\sigma^2_L$ would be negative;
+for a small $r$ in 2025, the error variance $\sigma^2_{T, t}$ of some tests would be negative.
+
+```{r}
+#| label: fig-sensitivity
+#| fig-height: 5.5
+#| fig-cap: "National decomposition of eligibility for every resit share anchor $r$ (choose the year above the plot), averaged over the tests weighted by their number of pupils. Source: model fitted to CvTE [@cvte2025; @cvte2026], with Cito's resit share [@cito2026] marked."  # nolint: line_length_linter
+sensitivity_plot(sensitivity, resit_flip)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-sensitivity
+knitr::kable(filter(sensitivity, feasible), digits = 3)
+```
+:::
+
+Three results follow from @fig-sensitivity.
+First, the total eligibility hardly depends on the anchor
+(between `{r} points(robust_in(2026)$eligible_low)`% and `{r} points(robust_in(2026)$eligible_high)`% in 2026),
+because the reduced model already determines it.
+Second, category design is still the largest source for every resit share that the tables allow
+(between `{r} points(robust_in(2026)$design_low)` and `{r} points(robust_in(2026)$design_high)` percentage points in 2026).
+Third, the split between the teacher error and the test error does depend on the anchor:
+the teacher error is larger than the test error only for $r$ below about `{r} share(robust_in(2026)$crossing)`
+(`{r} share(robust_in(2025)$crossing)` in 2025), and at Cito's share it is `{r} sprintf("%.1f", robust_in(2026)$ratio_at_anchor)` times as large.
+Hence, the size of the teacher error relative to the test error should be read with the anchor in mind.
+Moreover, the tables bound the anchor:
+in 2025, only $r$ between `{r} share(robust_in(2025)$allowed_low)` and `{r} share(robust_in(2025)$allowed_high)` gives non-negative variances.
