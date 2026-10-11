@@ -65,9 +65,7 @@ Therefore, we cannot solve @eq-resit-share analytically.
 Instead, we estimate the share via Brent’s method [@brent1973],
 a root-finding algorithm that combines bisection, secant, and inverse quadratic interpolation methods.
 
-<!-- TODO: actually do it -->
-
-Once we have the test's measurement uncertainty $\sigma^2_{T, \text{ref}}$,
+Once we have the test's measurement uncertainty $\sigma^2_{T, \text{ref}}$ (@tbl-anchor),
 we can use @eq-original-parameters to solve for its loading factor $\alpha_{\text{ref}}$ and for the teacher's error $\sigma^2_L$:
 
 $$
@@ -75,7 +73,18 @@ $$
 \sigma^2_L = \sigma^2_{\text{ref}} - \frac{b_{\text{ref}} \sigma^2_{\text{ref}}}{\alpha_{\text{ref}}}.
 $$ {#eq-loading-teacher-error}
 
-Finally, we scale $\alpha_t$, $\beta_t$, $\sigma^2_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
-so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (see @sec-measurement-error).
+```{r}
+#| label: tbl-anchor
+#| tbl-cap: "Test error $\\sigma_{T, \\text{ref}}$ and loading factor $\\alpha_{\\text{ref}}$ of the reference test (in estimation units), and the teacher's error variance $\\sigma^2_L$, per test year."  # nolint: line_length_linter
+knitr::kable(anchor_summary(structural), digits = 3)
+```
 
-<!-- TODO: actually do it and report the results in a table. -->
+Finally, we scale $\alpha_t$, $\beta_t$, $\sigma^2_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
+so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (see @sec-measurement-model).
+@tbl-original-parameters shows the scaled original parameters per test and year.
+
+```{r}
+#| label: tbl-original-parameters
+#| tbl-cap: "Original parameters per test and year: the mean $\\mu_t$ and variance $\\sigma^2_{\\theta, t}$ of the common factor, the loading factor $\\alpha_t$, the intercept $\\beta_t$, and the test error $\\sigma_{T, t}$, with $\\alpha_{\\text{ref}} = 1$."  # nolint: line_length_linter
+knitr::kable(original_parameters(structural), digits = 3)
+```
