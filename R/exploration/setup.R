@@ -2,6 +2,7 @@
 # Run after R/data/get-data.R, from the project root.
 source("R/plotting/style.R")
 source("R/plotting/plotly-helpers.R")
+source("R/plotting/selectors.R")
 source("R/plotting/advice-bubbles.R")
 source("R/exploration/data.R")
 source("R/exploration/plot-compliance.R")
