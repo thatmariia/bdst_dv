@@ -4,23 +4,30 @@
 #| label: exploratory-setup
 #| include: false
 # plot functions, plus the datasets compliance, joint, and standardized
-source("R/exploratory/setup.R")
+source("R/exploration/setup.R")
 ```
 
 ### Compliance with raising the advice
 
 For the pupils that got a test advice that differed from the provisional advice, DUO's revision data [@duo_heroverweging] lets us check the share of pupils that got their advice raised. This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies and the overall compliance with that policy across the country.
 
+Figure @fig-compliance-values shows the share of eligible pupils whose advice was raised after a higher test result.
+It shows that the share of pupils with raised advice increased substantially once it became mandatory to reevaluate the advice.
+
+Figure @fig-compliance-plot provides a more detailed view.
+It shows the shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice.
+The share of pupils with a higher test advice than the provisional advice decreased from before to after the policy change.
+
 ```{r}
-#| label: compliance-values
+#| label: fig-compliance-values
 #| fig-height: 2
-#| fig-cap: "Compliance with raising the advice after a higher test result, per test year. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
+#| fig-cap: "Share of eligible pupils whose advice was raised after a higher test result, per test year. Raising of advice is a sign of compliance with the policy implemented from 2023/2024. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
 compliance_heatmap(compliance)
 ```
 
 ```{r}
 #| label: fig-compliance-plot
-#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
+#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Bands: bounds from suppressed counts. No test in 2020. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
 compliance_plot(compliance)
 ```
 
@@ -45,7 +52,7 @@ $$ {#eq-joint}
 
 where $m_t(i)$ is the share of pupils with provisional advice $i$, and $\PP_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
 
-@fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year. The slider allows switching between years.
+@fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year.
 A large portion of the of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower that the test result)
 is located in the single-track provisional advice (larger red circles). They correspond to the test results that combine that track with the next higher one (e.g., provisional HAVO vs test result HAVO/VWO). While the test results contain the provisionally advised track, their values differ.
 According to DUO's conversion table [@duo_conversion] in @tbl-duo-gap-matrix, the mismatch between them is 0.5.
@@ -53,8 +60,8 @@ That mismatch is the source of disagreement that we call *category design*.
 
 ```{r}
 #| label: fig-joint-plot
-#| fig-height: 9
-#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (use the slider to switch years). Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
+#| fig-height: 6.5
+#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (choose a year above the plot). Each bubble represents the share of pupils for each combination of provisional advice and test result. Cells under 0.05% of pupils are not shown. Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
 joint_plot(joint)
 ```
 
@@ -162,7 +169,7 @@ The differences in leniency and disagreement constitute the source of disagreeme
 
 ```{r}
 #| label: fig-standardized
-#| fig-cap: "Standardised leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
+#| fig-cap: "Standardized leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
 standardized_plot(standardized)
 ```
 
