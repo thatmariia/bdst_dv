@@ -2,6 +2,8 @@
 
 **DV7**
 
+What share of Dutch secondary school pupils is eligible for an upward revision of the teacher's advice after receiving the test recommendation, and how much does each error source contribute to that share?
+
 
 ## Quickstart
 
