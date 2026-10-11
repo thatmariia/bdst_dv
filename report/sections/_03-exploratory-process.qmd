@@ -53,7 +53,7 @@ $$ {#eq-joint}
 where $m_t(i)$ is the share of pupils with provisional advice $i$, and $\PP_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
 
 @fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year.
-A large portion of the of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower that the test result)
+A large portion of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower than the test result)
 is located in the single-track provisional advice (larger red circles). They correspond to the test results that combine that track with the next higher one (e.g., provisional HAVO vs test result HAVO/VWO). While the test results contain the provisionally advised track, their values differ.
 According to DUO's conversion table [@duo_conversion] in @tbl-duo-gap-matrix, the mismatch between them is 0.5.
 That mismatch is the source of disagreement that we call *category design*.
@@ -150,7 +150,7 @@ $\Delta \text{disagreement}$ = `{r} sprintf("%.1f", std_val(2026, "diff", "disag
 in 2026; in 2025, the spread of disagreement was the same:
 `{r} sprintf("%.1f", std_val(2025, "max", "disagreement"))`% -
 `{r} sprintf("%.1f", std_val(2025, "min", "disagreement"))`% =
-`{r} sprintf("%.1f", std_val(2025, "diff", "disagreement"))`$%.
+`{r} sprintf("%.1f", std_val(2025, "diff", "disagreement"))`%.
 
 The leniency range in 2026 was from
 `{r} sprintf("%.1f", std_val(2026, "min", "leniency"))`% to

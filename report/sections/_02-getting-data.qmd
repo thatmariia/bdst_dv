@@ -18,7 +18,7 @@ knitr::kable(data_overview, format.args = list(big.mark = ","))
 
 #### DUO gap matrix
 
-@tbl-duo-gap-matrix shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO [@duo_conversion]. The rows correspond to the provisional advice, and the columns correspond to the test result. Let $G(i, j)$ be the entry in row $i$ and column $j$ of this matrix. Then $G(i, j)$ is the indication of how much higher the track $i$ is valued than track $j$.
+@tbl-duo-gap-matrix shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO [@duo_conversion]. The rows correspond to the provisional advice, and the columns correspond to the test result. Let $G(i, j)$ be the entry in row $i$ and column $j$ of this matrix. Then $G(i, j)$ is the indication of how much higher the test result $j$ is than the provisional advice $i$.
 
 ```{r}
 #| label: tbl-duo-gap-matrix
@@ -66,6 +66,19 @@ cvte_pupils |>
     knitr::kable()
 ```
 
+The CvTE tables cover pupils with a known provisional advice, including special education (s(b)o), whereas our DUO data is restricted to regular schools.
+Their populations therefore differ, which limits direct comparisons.
+The coverage fraction $f_y$ is recorded in @tbl-cvte-coverage [@cvte2025; @cvte2026].
+
+```{r}
+#| label: tbl-cvte-coverage
+#| tbl-cap: "Share of test participants with a known provisional advice."
+knitr::kable(cvte_coverage, digits = 2)
+```
+
+Two missing `###` cells in the 2026 Lib digital table were recovered as 100 minus the other row percentages.
+One Lib paper row summing to 95.6% was renormalised to 100%; the `note` column records these repairs.
+
 #### DUO data
 
 DUO [@duo_eindscores] provides a table (@tbl-main-provider) that shows the test provider used by each school for each year and the share of pupils that took that test.
@@ -89,7 +102,7 @@ test_scores |>
     knitr::kable()
 ```
 
-DUO [@duo_referentieniveau] also provides a table (@tbl-reading-2f) that shows, for each school, year, and test provider, the share of pupils that were had their reading skills tested at the 2F level. It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for $n < 5$).
+DUO [@duo_referentieniveau] also provides a table (@tbl-reading-2f) that shows, for each school, year, and test provider, the share of pupils that had their reading skills tested at the 2F level. It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for $n < 5$).
 
 ```{r}
 #| label: tbl-reading-2f
@@ -98,7 +111,7 @@ reading_2f |>
     knitr::kable()
 ```
 
-From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the derived shares of the same numbers relative to the total number of pupils, the difference between the shares of pupils with higher and lower test advice, and the total disagreement share (sum).
+From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the derived shares of the same numbers relative to the total number of pupils, the difference between the shares of pupils with higher and lower test advice, and the total disagreement share (sum).
 
 ```{r}
 #| label: tbl-advice-reconsiderations

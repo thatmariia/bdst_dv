@@ -1,5 +1,5 @@
 ---
-title: "DV Assignment 2: [Your Title Here]"
+title: "DV Assignment 2: Why pupils become eligible for higher school advice"
 author: "Mariia Steeghs-Turchina"
 date: today
 bibliography: references.bib

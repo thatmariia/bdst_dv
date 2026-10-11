@@ -5,7 +5,7 @@ At the end of the primary school, Dutch pupils receive judgements about the suit
 - the advice of the primary school teacher *(voorlopig schooladvies)*,
 - the results of a standardized test *(doorstroomtoets)*, which arrives about a month later.
 
-Dutch secondary schools are ordinally divided into four main tracks:
+Dutch secondary schools are ordinally divided into six ordered levels:
 
 - PRO *(praktijkonderwijs)*,
 - VMBO-B *(basisberoepsgerichte leerweg)*
@@ -30,6 +30,6 @@ There are four main sources of potential disagreement between the teacher's advi
 - **teacher error**: teachers can make mistakes, and
 - **test error**: the tests have measurement uncertainty [@cito2026].
 
-The present research question is to attempt to quantify the impact of each source of disagreement.
-
-*What are you investigating, and why does it matter? Who is the target audience for your final visualization, and how does that shape your choices? You can start from what you wrote in Part 1.*
+We ask: what share of pupils is eligible for an upward revision, and how much does each source contribute to that share?
+Eligibility matters because it triggers reconsideration under the up-only rule, while schools choose which test their pupils take.
+The explorer is intended for policy makers comparing rules, school boards comparing tests and schools, and parents exploring outcomes by provisional advice.

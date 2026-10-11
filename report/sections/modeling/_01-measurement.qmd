@@ -9,7 +9,7 @@ Since the test is administered by schools, and schools choose their test, pupils
 We assume that $\theta_p$ is normally distributed within each test population with mean $\mu_t$ and variance $\sigma^2_{\theta, t}$:
 
 $$
-\theta_p \mid t, p = t \sim \mathcal{N}(\mu_t, \sigma^2_{\theta, t}).
+\theta_p \mid (\text{pupil }p\text{ takes test }t) \sim \mathcal{N}(\mu_t, \sigma^2_{\theta, t}).
 $$ {#eq-common-factor}
 
 Then we can model the teacher's latent provisional advice $L^*_p$ for pupil $p$ as follows:
@@ -36,7 +36,7 @@ $$ {#eq-test}
 The loading factor $\alpha_t$ and the intercept $\beta_t$ are specific to the test provider $t$.
 $\alpha_t$ encodes the test's sensitivity to the common factor:
 a higher $\alpha_t$ distributes the test results more widely for different $\theta$ value (pupils' abilities).
-This sensitivity can be affected by factors such as the the design, length, and difficulty of the test.
+This sensitivity can be affected by factors such as the design, length, and difficulty of the test.
 The intercept $\beta_t$ encodes the test's leniency:
 a higher $\beta_t$ shifts the test results to a higher track.
 The test scale is normalized with respect to the teacher's scale,
@@ -58,8 +58,8 @@ Then we can write:
 
 $$
 \begin{aligned}
-L_p = i \Leftrightarrow \lambda_{i} < L^*_p \leq \lambda_{i+1}, \quad &i = 1, \ldots, 9 \\
-T_p = j \Leftrightarrow \tau_{j} < T^*_p \leq \tau_{j+1}, \quad &j = 1, \ldots, 5.
+L_p = i \Leftrightarrow \lambda_{i} < L^*_p \leq \lambda_{i+1}, \quad &i = 0, \ldots, 9 \\
+T_p = j \Leftrightarrow \tau_{j} < T^*_p \leq \tau_{j+1}, \quad &j = 0, \ldots, 5.
 \end{aligned}
 $$ {#eq-thresholds}
 
@@ -69,14 +69,14 @@ with the teacher's advice as the reference indicator.
 A pupil is eligible for a higher track if $G(L_p, T_p) > 0$.
 Let $\pi \in [0, 1]$ be the compliance -- the probability that a teacher raises the advice when
 the test result is higher than the provisional advice.
-We can then define $U_p \sim \mathcal{U}(0, 1)$ as the indicator of whether the pupil's advice is raised.
-Then if $U_p \leq \pi$, the pupil's advice is raised.
+We can then define $U_p \sim \mathcal{U}(0, 1)$ as an independent uniform draw.
+An eligible pupil's advice is raised if $U_p \leq \pi$.
 Now, we can define the final advice $F_p$ as follows:
 
 $$
 F_p = \begin{cases}
-    W_{T_p} \quad &\text{if } G(L_p, T_p) > 0 \text{ and } U_p \leq \pi, \\
-    V_{L_p} \quad &\text{otherwise}.
+    w_{T_p} \quad &\text{if } G(L_p, T_p) > 0 \text{ and } U_p \leq \pi, \\
+    v_{L_p} \quad &\text{otherwise}.
 \end{cases}
 $$ {#eq-final-advice}
 

@@ -45,7 +45,7 @@ The resulting pseudo counts are shown in @fig-model-counts.
 ```{r}
 #| label: fig-model-counts
 #| fig-height: 6.5
-#| fig-cap: "Psudo model counts of pupils per provisional advice $i$ and test result $j$, by test and year (choose a test and a year above the plot).  Each bubble represents the pseudo count for that combination. Cells under 0.05% are not shown."  # nolint: line_length_linter
+#| fig-cap: "Pseudo model counts of pupils per provisional advice $i$ and test result $j$, by test and year (choose a test and a year above the plot).  Each bubble represents the pseudo count for that combination. Cells under 0.05% are not shown."  # nolint: line_length_linter
 model_counts_plot(model_counts, gap_matrix)
 ```
 
@@ -59,13 +59,19 @@ $$
 \log \mathcal{L} = \sum_t \sum_{i, j} n_t(i, j) \log q_t(i, j).
 $$ {#eq-log-likelihood}
 
+We fit all tests of a year jointly, so they share the thresholds $\lambda$ and $\tau$: one common ruler.
+Separate thresholds for each test could absorb differences in leniency.
 We can maximize the log-likelihood to find the best-fitting parameters of the published data.
+The model is constrained: each $10 \times 6$ table has 59 free cell probabilities, compared with five parameters per non-reference test and 14 thresholds shared across tests.
+The pseudo counts use rounded percentages and only pupils with known provisional advice; pupils are also clustered in schools.
+Naive multinomial standard errors would ignore these features, so we assess fit descriptively.
 
 As mentioned in @sec-measurement-model,
 the measurement scale is set by the teacher's advice ($\mu_\text{ref} = 0$ and $\sigma^2_\text{ref} = 1$);
 the origin of the test's scale is set by the test's leniency ($\beta_\text{ref} = 0$).
 We cannot set the test's sensitivity $\alpha_\text{ref}$ to a fixed value, because it is not identifiable.
-Instead, we set $\psi^2_\text{ref} = 1$.
+Instead, we set $\psi^2_\text{ref} = 1$, which fixes the test units without changing fitted probabilities.
+The value of $\alpha_\text{ref}$ depends on the teacher/test error split, identified in the next step.
 
 #### Parameters
 
@@ -90,7 +96,7 @@ The final set of parameters to be estimated is then:
 - the slope of the reference test $b_\text{ref}$ ($\#$ = 1),
 - the parameters of the other tests $(\mu_t, \log \sigma_t, a_t, b_t, \log \psi_t)$ ($\#$ = 5 per test).
 
-We estimate per-test parameters for the tests in each year, excluding the reference test, which has its parameters fixed by the normalization.
+We estimate per-test parameters for the tests in each year, with only its slope free for the reference test; its other parameters are fixed by the normalization.
 Then, the total number of parameters is
 `{r} length(fits[["2025"]]$par)` in 2025 (`{r} length(fits[["2025"]]$counts)` tests) and
 `{r} length(fits[["2026"]]$par)` in 2026 (`{r} length(fits[["2026"]]$counts)` tests).
@@ -110,6 +116,9 @@ $$ {#eq-dissimilarity-index}
 #| fig-cap: "Dissimilarity index of the model fit per test and year. The index represents the share of pupils that would have to move to another cell. Open circle: 2025, filled: 2026."  # nolint: line_length_linter
 dissimilarity_plot(fit_quality)
 ```
+
+The dissimilarity index is about 3–6% for Lib, IEP, and Dia, compared with 7–13% for AMN, ROUTE 8, and DOE.
+The latter tests have more pupils with PrO advice in the published tables; this population difference may contribute to the weaker fit, but the index does not establish its cause.
 
 ::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
 

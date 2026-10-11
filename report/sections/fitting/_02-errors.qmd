@@ -12,6 +12,8 @@ $$ {#eq-original-parameters}
 However, we cannot identify the teacher's error $\sigma^2_L$ from the data.
 The CvTE tables only provide information on the joint distribution of the provisional advice and test result,
 but they do not attribute the discrepancy to either teacher or the test errors.
+Any $0 \leq \sigma^2_L \leq \min_t(\psi_t^2\sigma_t^2/s_t^2)$ gives the same fitted tables with non-negative error variances.
+Two noisy measurements reveal their disagreement, but an outside constraint is needed to split it between them.
 
 ```{r}
 #| label: tot-cito-misclassification
@@ -23,13 +25,14 @@ tot_cito <- cito_misclassification |>
 
 The tests have measurement uncertainty, which implies that the test results are not perfectly reliable.
 Hence, if a pupil were to take the equivalent test multiple times, we would not expect the same result each time.
-Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the test's measurement uncertainty was
+Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the share of test advices changing category was
 $r$ = `{r} sprintf("%.1f", tot_cito$flip)`%
-(`{r} sprintf("%.1f", tot_cito$lower)`% lower scores, `{r} sprintf("%.1f", tot_cito$higher)`% higher).
-Lib paper test is a successor of the Centrale Eindtoets, and we assume that it has a similar measurement uncertainty.
-Hence, we take Lib paper test as a reference test and set its measurement uncertainty to $\sigma_{T, \text{ref}}$ is the same.
+(`{r} sprintf("%.1f", tot_cito$lower)`% lower advice categories, `{r} sprintf("%.1f", tot_cito$higher)`% higher advice categories).
+We use Lib paper as the reference test and assume that the same category-change share applies to it.
+This transfers a result from a different test and year; it is an anchoring assumption, assessed in @sec-sensitivity.
 
-Suppose a pupil is retaking a test in our model.
+Following the redraw construction, we centre a simulated result on the pupil's original reading, rather than draw two independent errors around the common factor.
+This is why the added perturbation has one error variance.
 Then the new test result is $T^{**}_p = T^*_p + \epsilon_{T, p}$, where $\epsilon_{T, p} \sim \mathcal{N}(0, \sigma^2_{T, \text{ref}})$,
 (see @eq-test). Then the resit $T^{**}_p$ has the same outcome as the original test $T^*_p$ if the difference is within the thresholds of the test result:
 $\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}$, which follows from @eq-thresholds.
@@ -51,8 +54,8 @@ $$ {#eq-resit-probability-same}
 
 Then the share of pupils that would have the results that change the category is
 one minus the probability above, averaged over all pupils in the reference test population.
-From @eq-reduced-model, we have $T^*_p \sim \mathcal{N}(\mu_\text{ref}, s^2_\text{ref})$.
-Forcing it to be equal to Cito's measurement uncertainty, we obtain
+From @eq-reduced-model, we have $T^*_p \sim \mathcal{N}(a_\text{ref} + b_\text{ref}\mu_\text{ref}, s^2_\text{ref}) = \mathcal{N}(0, s^2_\text{ref})$.
+Forcing it to be equal to Cito's category-change share, we obtain
 
 $$
 \EE \left[ 1 -
@@ -62,7 +65,7 @@ $$ {#eq-resit-share}
 
 The probability that a pupil's test result changes category depends on the category of the original test result.
 Therefore, we cannot solve @eq-resit-share analytically.
-Instead, we estimate the share via Brent’s method [@brent1973],
+Instead, we solve for $\sigma_{T, \text{ref}}$ via Brent’s method [@brent1973],
 a root-finding algorithm that combines bisection, secant, and inverse quadratic interpolation methods.
 
 Once we have the test's measurement uncertainty $\sigma^2_{T, \text{ref}}$ (@tbl-anchor),
@@ -79,7 +82,10 @@ $$ {#eq-loading-teacher-error}
 knitr::kable(anchor_summary(structural), digits = 3)
 ```
 
-Finally, we scale $\alpha_t$, $\beta_t$, $\sigma^2_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
+At this anchor, the teacher's reliability in the reference population, $1-\sigma_L^2$, is about 0.80–0.81, compared with about 0.94 for the reference test.
+Thus the teacher has the larger error share under this assumed anchor; @sec-sensitivity shows how that comparison changes with $r$.
+
+Finally, we scale $\alpha_t$, $\beta_t$, $\sigma_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
 so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (see @sec-measurement-model).
 @tbl-original-parameters shows the scaled original parameters per test and year.
 

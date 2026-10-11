@@ -1,7 +1,10 @@
 ## Conclusion
 
-*What can you conclude from your visualization? What are the limitations of this analysis?*
+The decomposition attributes eligibility to category design, teacher error, test error, and the test menu.
+Category design remains the largest component across the feasible anchors examined in @sec-sensitivity; the relative contributions of teacher and test error depend on the assumed resit share.
+The explorer makes these model results comparable across the Netherlands and the schools and groups represented in the data.
 
-------------------------------------------------------------------------
-
-**Before submitting:** run the lintr check on this file, and re-render from a clean environment (`rm(list = ls())`, already done above) to make sure everything reproduces from scratch.
+The error split transfers one simulated resit share from the 2022 Centrale Eindtoets to Lib paper.
+The common factor measures what teacher and test share, rather than an independent truth; teacher “error” can include information the test does not capture.
+Teacher and test errors may also be correlated, for example through a shared assessment provider, contrary to the model's independence assumption.
+Finally, the CvTE tables cover only 61–69% of test participants and include special education, whereas our DUO school analysis uses regular schools.
