@@ -65,3 +65,46 @@ the measurement scale is set by the teacher's advice ($\mu_\text{ref} = 0$ and $
 the origin of the test's scale is set by the test's leniency ($\beta_\text{ref} = 0$).
 We cannot set the test's sensitivity $\alpha_\text{ref}$ to a fixed value, because it is not identifiable.
 Instead, we set $\psi^2_\text{ref} = 1$.
+
+#### Parameters
+
+There are two types of restrictions on the parameters:
+thresholds must increase ($\lambda_1 < \dots < \lambda_9$, $\tau_1 < \dots < \tau_5$), and
+spreads must be positive ($\sigma_t, \psi_t > 0$).
+We handle these restrictions by transforming these parameters to unconstrained parameters as follows:
+
+- the first threshold of each scale is estimated directly -- this sets the origin of the scale,
+- the gaps between consecutive thresholds are estimated on the log scale,
+i.e., $\lambda_{l+1} - \lambda_l = e^{\gamma_l}$ and $\tau_{l+1} - \tau_l = e^{\zeta_l}$, --
+this ensures that the thresholds increase by forcing the gaps to be positive,
+- the spreads are estimated on the log scale, i.e., $\sigma_t = e^{\eta_t}$ and $\psi_t = e^{\xi_t}$. --
+this ensures that the spreads are positive.
+
+The final set of parameters to be estimated is then:
+
+- the first threshold of the teacher's advice $\lambda_1$ ($\#$ = 1),
+- the gaps between consecutive thresholds of the teacher's advice $\gamma_1, \dots, \gamma_8$ ($\#$ = 8),
+- the first threshold of the test result $\tau_1$ ($\#$ = 1),
+- the gaps between consecutive thresholds of the test result $\zeta_1, \dots, \zeta_4$ ($\#$ = 4),
+- the slope of the reference test $b_\text{ref}$ ($\#$ = 1),
+- the parameters of the other tests $(\mu_t, \log \sigma_t, a_t, b_t, \log \psi_t)$ ($\#$ = 5 per test).
+
+We estimate per-test parameters for the tests in each year, excluding the reference test, which has its parameters fixed by the normalization.
+Then, the total number of parameters is
+`{r} 15 + 5 * (8 - 1) # TODO: use the actual number of tests` in 2025 (`{r} # TODO: use the actual number of tests` tests) and
+`{r} 15 + 5 * (7 - 1) # TODO: use the actual number of tests` in 2026 (`{r} # TODO: use the actual number of tests` tests).
+
+We maximize the log-likelihood in @eq-log-likelihood with the quasi-Newton L-BFGS-B algorithm [@byrd1995],
+a quasi-Newton method that uses the slope and an estimate of the curvature to choose each step.
+We then use a dissimilarity index to summarize the fit, which is the share of pupils that
+would have to move to another cell for the fitted table to equal the published one:
+
+$$
+\DI_t = \frac12 \sum_{i, j} \left| \hat q_t(i, j) - J_t(i, j) \right|.
+$$ {#eq-dissimilarity-index}
+
+```{r}
+#| label: fig-dissimilarity-index
+#| fig-cap: "Dissimilarity index of the model fit per test and year."
+# TODO: fit the model and compute the dissimilarity index per test and year
+```
