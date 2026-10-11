@@ -9,7 +9,7 @@
 joint_plot <- function(
     joint,
     years = sort(unique(joint$test_year)),
-    title = "Test advice is often lower than the teacher's advice",
+    title = "advice joint distribution",
     subtitle = NULL
 ) {
     joint |>
