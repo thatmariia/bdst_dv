@@ -7,11 +7,11 @@ mandatory_from <- 2024
 #' @param compliance Output of compliance_by_year().
 #' @param title,subtitle Plot title and subtitle; subtitle = NULL leaves
 #'   the subtitle out.
-compliance_heatmap <- function(compliance,
-                               title = paste(
-                                   "Compliance with raising the advice policy"
-                               ),
-                               subtitle = NULL) {
+compliance_heatmap <- function(
+    compliance,
+    title = "Compliance with raising the advice policy",
+    subtitle = NULL
+) {
     years <- seq(min(compliance$test_year), max(compliance$test_year))
     tibble(test_year = years) |>
         left_join(compliance, by = "test_year") |>
@@ -55,21 +55,17 @@ compliance_heatmap <- function(compliance,
 #' @param compliance Output of compliance_by_year().
 #' @param title,subtitle Plot title and subtitle; subtitle = NULL leaves
 #'   the subtitle out.
-compliance_plot <- function(compliance,
-                            title = paste(
-                                "Raised advice jumped once raising became",
-                                "mandatory"
-                            ),
-                            subtitle = paste(
-                                "Share of pupils whose test advice is higher /",
-                                "lower than the teacher's, and<br>whose advice",
-                                "was raised. Bands: bounds from suppressed",
-                                "counts. No test in 2020."
-                            )) {
+compliance_plot <- function(
+    compliance,
+    title = "Shares of higher/lower test advice and raised advice",
+    subtitle = NULL
+) {
     measures <- compliance_measures(compliance) |>
-        mutate(tooltip = sprintf(
-            "%s: %s (bounds %s–%s)", measure, pct(est), pct(lo), pct(hi)
-        ))
+        mutate(
+            tooltip = sprintf(
+                "%s: %s (bounds %s–%s)", measure, pct(est), pct(lo), pct(hi)
+            )
+        )
     years <- seq(min(measures$test_year), max(measures$test_year))
     ymax <- max(measures$hi)
     ends <- filter(measures, test_year == max(test_year))
@@ -77,10 +73,12 @@ compliance_plot <- function(compliance,
     plot <- measures |>
         # text is for the plotly tooltip; ggplot2 only checks layer
         # aesthetics, and the group keeps per-point text from splitting lines.
-        ggplot(aes(
-            x = test_year, y = est, color = measure, fill = measure,
-            group = segment, text = tooltip
-        )) +
+        ggplot(
+            aes(
+                x = test_year, y = est, color = measure, fill = measure,
+                group = segment, text = tooltip
+            )
+        ) +
         # plotly cannot draw infinite limits, so the band uses the data range.
         annotate(
             "rect",
@@ -115,12 +113,14 @@ compliance_plot <- function(compliance,
                 plotly_labels(
                     ends$test_year, ends$est, as.character(ends$measure)
                 ),
-                list(list(
-                    x = mandatory_from - 0.5, y = ymax,
-                    text = "raising mandatory →", showarrow = FALSE,
-                    xanchor = "left", yanchor = "bottom", xshift = 4,
-                    font = list(size = 11, color = ink[["secondary"]])
-                ))
+                list(
+                    list(
+                        x = mandatory_from - 0.5, y = ymax,
+                        text = "raising mandatory →", showarrow = FALSE,
+                        xanchor = "left", yanchor = "bottom", xshift = 4,
+                        font = list(size = 11, color = ink[["secondary"]])
+                    )
+                )
             )
         )
 }
