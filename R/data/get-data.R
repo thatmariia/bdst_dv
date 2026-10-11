@@ -92,6 +92,7 @@ cvte_conditional <- read_report_table("cvte_conditional")
 cvte_provisional <- read_report_table("cvte_provisional")
 cvte_pupils <- read_report_table("cvte_pupils") |> filter(test_year >= 2025)
 cvte_agreement <- read_report_table("cvte_agreement")
+cvte_coverage <- read_report_table("cvte_coverage")
 cito_misclassification <- read_report_table("cito_misclassification")
 gap_cells <- read_report_table("gap_matrix")
 gap_matrix <- matrix(
