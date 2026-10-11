@@ -91,8 +91,10 @@ The final set of parameters to be estimated is then:
 
 We estimate per-test parameters for the tests in each year, excluding the reference test, which has its parameters fixed by the normalization.
 Then, the total number of parameters is
-`{r} 15 + 5 * (8 - 1) # TODO: use the actual number of tests` in 2025 (`{r} # TODO: use the actual number of tests` tests) and
-`{r} 15 + 5 * (7 - 1) # TODO: use the actual number of tests` in 2026 (`{r} # TODO: use the actual number of tests` tests).
+`{r} 15 + 5 * (8 - 1)` in 2025 (`{r} 8` tests) and
+<!-- # TODO: use the actual number of tests -->
+`{r} 15 + 5 * (7 - 1)` in 2026 (`{r} 7` tests).
+<!-- # TODO: use the actual number of tests -->
 
 We maximize the log-likelihood in @eq-log-likelihood with the quasi-Newton L-BFGS-B algorithm [@byrd1995],
 a quasi-Newton method that uses the slope and an estimate of the curvature to choose each step.
@@ -100,7 +102,7 @@ We then use a dissimilarity index to summarize the fit, which is the share of pu
 would have to move to another cell for the fitted table to equal the published one:
 
 $$
-\DI_t = \frac12 \sum_{i, j} \left| \hat q_t(i, j) - J_t(i, j) \right|.
+\text{DI}_t = \frac12 \sum_{i, j} \left| \hat q_t(i, j) - J_t(i, j) \right|.
 $$ {#eq-dissimilarity-index}
 
 ```{r}

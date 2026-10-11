@@ -24,7 +24,7 @@ tot_cito <- cito_misclassification |>
 The tests have measurement uncertainty, which implies that the test results are not perfectly reliable.
 Hence, if a pupil were to take the equivalent test multiple times, we would not expect the same result each time.
 Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the test's measurement uncertainty was
-`{r} sprintf("%.1f", tot_cito$flip * 100)`%
-(`{r} sprintf("%.1f", tot_cito$lower * 100)`% lower scores, `{r} sprintf("%.1f", tot_cito$higher * 100)`% higher).
+`{r} sprintf("%.1f", tot_cito$flip)`%
+(`{r} sprintf("%.1f", tot_cito$lower)`% lower scores, `{r} sprintf("%.1f", tot_cito$higher)`% higher).
 Lib paper test is a successor of the Centrale Eindtoets, and we assume that it has a similar measurement uncertainty.
 Hence, we take Lib paper test as a reference test and set its measurement uncertainty to $\sigma_{T, \text{ref}}$ is the same.
