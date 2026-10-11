@@ -1,0 +1,30 @@
+### Separating errors
+
+We now reverse the reduced parameters in @eq-reduced-parameters back to the original parameters given $\sigma^2_L$:
+
+$$
+\sigma^2_{\theta, t} = \sigma^2_t - \sigma^2_L, \quad
+\alpha_t = \frac{b_t \sigma^2_t}{\sigma^2_{\theta, t}}, \quad
+\beta_t = a_t + b_t \mu_t - \alpha_t \mu_t, \quad
+\sigma^2_{T, t} = s^2_t - \alpha_t^2 \sigma^2_{\theta, t}.
+$$ {#eq-original-parameters}
+
+However, we cannot identify the teacher's error $\sigma^2_L$ from the data.
+The CvTE tables only provide information on the joint distribution of the provisional advice and test result,
+but they do not attribute the discrepancy to either teacher or the test errors.
+
+```{r}
+#| label: tot-cito-misclassification
+#| include: false
+tot_cito <- cito_misclassification |>
+    filter(test_advice == "total") |>
+    mutate(flip = (lower + higher))
+```
+
+The tests have measurement uncertainty, which implies that the test results are not perfectly reliable.
+Hence, if a pupil were to take the equivalent test multiple times, we would not expect the same result each time.
+Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the test's measurement uncertainty was
+`{r} sprintf("%.1f", tot_cito$flip * 100)`%
+(`{r} sprintf("%.1f", tot_cito$lower * 100)`% lower scores, `{r} sprintf("%.1f", tot_cito$higher * 100)`% higher).
+Lib paper test is a successor of the Centrale Eindtoets, and we assume that it has a similar measurement uncertainty.
+Hence, we take Lib paper test as a reference test and set its measurement uncertainty to $\sigma_{T, \text{ref}}$ is the same.

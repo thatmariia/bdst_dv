@@ -7,6 +7,9 @@
 *.knit.md
 *.utf8.md
 
+# anything with .vdoc.
+*.vdoc.*
+
 # Individual work and local settings
 /assignment-1/*
 /misc/

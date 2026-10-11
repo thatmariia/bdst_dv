@@ -1,3 +1,5 @@
 ## Fitting
 
 {{< include sections/fitting/_01-tables.qmd >}}
+
+{{< include sections/fitting/_02-errors.qmd >}}
