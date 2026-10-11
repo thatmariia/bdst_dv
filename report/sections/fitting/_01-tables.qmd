@@ -34,7 +34,7 @@ plus the lower-left corner that was subtracted twice.
 
 CvTE provides $J_t(i, j)$ as the share of pupils with provisional advice $i$ and test result $j$ in test $t$.
 To approximate the number of pupils with these evaluations,
-we multiply the share by the number of pupils in test $t$ and the fraction of pupils in year $y$, for whom the provisional advice is available:
+we multiply the share by the number of pupils in test $t$ and the fraction of pupils in year $y$, for whom the provisional advice is available [@cvte2025; @cvte2026]:
 
 $$
 n_t(i, j) = N_t f_y J_t(i, j).
@@ -44,8 +44,9 @@ The resulting pseudo counts are shown in @fig-model-counts.
 
 ```{r}
 #| label: fig-model-counts
-#| fig-cap: "Psudo model counts of pupils with provisional advice $i$ and test result $j$, per test and year."  # nolint: line_length_linter
-# TODO
+#| fig-height: 6.5
+#| fig-cap: "Psudo model counts of pupils per provisional advice $i$ and test result $j$, by test and year (choose a test and a year above the plot).  Each bubble represents the pseudo count for that combination. Cells under 0.05% are not shown."  # nolint: line_length_linter
+model_counts_plot(model_counts, gap_matrix)
 ```
 
 #### Likelihood
@@ -91,14 +92,12 @@ The final set of parameters to be estimated is then:
 
 We estimate per-test parameters for the tests in each year, excluding the reference test, which has its parameters fixed by the normalization.
 Then, the total number of parameters is
-`{r} 15 + 5 * (8 - 1)` in 2025 (`{r} 8` tests) and
-<!-- # TODO: use the actual number of tests -->
-`{r} 15 + 5 * (7 - 1)` in 2026 (`{r} 7` tests).
-<!-- # TODO: use the actual number of tests -->
+`{r} length(fits[["2025"]]$par)` in 2025 (`{r} length(fits[["2025"]]$counts)` tests) and
+`{r} length(fits[["2026"]]$par)` in 2026 (`{r} length(fits[["2026"]]$counts)` tests).
 
 We maximize the log-likelihood in @eq-log-likelihood with the quasi-Newton L-BFGS-B algorithm [@byrd1995],
 a quasi-Newton method that uses the slope and an estimate of the curvature to choose each step.
-We then use a dissimilarity index to summarize the fit, which is the share of pupils that
+We then use a dissimilarity index to summarize the fit (@fig-dissimilarity-index), which is the share of pupils that
 would have to move to another cell for the fitted table to equal the published one:
 
 $$
@@ -107,6 +106,15 @@ $$ {#eq-dissimilarity-index}
 
 ```{r}
 #| label: fig-dissimilarity-index
-#| fig-cap: "Dissimilarity index of the model fit per test and year."
-# TODO: fit the model and compute the dissimilarity index per test and year
+#| fig-height: 5
+#| fig-cap: "Dissimilarity index of the model fit per test and year. The index represents the share of pupils that would have to move to another cell. Open circle: 2025, filled: 2026."  # nolint: line_length_linter
+dissimilarity_plot(fit_quality)
 ```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-fit-quality
+knitr::kable(fit_quality, digits = 3)
+```
+:::
