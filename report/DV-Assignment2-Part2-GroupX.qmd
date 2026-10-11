@@ -48,7 +48,7 @@ library(dplyr)
 library(ggplot2)
 
 # downloads the DUO files into data/raw/ if needed, applies conventions
-# D1-D8, reads the report tables in data/reports/, and stops if the sources
+# D1-D7, reads the report tables in data/reports/, and stops if the sources
 # disagree (see R/data/get-data.R). `datasets` lists the resulting tables,
 # `data_overview` describes them (provenance from data/sources.csv plus
 # rows and columns), and `source_checks` holds the checks.

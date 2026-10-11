@@ -1,6 +1,6 @@
 ## Getting data
 
-We use and derive the following tables from the mentioned sources: CvTE [@cvte2025; @cvte2026], DUO [@duo_eindscores; @duo_heroverweging; @duo_advies; @duo_referentieniveau; @duo_conversion], the Inspectorate [@inspectie_schoolweging], and Cito [@cito2026]. @tbl-data-overview in @sec-data-sources shows the provenance of each table, and Tables [-@tbl-duo-gap-matrix]-[-@tbl-school-weighting]
+We use and derive the following tables from the mentioned sources: CvTE [@cvte2025; @cvte2026], DUO [@duo_eindscores; @duo_heroverweging; @duo_advies; @duo_conversion], the Inspectorate [@inspectie_schoolweging], and Cito [@cito2026]. @tbl-data-overview in @sec-data-sources shows the provenance of each table, and Tables [-@tbl-duo-gap-matrix]-[-@tbl-school-weighting]
 in @sec-data-tables shows the glimpses of the tables themselves, with a short description of their contents.
 
 ### Data sources {#sec-data-sources}
@@ -102,16 +102,7 @@ test_scores |>
     knitr::kable()
 ```
 
-DUO [@duo_referentieniveau] also provides a table (@tbl-reading-2f) that shows, for each school, year, and test provider, the share of pupils that had their reading skills tested at the 2F level. It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for $n < 5$).
-
-```{r}
-#| label: tbl-reading-2f
-reading_2f |>
-    filter(institution_code == "00BA") |>
-    knitr::kable()
-```
-
-From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the derived shares of the same numbers relative to the total number of pupils, the difference between the shares of pupils with higher and lower test advice, and the total disagreement share (sum).
+From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the share of pupils whose provisional advice was raised.
 
 ```{r}
 #| label: tbl-advice-reconsiderations
