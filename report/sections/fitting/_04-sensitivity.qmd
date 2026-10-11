@@ -1,4 +1,4 @@
-### Sensitivity to the anchor {#sec-sensitivity}
+### Anchor sensitivity {#sec-sensitivity}
 
 ```{r}
 #| label: sensitivity-values

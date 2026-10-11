@@ -1,4 +1,4 @@
-### Separating errors
+### Separating errors {#sec-separating-errors}
 
 We now reverse the reduced parameters in @eq-reduced-parameters back to the original parameters given $\sigma^2_L$:
 
