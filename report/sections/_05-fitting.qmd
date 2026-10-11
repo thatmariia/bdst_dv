@@ -1,9 +1,19 @@
 ## Fitting
 
+```{r}
+#| label: model-setup
+#| include: false
+# fits the reduced model per year (fits, fit_quality), separates the teacher
+# and test errors (structural), and decomposes eligibility (decomposition)
+source("R/model/setup.R")
+```
+
 {{< include sections/fitting/_01-tables.qmd >}}
 
 {{< include sections/fitting/_02-errors.qmd >}}
 
 {{< include sections/fitting/_03-decomposition.qmd >}}
+
+{{< include sections/fitting/_04-sensitivity.qmd >}}
 
 
