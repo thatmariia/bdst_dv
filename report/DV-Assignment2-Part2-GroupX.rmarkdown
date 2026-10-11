@@ -1,0 +1,1239 @@
+---
+title: "DV Assignment 2: Why pupils become eligible for higher school advice"
+author: "Mariia Steeghs-Turchina"
+date: today
+bibliography: references.bib
+csl: https://www.zotero.org/styles/apa
+link-citations: true
+format:
+  html:
+    number-sections: true
+    include-in-header:
+      text: |
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+          p {
+            text-align: justify;
+          }
+        </style>
+    mermaid:
+      theme: neutral
+    fontsize: 11pt
+    theme: cosmo
+    mainfont: "'IBM Plex Sans', sans-serif"
+    toc: true
+    toc-location: left
+    code-fold: true
+execute:
+  echo: false
+knitr:
+  opts_knit:
+    root.dir: ".."
+---
+
+<!-- define latex operators -->
+$\newcommand{\Var}{\operatorname{Var}}$
+$\newcommand{\Cov}{\operatorname{Cov}}$
+$\newcommand{\PP}{\mathbb{P}}$
+$\newcommand{\EE}{\mathbb{E}}$
+$\newcommand{\indicator}{\mathbf{1}}$
+
+```{r}
+#| label: setup
+#| include: false
+# clear environment so rendering only depends on what's in this file
+rm(list = ls())
+
+library(dplyr)
+library(ggplot2)
+
+# downloads the DUO files into data/raw/ if needed, applies conventions
+# D1-D8, reads the report tables in data/reports/, and stops if the sources
+# disagree (see R/data/get-data.R). `datasets` lists the resulting tables,
+# `data_overview` describes them (provenance from data/sources.csv plus
+# rows and columns), and `source_checks` holds the checks.
+source("R/data/get-data.R")
+```
+
+## Introduction
+
+At the end of the primary school, Dutch pupils receive judgements about the suitability of different secondary school levels. This recommendation is based on two sources:
+
+- the advice of the primary school teacher *(voorlopig schooladvies)*,
+- the results of a standardized test *(doorstroomtoets)*, which arrives about a month later.
+
+Dutch secondary schools are ordinally divided into six ordered levels:
+
+- PRO *(praktijkonderwijs)*,
+- VMBO-B *(basisberoepsgerichte leerweg)*
+- VMBO-K *(kaderberoepsgerichte leerweg)*,
+- VMBO-GT *(gemengde/theoretische leerweg)*,
+- HAVO *(hoger algemeen voortgezet onderwijs)*,
+- VWO *(voorbereidend wetenschappelijk onderwijs)*.
+
+The teacher's provisional advice can be a single track or a combination of two tracks (ten options). In contrast, the test results are always reported as a combination of two tracks or single VWO (six options). When the two sources disagree, the final advice is normally determined as follows:
+
+- if the teacher's advice is higher than the test result, nothing changes;
+- if the teacher's advice is lower than the test result, the teacher should raise their advice.
+
+This asymmetrical up-only method has been implemented since the academic year 2023/2024 [@cvte2026]. Before that year, the raising of the advice was optional.
+
+Each school can choose which test provider to use, and the test is administered by the school itself. Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8. Furthermore, IEP and Lib are available in both paper and digital versions. The College voor Toetsen en Examens (CvTE) provides a framework for matching the results of the different test providers to the same reference levels [@cvte2026]. However, the CvTE has also published reports showing that pupils with the same provisional advice receive different test results depending on the test provider [@cvte2025; @cvte2026]. It is unclear whether this is due to differences in the test providers, or due to differences in the schools that use those providers.
+
+There are four main sources of potential disagreement between the teacher's advice and the test result:
+
+- **category design**: the teacher's advice has a different scale than the test result,
+- **test menu**: the tests have different providers and modes,
+- **teacher error**: teachers can make mistakes, and
+- **test error**: the tests have measurement uncertainty [@cito2026].
+
+We ask: what share of pupils is eligible for an upward revision, and how much does each source contribute to that share?
+Eligibility matters because it triggers reconsideration under the up-only rule, while schools choose which test their pupils take.
+The explorer is intended for policy makers comparing rules, school boards comparing tests and schools, and parents exploring outcomes by provisional advice.
+
+We fit a joint model to the CvTE tables, use Cito's simulated resit share to separate teacher and test error, and decompose eligibility into the four sources above.
+DUO data extends the analysis to schools, while a sensitivity check varies the assumed resit share.
+
+In the national model, category design is the largest component across the feasible anchors examined (@sec-sensitivity).
+The explorer's waterfall shows how the components add up, and its observed markers allow comparison with the data where available.
+Its school views and what-ifs help readers explore how the model results vary across schools and test choices (@fig-explorer).
+
+Open questions remain about whether the Cito anchor transfers to Lib paper, whether teacher and test errors are independent, and how representative the available pupils are.
+The model also cannot establish which advice is correct for an individual child.
+
+
+## Getting data
+
+We use and derive the following tables from the mentioned sources: CvTE [@cvte2025; @cvte2026], DUO [@duo_eindscores; @duo_heroverweging; @duo_advies; @duo_referentieniveau; @duo_conversion], the Inspectorate [@inspectie_schoolweging], and Cito [@cito2026]. @tbl-data-overview in @sec-data-sources shows the provenance of each table, and Tables [-@tbl-duo-gap-matrix]-[-@tbl-school-weighting]
+in @sec-data-tables shows the glimpses of the tables themselves, with a short description of their contents.
+
+### Data sources {#sec-data-sources}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data sources"}
+```{r}
+#| label: tbl-data-overview
+knitr::kable(data_overview, format.args = list(big.mark = ","))
+```
+:::
+
+
+### Data tables {#sec-data-tables}
+::: {.callout-note collapse="true" appearance="minimal" title="Data tables"}
+
+#### DUO gap matrix
+
+@tbl-duo-gap-matrix shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO [@duo_conversion]. The rows correspond to the provisional advice, and the columns correspond to the test result. Let $G(i, j)$ be the entry in row $i$ and column $j$ of this matrix. Then $G(i, j)$ is the indication of how much higher the test result $j$ is than the provisional advice $i$.
+
+```{r}
+#| label: tbl-duo-gap-matrix
+knitr::kable(gap_matrix, format.args = list(big.mark = ","))
+```
+
+To compare the recommendations, we define two weight vectors $v$ and $w$ for the provisional advice $i$ and the test result $j$, respectively. The weight vectors are defined as follows:
+
+$$
+v_i = (0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0),
+$$
+
+$$
+w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
+$$
+
+The mismatch between the provisional advice and the test result is what constitutes the category design source of disagreement.
+
+#### CvTE data
+
+For each test (separating the paper and digital versions) and year, CvTE [@cvte2025; @cvte2026] provides a table that shows the distribution of a test result $j$ for each provisional advice $i$. A sample is shown in @tbl-cvte-conditional.
+
+```{r}
+#| label: tbl-cvte-conditional
+cvte_conditional |>
+    filter(test_year == 2025 & test == "Lib digital" & provisional == "havo") |>
+    knitr::kable()
+```
+
+CvTE also provides a table showing the distribution of provisional advice $i$ for each test and year (@tbl-cvte-provisional).
+
+```{r}
+#| label: tbl-cvte-provisional
+cvte_provisional |>
+    filter(test_year == 2025 & test == "Lib digital") |>
+    knitr::kable()
+```
+
+The number of pupils that have taken each test in a particular year is also provided, example shown in @tbl-cvte-pupils.
+
+```{r}
+#| label: tbl-cvte-pupils
+cvte_pupils |>
+    filter(test == "Lib digital") |>
+    knitr::kable()
+```
+
+The CvTE tables cover pupils with a known provisional advice, including special education (s(b)o), whereas our DUO data is restricted to regular schools.
+Their populations therefore differ, which limits direct comparisons.
+The coverage fraction $f_y$ is recorded in @tbl-cvte-coverage [@cvte2025; @cvte2026].
+
+```{r}
+#| label: tbl-cvte-coverage
+#| tbl-cap: "Share of test participants with a known provisional advice."
+knitr::kable(cvte_coverage, digits = 2)
+```
+
+Two missing `###` cells in the 2026 Lib digital table were recovered as 100 minus the other row percentages.
+One Lib paper row summing to 95.6% was renormalised to 100%; the `note` column records these repairs.
+
+#### DUO data
+
+DUO [@duo_eindscores] provides a table (@tbl-main-provider) that shows the test provider used by each school for each year and the share of pupils that took that test.
+
+```{r}
+#| label: tbl-main-provider
+main_provider |>
+    distinct(provider, .keep_all = TRUE) |>
+    distinct(test_year, .keep_all = TRUE) |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+They also provide a table that shows, for each school and year, the number of pupils that took each test. For some results, we do not have the number of pupils, but we do have a lower and upper bound (for $n < 5$). The example is shown in @tbl-test-scores.
+
+```{r}
+#| label: tbl-test-scores
+test_scores |>
+    filter(institution_code == "00CD") |>
+    distinct(provider, .keep_all = TRUE) |>
+    knitr::kable()
+```
+
+DUO [@duo_referentieniveau] also provides a table (@tbl-reading-2f) that shows, for each school, year, and test provider, the share of pupils that had their reading skills tested at the 2F level. It also shows the share of those who reached the 2F level, and the lower and upper bounds of that share (for $n < 5$).
+
+```{r}
+#| label: tbl-reading-2f
+reading_2f |>
+    filter(institution_code == "00BA") |>
+    knitr::kable()
+```
+
+From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the derived shares of the same numbers relative to the total number of pupils, the difference between the shares of pupils with higher and lower test advice, and the total disagreement share (sum).
+
+```{r}
+#| label: tbl-advice-reconsiderations
+advice_reconsiderations |>
+    filter(institution_code == "00DD") |>
+    knitr::kable()
+```
+
+DUO [@duo_advies] also supplies the table (@tbl-final-advice) with final advice after revisions, which shows the number of pupils (with lower and upper bounds for $n < 5$) that received each final advice for each school and year.
+
+```{r}
+#| label: tbl-final-advice
+final_advice |>
+    filter(institution_code == "00BB" & advice == "vmbo gt") |>
+    filter(n > 2.5) |>
+    knitr::kable()
+```
+
+We summarize the final advice table (@tbl-advice-summary) for a single school per year, showing the total number of pupils, mean advice, and shares of VWO and combined advice.
+
+```{r}
+#| label: tbl-advice-summary
+advice_summary |>
+    filter(institution_code == "31LH") |>
+    knitr::kable()
+```
+
+We also use DUO data that contains the name, place, municipality, province, and school board (with names) of each school location, spread over
+Tables [-@tbl-school-locations]-[-@tbl-school-boards] [@duo_schooladviezen; @duo_adressen].
+
+```{r}
+#| label: tbl-school-locations
+school_locations |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+```{r}
+#| label: tbl-school-boards
+school_boards |>
+    filter(board_number == "41646") |>
+    knitr::kable()
+```
+
+#### Cito data
+
+The simulated data from Cito [@cito2026] (@tbl-cito-misclassification) shows how measurement uncertainty could change test advice. For each original test advice, they show the percentage of pupils that would receive a different or unchanged advice if the test was repeated.
+
+```{r}
+#| label: tbl-cito-misclassification
+cito_misclassification |>
+    knitr::kable()
+```
+
+#### Inspectorate data
+
+The Inspectorate [@inspectie_schoolweging] provides the data on socioeconomic weighting of schools (see @tbl-school-weighting). The higher the weighting, the more disadvantaged pupils are in that school. The table also supplies the spread of the socioeconomic weighting along with the number of pupils in that school.
+
+```{r}
+#| label: tbl-school-weighting
+school_weighting |>
+    filter(institution_code == "00DN") |>
+    knitr::kable()
+```
+:::
+
+
+## Exploratory process
+
+```{r}
+#| label: exploratory-setup
+#| include: false
+# plot functions, plus the datasets compliance, joint, and standardized
+source("R/exploration/setup.R")
+```
+
+### Compliance with raising the advice
+
+For the pupils that got a test advice that differed from the provisional advice, DUO's revision data [@duo_heroverweging] lets us check the share of pupils that got their advice raised. This would allow us to evaluate the difference between the pre-2023/2024 and post-2023/2024 policies and the overall compliance with that policy across the country.
+
+Figure @fig-compliance-values shows the share of eligible pupils whose advice was raised after a higher test result.
+It shows that the share of pupils with raised advice increased substantially once it became mandatory to reevaluate the advice.
+
+Figure @fig-compliance-plot provides a more detailed view.
+It shows the shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice.
+The share of pupils with a higher test advice than the provisional advice decreased from before to after the policy change.
+
+```{r}
+#| label: fig-compliance-values
+#| fig-height: 2
+#| fig-cap: "Share of eligible pupils whose advice was raised after a higher test result, per test year. Raising of advice is a sign of compliance with the policy implemented from 2023/2024. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
+compliance_heatmap(compliance)
+```
+
+```{r}
+#| label: fig-compliance-plot
+#| fig-cap: "Shares of pupils with a higher or lower test advice than the teacher's, and with a raised advice, per test year. Bands: bounds from suppressed counts. No test in 2020. Source: DUO [@duo_heroverweging], regular primary schools."  # nolint: line_length_linter
+compliance_plot(compliance)
+```
+
+```{r}
+#| label: compliance-measures
+#| include: false
+comp_m <- compliance_measures(compliance)
+comp_m_sum <- comp_m |>
+    filter(type == "higher" | type == "lower") |>
+    summarise(lo = sum(lo), hi = sum(hi), .by = test_year)
+```
+
+There is a substantial disagreement between the teacher's provisional advice and the test result in both directions. Throughout the recorded years, the minimum percentage of pupils with a higher test advice than the provisional advice is `r .QuartoInlineRender(sprintf("%.1f", min(filter(comp_m, type == "higher")$lo) * 100))`%, and a lower test advice than the provisional advice is `r .QuartoInlineRender(sprintf("%.1f", min(filter(comp_m, type == "lower")$lo) * 100))`%. In total, the portion of pupils with a disagreement between the two sources is between `r .QuartoInlineRender(sprintf("%.1f", min(comp_m_sum$lo) * 100))`% and `r .QuartoInlineRender(sprintf("%.1f", max(comp_m_sum$hi) * 100))`%.
+
+### Category design
+
+Let $J_t(i, j)$ be the joint distribution of provisional advice $i$ and test advice $j$ for test $t$, defined as
+
+$$
+J_t(i, j) = m_t(i) \PP_t(j | i),
+$$ {#eq-joint}
+
+where $m_t(i)$ is the share of pupils with provisional advice $i$, and $\PP_t(j | i)$ is the conditional probability of test advice $j$ given provisional advice $i$.
+
+@fig-joint-plot shows the joint distribution of provisional and test advice, nationally, by test year.
+A large portion of the *eligible* results (i.e., eligible for a higher test advice because the provisional advice is lower than the test result)
+is located in the single-track provisional advice (larger red circles). They correspond to the test results that combine that track with the next higher one (e.g., provisional HAVO vs test result HAVO/VWO). While the test results contain the provisionally advised track, their values differ.
+According to DUO's conversion table [@duo_conversion] in @tbl-duo-gap-matrix, the mismatch between them is 0.5.
+That mismatch is the source of disagreement that we call *category design*.
+
+```{r}
+#| label: fig-joint-plot
+#| fig-height: 6.5
+#| fig-cap: "Joint distribution of provisional and test advice, nationally, by test year (choose a year above the plot). Each bubble represents the share of pupils for each combination of provisional advice and test result. Cells under 0.05% of pupils are not shown. Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
+joint_plot(joint)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-joint-table
+joint |>
+    select(test_year, provisional, test_advice, gap, share) |>
+    knitr::kable(digits = 4)
+```
+:::
+
+### Test menu
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+Different schools use different test providers, and those schools consist of different populations of pupils.
+To account for the differences in the populations, we can standardize the test results to a common distribution of provisional advice.
+Applied to CvTE's per-test tables [@cvte2025; @cvte2026], this allows us to compare the test providers and modes.
+The standardization is applied by replacing the share of pupils with provisional advice $i$ for test $t$, $m_t(i)$ in @eq-joint,
+with the national share $\bar{m}(i)$, which is the average of $m_t(i)$ over all tests $t$:
+
+$$
+\bar{m}(i) = \frac{\sum_t N_t(i) m_t(i)}{\sum_t N_t(i)},
+$$ {#eq-national-share}
+
+where $N_t(i)$ is the number of pupils with provisional advice $i$ for test $t$.
+Then we can define the standardized eligibility $h_t$ as follows:
+
+$$
+h_t = \sum_{i, j : G(i, j) > 0} \bar{m}(i) \PP_t (j | i).
+$$ {#eq-standardized-eligibility}
+
+This value represents the share of pupils that are eligible for a higher test advice than their provisional advice,
+given the national distribution of provisional advice.
+We also define $\ell_t$ as the standardized share of pupils that have scored lower on the test than their provisional advice:
+
+$$
+\ell_t = \sum_{i, j : G(i, j) < 0} \bar{m}(i) \PP_t (j | i).
+$$ {#eq-standardized-ineligibility}
+
+Now, we define the leniency index for a test $t$, which encodes the tendency of a test to give higher or lower advice
+than the provisional advice.
+Positive leniency indicates that the test is more likely to give a higher advice, and vice versa.
+We also define the disagreement index, which encodes the overall disagreement between the two sources:
+
+$$
+\text{leniency}_t = h_t - \ell_t, \quad \text{disagreement}_t = h_t + \ell_t.
+$$ {#eq-standardized-indices}
+
+```{r}
+#| label: standardized-values
+#| include: false
+stat <- function(s) {
+    if (s == "min") {
+        return(min)
+    } else if (s == "max") {
+        return(max)
+    }
+    function(x) max(x) - min(x)
+}
+
+std_val <- function(y, s, c) {
+    standardized |>
+        filter(test_year == y) |>
+        summarise(
+            value = stat(s)(get(c))
+        ) |>
+        pull(value) * 100
+}
+```
+:::
+
+@fig-standardized shows the standardized leniency and disagreement per test assuming a common distribution of provisional advice,
+with arrows from 2025 to 2026, indicating the change in the indices.
+If all pupils in the Netherlands took the same test in 2026, between
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "min", "higher")))`% and
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "max", "higher")))`%
+would be eligible for a higher track; in 2025 -- between
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "min", "higher")))`% and
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "max", "higher")))`%.
+
+The disagreements range from
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "min", "disagreement")))`% to
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "max", "disagreement")))`%,
+with
+$\Delta \text{disagreement}$ = `r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "diff", "disagreement")))`%
+in 2026; in 2025, the spread of disagreement was the same:
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "max", "disagreement")))`% -
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "min", "disagreement")))`% =
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "diff", "disagreement")))`%.
+
+The leniency range in 2026 was from
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "min", "leniency")))`% to
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "max", "leniency")))`%,
+with
+$\Delta \text{leniency}$ = `r .QuartoInlineRender(sprintf("%.1f", std_val(2026, "diff", "leniency")))`%,
+down from 2025, when the leniency range was
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "max", "leniency")))`% -
+(`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "min", "leniency")))`%) =
+`r .QuartoInlineRender(sprintf("%.1f", std_val(2025, "diff", "leniency")))`%.
+
+The tests differ more in their leniency than in their disagreement.
+Even the differences between modes of the same test providers are considerable.
+Among the providers who offer both modes (IEP and Lib), the paper versions are more lenient than digital.
+The differences in leniency and disagreement constitute the source of disagreement that we call *test menu*.
+
+```{r}
+#| label: fig-standardized
+#| fig-cap: "Standardized leniency and disagreement per test and mode: open circles 2025, filled 2026, arrows from 2025 to 2026. Source: CvTE [@cvte2025; @cvte2026]; DUO conversion table [@duo_conversion]."  # nolint: line_length_linter
+standardized_plot(standardized)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-standardized
+knitr::kable(standardized, digits = 4)
+```
+:::
+
+
+## Modeling
+
+### Measurement model {#sec-measurement-model}
+
+Suppose a pupil $p$ is up for an evaluation.
+They will receive a provisional advice from their teacher, and a test advice from the test provider $t$.
+Both measurements attempt to estimate the common factor: the pupil's suitability for secondary tracks $\theta_p$.
+Subscript $p$ marks parameters that vary per pupil, subscript $t$ -- parameters that vary per test.
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+Since the test is administered by schools, and schools choose their test, pupils taking different tests come from different populations.
+We assume that $\theta_p$ is normally distributed within each test population with mean $\mu_t$ and variance $\sigma^2_{\theta, t}$:
+
+$$
+\theta_p \mid (\text{pupil }p\text{ takes test }t) \sim \mathcal{N}(\mu_t, \sigma^2_{\theta, t}).
+$$ {#eq-common-factor}
+
+Then we can model the teacher's latent provisional advice $L^*_p$ for pupil $p$ as follows:
+
+$$
+L^*_p = \alpha_L \theta_p + \beta_L + \epsilon_{L, p} = \theta_p + \epsilon_{L, p}, \quad \epsilon_{L, p} \sim \mathcal{N}(0, \sigma^2_L),
+$$ {#eq-teacher}
+
+The latent scale is normalized with respect to the teacher's advice, by setting $\alpha_L = 1$ and $\beta_L = 0$.
+Thus, $\theta_p$ is measured in units of the teacher's scale.
+In the reference population ($t = \text{ref}$),
+we also set the mean of the teacher's judgement to zero, $\mu_{\text{ref}} = 0$, and variance to one:
+$\Var(L^*_p | t = \text{ref}) = \sigma^2_{\theta, \text{ref}} + \sigma^2_L = 1$.
+These scaling choices are made to fix the origin and unit of the latent scale.
+$\epsilon_{L, p}$ is the teacher's error, which can be attributed to the misjudgements about the pupil, as well
+as the information that is not visible to the test (e.g., motivation, work ethic, or behaviour).
+
+Now, we model the latent test advice $T^*_p$ as follows:
+
+$$
+T^*_p = \alpha_t \theta_p + \beta_t + \epsilon_{T, p}, \quad \epsilon_{T, p} \sim \mathcal{N}(0, \sigma^2_{T, t}).
+$$ {#eq-test}
+
+The loading factor $\alpha_t$ and the intercept $\beta_t$ are specific to the test provider $t$.
+$\alpha_t$ encodes the test's sensitivity to the common factor:
+a higher $\alpha_t$ distributes the test results more widely for different $\theta$ value (pupils' abilities).
+This sensitivity can be affected by factors such as the design, length, and difficulty of the test.
+The intercept $\beta_t$ encodes the test's leniency:
+a higher $\beta_t$ shifts the test results to a higher track.
+The test scale is normalized with respect to the teacher's scale,
+by setting $\alpha_{\text{ref}} = 1$ and $\beta_{\text{ref}} = 0$ for the reference test.
+The test error $\epsilon_{T, p}$ can be attributed to the test's measurement uncertainty [@cito2026] and
+is assumed to be normally distributed.
+We set the mean of the error to zero so that every systematic bias is captured by the intercept $\beta_t$,
+and we set the variance $\sigma^2_{T, t}$ to be specific to the test provider $t$.
+
+Neither the teacher's advice nor the test result is directly observed;
+instead, we observe the provisional advice $L$ and the test result $T$ as ordinal variables.
+When $L^*$ falls into the interval between the thresholds of $i$ and $i + 1$, the teacher assigns a provisional advice $i$ to the pupil.
+When $T^*$ falls into the interval between the thresholds of $j$ and $j + 1$, the test assigns a test result $j$ to the pupil.
+
+Let $\lambda_1 < \ldots < \lambda_9$ be the thresholds for the teacher's advice
+and $\tau_1 < \ldots < \tau_5$ be the thresholds for the test result,
+with $\lambda_0 = \tau_0 = -\infty$, $\lambda_{10} = \tau_6 = \infty$.
+Then we can write:
+
+$$
+\begin{aligned}
+L_p = i \Leftrightarrow \lambda_{i} < L^*_p \leq \lambda_{i+1}, \quad &i = 0, \ldots, 9 \\
+T_p = j \Leftrightarrow \tau_{j} < T^*_p \leq \tau_{j+1}, \quad &j = 0, \ldots, 5.
+\end{aligned}
+$$ {#eq-thresholds}
+
+This makes our model a one-factor ($\theta$) measurement model with two congeneric indicators ($L, T$),
+with the teacher's advice as the reference indicator.
+
+A pupil is eligible for a higher track if $G(L_p, T_p) > 0$.
+Let $\pi \in [0, 1]$ be the compliance -- the probability that a teacher raises the advice when
+the test result is higher than the provisional advice.
+We can then define $U_p \sim \mathcal{U}(0, 1)$ as an independent uniform draw.
+An eligible pupil's advice is raised if $U_p \leq \pi$.
+Now, we can define the final advice $F_p$ as follows:
+
+$$
+F_p = \begin{cases}
+    w_{T_p} \quad &\text{if } G(L_p, T_p) > 0 \text{ and } U_p \leq \pi, \\
+    v_{L_p} \quad &\text{otherwise}.
+\end{cases}
+$$ {#eq-final-advice}
+:::
+
+@fig-measurement-model shows the structure of the described model.
+
+```{mermaid}
+%%| echo: false
+%%| label: fig-measurement-model
+%%| fig-cap: "Structure of the measurement model"
+flowchart LR
+    theta(["`Common factor &nbsp $$\theta_p$$`"])
+    lstar(["`Latent provisional advice &nbsp $$L^*_p$$`"])
+    l(["`Provisional advice &nbsp $$L_p$$`"])
+    tstar(["`Latent test result &nbsp $$T^*_p$$`"])
+    t(["`Test result &nbsp $$T_p$$`"])
+    gap(["`Advice gap &nbsp $$G(L_p, T_p)$$`"])
+    f(["`Final advice &nbsp $$F_p$$`"])
+
+    theta --> lstar
+    theta --> tstar
+    lstar --> l
+    tstar --> t
+    l --> gap
+    t --> gap
+    gap --> f
+```
+
+Assumptions made:
+
+- the teacher error variance $\sigma^2_L$ and the provisional advice thresholds are the same for all pupils in every test population,
+- the test result thresholds are the same for all tests (CvTE provides a framework for matching the results, see @cvte2026),
+- pupils are independent of each other,
+- the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are all mutually independent,
+- the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are normally distributed.
+
+
+
+### Reduced model
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+We never observe the common factor $\theta_p$.
+The CvTE tables only provide the provisional advice and test results, and we can observe the final advice.
+Therefore, we need to eliminate the latent variable $\theta_p$ by integrating it out of the model, resulting in a reduced model.
+
+Because the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are normally distributed and mutually independent,
+we can write the joint distribution of the provisional advice and test result as a bivariate normal distribution.
+Then, in a test $t$ population, the joint distribution is given by:
+
+$$
+L^*_p \sim \mathcal{N}(\mu_t, \sigma^2_t), \quad
+T^*_p \mid L^*_p \sim \mathcal{N}(a_t + b_t L^*_p, \psi^2_t),
+$$ {#eq-reduced-model}
+
+where $\mu_t$ and $\sigma^2_t$ are the mean and variance of the latent provisional advice, and
+the latent test result is a regression on $L^*_p$ with intercept $a_t$, slope $b_t$, and residual variance $\psi^2_t$.
+Matching means, variances, and the covariance $\Cov(L^*_p, T^*_p) = \alpha_t \sigma^2_{\theta, t}$
+of the reduced model with the original model,
+we can express the parameters in terms of the original model parameters:
+
+$$
+\sigma^2_t = \sigma^2_{\theta, t} + \sigma^2_L, \quad
+b_t = \frac{\alpha_t \sigma^2_{\theta, t}}{\sigma^2_t}, \quad
+a_t = \alpha_t \mu_t + \beta_t - b_t \mu_t, \quad
+\psi^2_t = \frac{
+    \alpha^2_t \sigma^2_{\theta, t} \sigma^2_L
+}{
+    \sigma^2_t
+} + \sigma^2_{T, t}.
+$$ {#eq-reduced-parameters}
+
+The variance of the latent provisional advice $\sigma^2_t$ combines the spreads of pupils and the teacher's error.
+The slope $b_t$ is the loading factor $\alpha_t$ scaled by the share of provisional-advice variance due to the common factor, $\sigma^2_{\theta,t}/\sigma^2_t$ (the teacher's reliability).
+The intercept $a_t$ is the test's leniency $\beta_t$ adjusted for the difference between the provisional advice and the test result.
+The residual variance $\psi^2_t$ combines the test's measurement uncertainty $\sigma^2_{T, t}$ and the part of the teacher's error that the test cannot explain.
+
+For a given test $t$, the reduced model in @eq-reduced-model is a bivariate normal distribution behind the polychoric correlation [@olsson1979],
+with parameters $\mu_t, \sigma^2_t, a_t, b_t, \psi^2_t$.
+By the law of total variance, the variance of the latent test result and the correlation between the latent provisional advice and test result are given by:
+
+$$
+s^2_t = \Var(T^*_p) = b^2_t \sigma^2_t + \psi^2_t, \quad
+\rho_t = \frac{\Cov(L^*_p, T^*_p)}{\sigma_t s_t} = \frac{b_t \sigma_t}{s_t}.
+$$ {#eq-reduced-variance-correlation}
+:::
+
+
+
+
+## Fitting
+
+```{r}
+#| label: model-setup
+#| include: false
+# fits the reduced model per year (fits, fit_quality), separates the teacher
+# and test errors (structural), and decomposes eligibility (decomposition)
+source("R/national-model/setup.R")
+source("R/school-model/setup.R")
+```
+
+### Fitting tables
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+#### Model predictions
+
+For each test $t$, the data provides the joint distribution $J_t(i, j)$ of the provisional advice and test result, as shown in @eq-joint.
+The model predicts the same share $q_t(i, j)$ (the model's counterpart of $J_t(i, j)$),
+which is the probability that the pupil's evaluations are within the rectangular area defined by the thresholds of $i$ and $j$ (see @eq-thresholds):
+
+- the provisional advice thresholds $\lambda_i$ and $\lambda_{i+1}$, and
+- the test result thresholds $\tau_j$ and $\tau_{j+1}$.
+
+To obtain $q_t(i, j)$, we need to standardize the thresholds, i.e., its boundaries, to the latent scale of the provisional advice $L^*$, which is the reference indicator in our measurement model.
+We do this by subtracting the evaluation's mean and dividing by its standard deviation from Equations [-@eq-reduced-model] and [-@eq-reduced-variance-correlation]:
+
+$$
+u_{t, i} = \frac{\lambda_i - \mu_t}{\sigma_t}, \quad
+v_{t, j} = \frac{\tau_j - (a_t + b_t \mu_t)}{s_t}.
+$$ {#eq-standardized-thresholds}
+
+The standardized thresholds $u_{t, i}$ and $v_{t, j}$ are the boundaries of the rectangular area in the bivariate normal distribution of the reduced model.
+Then, $q_t(i, j)$ is the probability mass within this area, which can be computed using the bivariate normal cumulative distribution function $\Phi_2$ [@olsson1979]:
+
+$$
+q_t(i, j) =
+\Phi_2(u_{t, i+1}, v_{t, j+1}, \rho_t) -
+\Phi_2(u_{t, i}, v_{t, j+1}, \rho_t) -
+\Phi_2(u_{t, i+1}, v_{t, j}, \rho_t) +
+\Phi_2(u_{t, i}, v_{t, j}, \rho_t),
+$$ {#eq-model-probability}
+
+i.e., the probability below the upper-right corner,
+minus the areas to the left and below,
+plus the lower-left corner that was subtracted twice.
+
+CvTE provides $J_t(i, j)$ as the share of pupils with provisional advice $i$ and test result $j$ in test $t$.
+To approximate the number of pupils with these evaluations,
+we multiply the share by the number of pupils in test $t$ and the fraction of pupils in year $y$, for whom the provisional advice is available [@cvte2025; @cvte2026]:
+
+$$
+n_t(i, j) = N_t f_y J_t(i, j).
+$$ {#eq-model-counts}
+
+The resulting pseudo counts are shown in @fig-model-counts.
+
+```{r}
+#| label: fig-model-counts
+#| fig-height: 6.5
+#| fig-cap: "Pseudo model counts of pupils per provisional advice $i$ and test result $j$, by test and year (choose a test and a year above the plot).  Each bubble represents the pseudo count for that combination. Cells under 0.05% are not shown."  # nolint: line_length_linter
+model_counts_plot(model_counts, gap_matrix)
+```
+
+#### Likelihood
+
+As mentioned in @sec-measurement-model, the model assumes that pupils are independent.
+Then the counts $n_t(i, j)$ follow a multinomial distribution with probabilities $q_t(i, j)$.
+The log-likelihood of the model is then given by:
+
+$$
+\log \mathcal{L} = \sum_t \sum_{i, j} n_t(i, j) \log q_t(i, j).
+$$ {#eq-log-likelihood}
+
+We fit all tests of a year jointly, so they share the thresholds $\lambda$ and $\tau$: one common ruler.
+Separate thresholds for each test could absorb differences in leniency.
+We can maximize the log-likelihood to find the best-fitting parameters of the published data.
+The model is constrained: each $10 \times 6$ table has 59 free cell probabilities, compared with five parameters per non-reference test and 14 thresholds shared across tests.
+The pseudo counts use rounded percentages and only pupils with known provisional advice; pupils are also clustered in schools.
+Naive multinomial standard errors would ignore these features, so we assess fit descriptively.
+
+As mentioned in @sec-measurement-model,
+the measurement scale is set by the teacher's advice ($\mu_\text{ref} = 0$ and $\sigma^2_\text{ref} = 1$);
+the origin of the test's scale is set by the test's leniency ($\beta_\text{ref} = 0$).
+We cannot set the test's sensitivity $\alpha_\text{ref}$ to a fixed value, because it is not identifiable.
+Instead, we set $\psi^2_\text{ref} = 1$, which fixes the test units without changing fitted probabilities.
+The value of $\alpha_\text{ref}$ depends on the teacher/test error split, identified in the next step.
+
+#### Parameters
+
+There are two types of restrictions on the parameters:
+thresholds must increase ($\lambda_1 < \dots < \lambda_9$, $\tau_1 < \dots < \tau_5$), and
+spreads must be positive ($\sigma_t, \psi_t > 0$).
+We handle these restrictions by transforming these parameters to unconstrained parameters as follows:
+
+- the first threshold of each scale is estimated directly -- this sets the origin of the scale,
+- the gaps between consecutive thresholds are estimated on the log scale,
+i.e., $\lambda_{l+1} - \lambda_l = e^{\gamma_l}$ and $\tau_{l+1} - \tau_l = e^{\zeta_l}$, --
+this ensures that the thresholds increase by forcing the gaps to be positive,
+- the spreads are estimated on the log scale, i.e., $\sigma_t = e^{\eta_t}$ and $\psi_t = e^{\xi_t}$. --
+this ensures that the spreads are positive.
+
+The final set of parameters to be estimated is then:
+
+- the first threshold of the teacher's advice $\lambda_1$ ($\#$ = 1),
+- the gaps between consecutive thresholds of the teacher's advice $\gamma_1, \dots, \gamma_8$ ($\#$ = 8),
+- the first threshold of the test result $\tau_1$ ($\#$ = 1),
+- the gaps between consecutive thresholds of the test result $\zeta_1, \dots, \zeta_4$ ($\#$ = 4),
+- the slope of the reference test $b_\text{ref}$ ($\#$ = 1),
+- the parameters of the other tests $(\mu_t, \log \sigma_t, a_t, b_t, \log \psi_t)$ ($\#$ = 5 per test).
+
+We estimate per-test parameters for the tests in each year, with only its slope free for the reference test; its other parameters are fixed by the normalization.
+Then, the total number of parameters is
+`r .QuartoInlineRender(length(fits[["2025"]]$par))` in 2025 (`r .QuartoInlineRender(length(fits[["2025"]]$counts))` tests) and
+`r .QuartoInlineRender(length(fits[["2026"]]$par))` in 2026 (`r .QuartoInlineRender(length(fits[["2026"]]$counts))` tests).
+
+We maximize the log-likelihood in @eq-log-likelihood with the quasi-Newton L-BFGS-B algorithm [@byrd1995],
+a quasi-Newton method that uses the slope and an estimate of the curvature to choose each step.
+We then use a dissimilarity index to summarize the fit (@fig-dissimilarity-index), which is the share of pupils that
+would have to move to another cell for the fitted table to equal the published one:
+
+$$
+\text{DI}_t = \frac12 \sum_{i, j} \left| \hat q_t(i, j) - J_t(i, j) \right|.
+$$ {#eq-dissimilarity-index}
+
+```{r}
+#| label: fig-dissimilarity-index
+#| fig-height: 5
+#| fig-cap: "Dissimilarity index of the model fit per test and year. The index represents the share of pupils that would have to move to another cell. Open circle: 2025, filled: 2026."  # nolint: line_length_linter
+dissimilarity_plot(fit_quality)
+```
+
+The dissimilarity index is about 3–6% for Lib, IEP, and Dia, compared with 7–13% for AMN, ROUTE 8, and DOE.
+The latter tests have more pupils with PrO advice in the published tables; this population difference may contribute to the weaker fit, but the index does not establish its cause.
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-fit-quality
+knitr::kable(fit_quality, digits = 3)
+```
+:::
+:::
+
+
+
+### Separating errors {#sec-separating-errors}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+We now reverse the reduced parameters in @eq-reduced-parameters back to the original parameters given $\sigma^2_L$:
+
+$$
+\sigma^2_{\theta, t} = \sigma^2_t - \sigma^2_L, \quad
+\alpha_t = \frac{b_t \sigma^2_t}{\sigma^2_{\theta, t}}, \quad
+\beta_t = a_t + b_t \mu_t - \alpha_t \mu_t, \quad
+\sigma^2_{T, t} = s^2_t - \alpha_t^2 \sigma^2_{\theta, t}.
+$$ {#eq-original-parameters}
+
+However, we cannot identify the teacher's error $\sigma^2_L$ from the data.
+The CvTE tables only provide information on the joint distribution of the provisional advice and test result,
+but they do not attribute the discrepancy to either teacher or the test errors.
+Any $0 \leq \sigma^2_L \leq \min_t(\psi_t^2\sigma_t^2/s_t^2)$ gives the same fitted tables with non-negative error variances.
+Two noisy measurements reveal their disagreement, but an outside constraint is needed to split it between them.
+
+```{r}
+#| label: tot-cito-misclassification
+#| include: false
+tot_cito <- cito_misclassification |>
+    filter(test_advice == "total") |>
+    mutate(flip = (lower + higher))
+```
+
+The tests have measurement uncertainty, which implies that the test results are not perfectly reliable.
+Hence, if a pupil were to take the equivalent test multiple times, we would not expect the same result each time.
+Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the share of test advices changing category was
+$r$ = `r .QuartoInlineRender(sprintf("%.1f", tot_cito$flip))`%
+(`r .QuartoInlineRender(sprintf("%.1f", tot_cito$lower))`% lower advice categories, `r .QuartoInlineRender(sprintf("%.1f", tot_cito$higher))`% higher advice categories).
+We use Lib paper as the reference test and assume that the same category-change share applies to it.
+This transfers a result from a different test and year; it is an anchoring assumption, assessed in @sec-sensitivity.
+
+Following the redraw construction, we centre a simulated result on the pupil's original reading, rather than draw two independent errors around the common factor.
+This is why the added perturbation has one error variance.
+Then the new test result is $T^{**}_p = T^*_p + \epsilon_{T, p}$, where $\epsilon_{T, p} \sim \mathcal{N}(0, \sigma^2_{T, \text{ref}})$,
+(see @eq-test). Then the resit $T^{**}_p$ has the same outcome as the original test $T^*_p$ if the difference is within the thresholds of the test result:
+$\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}$, which follows from @eq-thresholds.
+By normal distribution, the probability of this happening is given by:
+
+$$
+\Pr(\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}) =
+\Phi\left(\frac{
+    \tau_{T_p + 1} - T^*_p
+}{
+    \sigma_{T, \text{ref}}
+}\right) -
+\Phi\left(\frac{
+    \tau_{T_p} - T^*_p
+}{
+    \sigma_{T, \text{ref}}
+}\right).
+$$ {#eq-resit-probability-same}
+
+Then the share of pupils that would have the results that change the category is
+one minus the probability above, averaged over all pupils in the reference test population.
+From @eq-reduced-model, we have $T^*_p \sim \mathcal{N}(a_\text{ref} + b_\text{ref}\mu_\text{ref}, s^2_\text{ref}) = \mathcal{N}(0, s^2_\text{ref})$.
+Forcing it to be equal to Cito's category-change share, we obtain
+
+$$
+\EE \left[ 1 -
+\Pr(\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1})
+\right] = r.
+$$ {#eq-resit-share}
+
+The probability that a pupil's test result changes category depends on the category of the original test result.
+Therefore, we cannot solve @eq-resit-share analytically.
+Instead, we solve for $\sigma_{T, \text{ref}}$ via Brent’s method [@brent1973],
+a root-finding algorithm that combines bisection, secant, and inverse quadratic interpolation methods.
+
+Once we have the test's measurement uncertainty $\sigma^2_{T, \text{ref}}$ (@tbl-anchor),
+we can use @eq-original-parameters to solve for its loading factor $\alpha_{\text{ref}}$ and for the teacher's error $\sigma^2_L$:
+
+$$
+\alpha_{\text{ref}} = \frac{s_{\text{ref}}^2 - \sigma^2_{T, \text{ref}}}{b_{\text{ref}} \sigma^2_{\text{ref}}}, \quad
+\sigma^2_L = \sigma^2_{\text{ref}} - \frac{b_{\text{ref}} \sigma^2_{\text{ref}}}{\alpha_{\text{ref}}}.
+$$ {#eq-loading-teacher-error}
+
+```{r}
+#| label: tbl-anchor
+#| tbl-cap: "Test error $\\sigma_{T, \\text{ref}}$ and loading factor $\\alpha_{\\text{ref}}$ of the reference test (in estimation units), and the teacher's error variance $\\sigma^2_L$, per test year."  # nolint: line_length_linter
+knitr::kable(anchor_summary(structural), digits = 3)
+```
+
+At this anchor, the teacher's reliability in the reference population, $1-\sigma_L^2$, is about 0.80–0.81, compared with about 0.94 for the reference test.
+Thus the teacher has the larger error share under this assumed anchor; @sec-sensitivity shows how that comparison changes with $r$.
+
+Finally, we scale $\alpha_t$, $\beta_t$, $\sigma_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
+so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (see @sec-measurement-model).
+@tbl-original-parameters shows the scaled original parameters per test and year.
+
+```{r}
+#| label: tbl-original-parameters
+#| tbl-cap: "Original parameters per test and year: the mean $\\mu_t$ and variance $\\sigma^2_{\\theta, t}$ of the common factor, the loading factor $\\alpha_t$, the intercept $\\beta_t$, and the test error $\\sigma_{T, t}$, with $\\alpha_{\\text{ref}} = 1$."  # nolint: line_length_linter
+knitr::kable(original_parameters(structural), digits = 3)
+```
+:::
+
+
+
+### Decomposition {#sec-decomposition}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+With the original parameters in @tbl-original-parameters, we can switch each source of disagreement on and off,
+and see how the share of pupils that are eligible for a higher track changes.
+To compare the tests on the same pupils, we let the whole national population take each test.
+Similar to @eq-national-share, the national population is the combination of the test populations in @eq-common-factor,
+weighted by the number of pupils $N_t$ that took each test:
+
+$$
+\theta_p \sim \sum_t w_t \mathcal{N}(\mu_t, \sigma^2_{\theta, t}), \quad w_t = \frac{N_t}{\sum_{t'} N_{t'}}.
+$$ {#eq-national-population}
+
+Since we assume the teacher and the test make their errors in measuring $\theta_p$ independently (see @sec-measurement-model),
+we can use Equations [-@eq-teacher], [-@eq-test], and [-@eq-thresholds],
+to compute the probabilities that the teacher gives the provisional advice $i$ and that the test $t$ gives the test result $j$:
+
+$$
+\begin{aligned}
+\PP(L_p = i \mid \theta_p) &=
+\Phi\left(\frac{\lambda_{i+1} - \theta_p}{\sigma_L}\right) -
+\Phi\left(\frac{\lambda_i - \theta_p}{\sigma_L}\right), \\
+\PP_t(T_p = j \mid \theta_p) &=
+\Phi\left(\frac{\tau_{j+1} - \alpha_t \theta_p - \beta_t}{\sigma_{T, t}}\right) -
+\Phi\left(\frac{\tau_j - \alpha_t \theta_p - \beta_t}{\sigma_{T, t}}\right).
+\end{aligned}
+$$ {#eq-category-probabilities}
+
+The share of eligible pupils $\tilde{h}_t$, given the whole national population took the test $t$, is then given by:
+
+$$
+\tilde{h}_t = \sum_{i, j : G(i, j) > 0} \EE_\theta \left[ \PP(L_p = i \mid \theta_p) \PP_t(T_p = j \mid \theta_p) \right],
+$$ {#eq-eligibility}
+
+i.e., the model's counterpart of the standardized eligibility $h_t$ in @eq-standardized-eligibility.
+We evaluate the expectation over the national population numerically, on a fine grid of $\theta$ values.
+Switching an error off means setting its standard deviation to zero.
+Then the teacher or the test reads the common factor exactly,
+and the probability in @eq-category-probabilities is one for the category that contains the error and zero otherwise.
+
+We attribute the eligibility to three sources:
+
+- **teacher error** ($L$): the teacher's error $\sigma_L$ instead of zero,
+- **test error** ($T$): the test's error $\sigma_{T, t}$ instead of zero, and
+- **test menu** ($M$): the parameters $(\alpha_t, \beta_t, \sigma_{T, t})$ of the test $t$ instead of the parameters of the reference test.
+
+Let $\tilde{h}(S)$ be the eligibility when the sources in the set $S \subseteq \{L, T, M\}$ are switched on, and the others are off.
+When all sources are off, both the teacher and the reference test are perfect,
+and the only remaining reason for eligibility is the mismatch between the two scales.
+Therefore, $\tilde{h}(\emptyset)$ is the *category design* source of disagreement.
+
+The contribution of a source depends on the order in which the sources are switched on, because the sources interact.
+For example, how much eligibility the test error adds depends on where the test's thresholds lie relative to the teacher's thresholds,
+which is what the test menu changes.
+Therefore, we use the Shapley value [@shapley1953],
+which averages the contribution of a source $k$ over all $3! = 6$ orders in which the sources can be switched on:
+
+$$
+\text{Sh}_k = \sum_{S \subseteq \{L, T, M\} \setminus \{k\}}
+\frac{|S|! \, (2 - |S|)!}{3!}
+\left[ \tilde{h}(S \cup \{k\}) - \tilde{h}(S) \right].
+$$ {#eq-shapley}
+
+The weight of a set $S$ is the share of the orders in which exactly the sources in $S$ are switched on before $k$.
+Since the contributions along each order add up to the total change in eligibility, so do their averages:
+
+$$
+\tilde{h}_t = \tilde{h}(\emptyset) + \text{Sh}_L + \text{Sh}_T + \text{Sh}_M.
+$$ {#eq-decomposition}
+
+The test menu contribution $\text{Sh}_M$ is negative for the tests that are stricter than the reference test, and zero for the reference test itself.
+
+```{r}
+#| label: decomposition-values
+#| include: false
+pp <- function(x) sprintf("%.1f", 100 * x)
+
+decomposition_of <- function(year, test_name = reference_test) {
+    filter(decomposition, test_year == year, test == test_name)
+}
+
+strictest_test <- function(year) {
+    decomposition |>
+        filter(test_year == year) |>
+        slice_min(test_menu)
+}
+
+ref_2025 <- decomposition_of(2025)
+ref_2026 <- decomposition_of(2026)
+year_2026 <- filter(decomposition, test_year == 2026)
+```
+:::
+
+@fig-decomposition shows the decomposition per test, for the chosen year.
+If the whole national population took the reference test in 2026,
+`r .QuartoInlineRender(pp(ref_2026$eligible))`% of pupils would be eligible for a higher track.
+Category design accounts for `r .QuartoInlineRender(pp(ref_2026$category_design))` percentage points,
+teacher error for `r .QuartoInlineRender(pp(ref_2026$teacher_error))`, and test error for `r .QuartoInlineRender(pp(ref_2026$test_error))`.
+In 2025, these were `r .QuartoInlineRender(pp(ref_2025$category_design))`, `r .QuartoInlineRender(pp(ref_2025$teacher_error))`, and `r .QuartoInlineRender(pp(ref_2025$test_error))`
+out of `r .QuartoInlineRender(pp(ref_2025$eligible))`%.
+Hence, `r .QuartoInlineRender(sprintf("%.0f", 100 * ref_2026$category_design / ref_2026$eligible))`% of the eligibility would remain even if both the teacher and the test were perfect,
+and the teacher error adds about `r .QuartoInlineRender(round(ref_2026$teacher_error / ref_2026$test_error))` times as much eligibility as the test error.
+
+Across the tests in 2026, the teacher error contributes between
+`r .QuartoInlineRender(pp(min(year_2026$teacher_error)))`% and `r .QuartoInlineRender(pp(max(year_2026$teacher_error)))`%,
+and the test error between
+`r .QuartoInlineRender(pp(min(year_2026$test_error)))`% and `r .QuartoInlineRender(pp(max(year_2026$test_error)))`%.
+The test menu contribution is largest for `r .QuartoInlineRender(strictest_test(2026)$test)`, which removes
+`r .QuartoInlineRender(pp(-strictest_test(2026)$test_menu))`% in 2026
+(`r .QuartoInlineRender(strictest_test(2025)$test)`, `r .QuartoInlineRender(pp(-strictest_test(2025)$test_menu))`% in 2025).
+I.e., taking the strictest test instead of the reference test removes more eligibility than the teacher error adds for any test.
+
+```{r}
+#| label: fig-decomposition
+#| fig-height: 5.5
+#| fig-cap: "Shapley decomposition of the share of pupils eligible for a higher track, if the whole national population took the test, per test (choose the year above the plot). Bars stack category design, teacher error, and test error; the hatched band is the eligibility that the test menu removes (since the reference test is the least strict); dots mark the total. Source: model fitted to CvTE [@cvte2025; @cvte2026], with Cito's resit share [@cito2026]."  # nolint: line_length_linter
+decomposition_plot(decomposition)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-decomposition
+knitr::kable(decomposition, digits = 3)
+```
+:::
+
+
+
+### Anchor sensitivity {#sec-sensitivity}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+```{r}
+#| label: sensitivity-values
+#| include: false
+robustness <- sensitivity_summary(sensitivity, resit_flip)
+robust_in <- function(year) filter(robustness, test_year == year)
+share <- function(x) sprintf("%.0f%%", 100 * x)
+points <- function(x) sprintf("%.1f", 100 * x)
+```
+
+The separation of the teacher error and the test error rests on a single number from outside the CvTE tables:
+Cito's resit share $r$ = `r .QuartoInlineRender(sprintf("%.1f", 100 * resit_flip))`% [@cito2026], as mentioned in @sec-separating-errors, which we assume for the reference test (@eq-resit-share).
+To see how much our results depend on this anchor, we repeat the separation of the errors and the decomposition for every resit share $r$ from 1% to 60%, in steps of one percent.
+The reduced model itself does not change, because it does not use the anchor.
+
+@fig-sensitivity shows the result.
+Each line is a national average over the tests, weighted by the number of pupils that took each test, in percentage points of all pupils:
+
+- the black line is the share of eligible pupils $\tilde{h}_t$ (@eq-eligibility), and
+- the grey, magenta, green, and violet lines are the Shapley values of category design, teacher error, test error, and test menu (@eq-decomposition).
+
+For the shaded resit shares, @eq-original-parameters gives a negative variance, so the model is not feasible:
+for a large $r$, the test error alone would explain more disagreement than the tables contain, and the teacher's error variance $\sigma^2_L$ would be negative;
+for a small $r$ in 2025, the error variance $\sigma^2_{T, t}$ of some tests would be negative.
+
+```{r}
+#| label: fig-sensitivity
+#| fig-height: 5.5
+#| fig-cap: "National decomposition of eligibility for every resit share anchor $r$ (choose the year above the plot), averaged over the tests weighted by their number of pupils. Source: model fitted to CvTE [@cvte2025; @cvte2026], with Cito's resit share [@cito2026] marked."  # nolint: line_length_linter
+sensitivity_plot(sensitivity, resit_flip)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-sensitivity
+knitr::kable(filter(sensitivity, feasible), digits = 3)
+```
+:::
+
+Three results follow from @fig-sensitivity.
+First, the total eligibility hardly depends on the anchor
+(between `r .QuartoInlineRender(points(robust_in(2026)$eligible_low))`% and `r .QuartoInlineRender(points(robust_in(2026)$eligible_high))`% in 2026),
+because the reduced model already determines it.
+Second, category design is still the largest source for every resit share that the tables allow
+(between `r .QuartoInlineRender(points(robust_in(2026)$design_low))` and `r .QuartoInlineRender(points(robust_in(2026)$design_high))` percentage points in 2026).
+Third, the split between the teacher error and the test error does depend on the anchor:
+the teacher error is larger than the test error only for $r$ below about `r .QuartoInlineRender(share(robust_in(2026)$crossing))`
+(`r .QuartoInlineRender(share(robust_in(2025)$crossing))` in 2025), and at Cito's share it is `r .QuartoInlineRender(sprintf("%.1f", robust_in(2026)$ratio_at_anchor))` times as large.
+Hence, the size of the teacher error relative to the test error should be read with the anchor in mind.
+Moreover, the tables bound the anchor:
+in 2025, only $r$ between `r .QuartoInlineRender(share(robust_in(2025)$allowed_low))` and `r .QuartoInlineRender(share(robust_in(2025)$allowed_high))` gives non-negative variances.
+:::
+
+
+
+### Per-school decomposition {#sec-final-school-model}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+```{r}
+#| label: per-school-setup
+#| include: false
+# School estimates and groups were prepared by the fitting setup.
+per_100 <- function(x) sprintf("%.0f", 100 * x)
+percent <- function(x) sprintf("%.0f%%", 100 * x)
+estimated <- school_estimates$schools
+national_2025 <- national_decomposition(decomposition, cvte_pupils) |>
+    filter(test_year == school_year)
+all_schools <- filter(school_groups, level == "national")$decomposition[[1]]
+leniency_z <- estimated$delta / estimated$se_delta
+model_eligible <- vapply(
+    school_estimates$results, \(r) r$decomposition[["eligible"]], 0
+)
+```
+
+To go from the Netherlands to single schools, we fit the model of @sec-measurement-model to each school $s$ separately.
+The pupils of a school have their own distribution of the common factor, $\theta_p \sim \mathcal{N}(\mu_s, \sigma^2_s)$,
+and the teachers of the school have a leniency $\delta_s$ that shifts their provisional advice:
+
+$$
+L^*_p = \theta_p + \delta_s + \epsilon_{L, p}.
+$$ {#eq-school-teacher}
+
+A positive $\delta_s$ means that the teachers advise higher than the teacher of the national model ($\delta_s = 0$) for the same pupils,
+and a negative $\delta_s$ that they advise lower.
+The thresholds, the teacher error, and the parameters of the tests are the national ones of `r .QuartoInlineRender(school_year)` (@tbl-original-parameters).
+DUO does not say whether a school took the paper or the digital version of IEP or Lib, so we use a mix of both versions, weighted by their national number of pupils.
+
+For each school, DUO gives the number of pupils with a higher, equal, and lower test advice, the number of raised advices [@duo_heroverweging],
+the final advice per category [@duo_advies], and the test [@duo_eindscores].
+Counts below five are suppressed, and we use their midpoint 2.5.
+We fit $(\mu_s, \sigma_s, \delta_s)$ to these counts by maximum likelihood,
+where the final advice is the provisional advice, raised to the test result for the school's share of raised advices.
+Most schools are small (median `r .QuartoInlineRender(median(estimated$total))` pupils), so we use an empirical Bayes prior:
+we first fit the schools with at least 50 pupils, and use the spread of their estimates as a normal prior for all schools,
+so that the estimates of small schools move towards the average.
+The final advice in the DUO data is somewhat higher than the model predicts from the provisional advice and the raises, which would make all schools look lenient.
+We absorb this in a national offset of `r .QuartoInlineRender(sprintf("%.2f", school_estimates$model$final_shift))` in the final advice,
+so that the leniency of the schools is centred on the national teacher.
+
+The decomposition of a school then follows @eq-shapley with four sources:
+the teacher error, the teachers' leniency ($\delta_s$ instead of zero), the test error, and the test menu (the school's test instead of the reference test).
+Groups of schools are averages of their schools, weighted by their number of pupils.
+Over all `r .QuartoInlineRender(format(nrow(estimated), big.mark = ","))` schools, the school-level model gives a category design of `r .QuartoInlineRender(per_100(all_schools[["category_design"]]))` in 100 pupils
+and `r .QuartoInlineRender(per_100(all_schools[["eligible"]]))` eligible pupils in 100,
+close to the national model (`r .QuartoInlineRender(per_100(national_2025$category_design))` and `r .QuartoInlineRender(per_100(national_2025$eligible))`).
+For single schools, the model's share of eligible pupils correlates `r .QuartoInlineRender(sprintf("%.2f", cor(model_eligible, estimated$higher / estimated$total)))` with the observed share of pupils with a higher test advice.
+The teachers of `r .QuartoInlineRender(percent(mean(leniency_z <= -2)))` of the schools are clearly stricter than the national teacher ($\delta_s$ at least two standard errors below zero),
+and those of `r .QuartoInlineRender(percent(mean(leniency_z >= 2)))` are clearly more lenient.
+:::
+
+
+
+
+## Final visualization
+
+```{r}
+#| label: final-setup
+#| include: false
+# prepares the explorer using the models fitted in the previous section
+source("R/final/setup.R")
+
+percent <- function(x) sprintf("%.0f%%", 100 * x)
+latest <- max(model_years)
+observed_rule <- joint |>
+    filter(test == "national", test_year == latest) |>
+    summarise(any = sum(share[gap > 0]), full = sum(share[gap >= 1]))
+
+by_advice <- national_explorer$decomposition |>
+    filter(test_year == latest, test == "national average")
+design_for <- function(advice) {
+    percent(by_advice$category_design[by_advice$advice == advice])
+}
+```
+
+The same results answer different questions for different readers.
+Policy makers set the rules of the advice, school boards choose the test for their schools,
+and parents want to know what the test means for their child at a particular school.
+Therefore, our final visualization is an explorer (@fig-explorer) that shows the decomposition of @sec-decomposition
+for different granularities:
+the Netherlands, every province, municipality, school board, group of schools with a similar school weighting, and single school.
+It answers three questions:
+
+- Where does the eligibility for a higher track come from, and who can change each source?
+- How would the eligibility change with another test or, for a single school, with the teachers of another school?
+- What can the test change for a child with a given provisional advice at that school?
+
+School boards can check whether the test of their schools suits their pupils, and whether their teachers advise in line with the test.
+Parents can see whether a school tends to advise lower than the test results suggest, and how much a more lenient test would help their child.
+For the Netherlands, the explorer shows the national model for 2025 and 2026.
+For groups of schools and single schools, it uses a school-level version of the model for 2025,
+the only year with both school data and a fitted model.
+
+
+### Eligibility explorer {#sec-final-explorer}
+
+```{r}
+#| label: fig-explorer
+#| fig-height: 7
+#| fig-cap: "Eligibility explorer. Search the Netherlands, a province, municipality, school board, group of similar schools, or school, and choose the pupils (all, or those with one provisional advice) and what-ifs above the figure. Top: where eligibility for a higher track comes from (hover over the info icons for what each source means and who can change it); the diamond marks the observed share of pupils with a higher test advice. Bottom: the test results of these pupils, one icon per percent. Sources: model fitted to CvTE [@cvte2025; @cvte2026] with Cito's resit share [@cito2026]; school data from DUO [@duo_heroverweging; @duo_advies; @duo_eindscores; @duo_schooladviezen; @duo_adressen] and the Inspectorate [@inspectie_schoolweging]."  # nolint: line_length_linter
+eligibility_explorer(
+    school_estimates, school_groups, national_explorer, gap_matrix,
+    compliance
+)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-explorer-provinces
+school_groups |>
+    filter(level == "province") |>
+    select(name, schools, pupils, higher, decomposition) |>
+    tidyr::unnest_wider(decomposition) |>
+    knitr::kable(digits = 3, format.args = list(big.mark = ","))
+```
+:::
+
+The waterfall in @fig-explorer shows the model's decomposition of eligibility (@eq-decomposition).
+Where available, a diamond marks the observed share for comparison.
+Search and navigation links switch between schools and groups; what-ifs recompute the model with another test or another school's estimated teacher leniency.
+The vertical line marks the estimate without that change. These are model scenarios, not measured effects of changing tests or teachers.
+
+In the national CvTE tables for `r .QuartoInlineRender(latest)`, `r .QuartoInlineRender(percent(observed_rule$any))` of pupils have a higher test advice, but only `r .QuartoInlineRender(percent(observed_rule$full))` have a difference of at least a full level.
+The model's error-free reference scenario estimates eligibility of `r .QuartoInlineRender(design_for("havo"))` among pupils assigned havo advice in that scenario; this is not an observed share attributable to category design.
+
+The 100 dots show rounded outcome proportions for the selected group and advice, not an individual child's chances.
+National dots use observed CvTE tables; when a test is selected, they describe its actual participants, while the waterfall models that test for the national population.
+School and group dots use model estimates.
+
+School estimates depend on the model assumptions and limited pupil counts.
+The stricter/more-lenient label uses an estimated leniency at least two standard errors from zero; the warning below 20 pupils is an additional caution, not a guarantee of reliability above that threshold.
+
+
+## Conclusion
+
+The decomposition attributes eligibility to category design, teacher error, test error, and the test menu.
+Category design remains the largest component across the feasible anchors examined in @sec-sensitivity; the relative contributions of teacher and test error depend on the assumed resit share.
+The explorer makes these model results comparable across the Netherlands and the schools and groups represented in the data.
+
+The error split transfers one simulated resit share from the 2022 Centrale Eindtoets to Lib paper.
+The common factor measures what teacher and test share, rather than an independent truth; teacher “error” can include information the test does not capture.
+Teacher and test errors may also be correlated, for example through a shared assessment provider, contrary to the model's independence assumption.
+Finally, the CvTE tables cover only 61–69% of test participants and include special education, whereas our DUO school analysis uses regular schools.
+
+
+## References {.unnumbered}
+
+::: {#refs}
+:::
+
+

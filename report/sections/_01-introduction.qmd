@@ -1,0 +1,45 @@
+## Introduction
+
+At the end of the primary school, Dutch pupils receive judgements about the suitability of different secondary school levels. This recommendation is based on two sources:
+
+- the advice of the primary school teacher *(voorlopig schooladvies)*,
+- the results of a standardized test *(doorstroomtoets)*, which arrives about a month later.
+
+Dutch secondary schools are ordinally divided into six ordered levels:
+
+- PRO *(praktijkonderwijs)*,
+- VMBO-B *(basisberoepsgerichte leerweg)*
+- VMBO-K *(kaderberoepsgerichte leerweg)*,
+- VMBO-GT *(gemengde/theoretische leerweg)*,
+- HAVO *(hoger algemeen voortgezet onderwijs)*,
+- VWO *(voorbereidend wetenschappelijk onderwijs)*.
+
+The teacher's provisional advice can be a single track or a combination of two tracks (ten options). In contrast, the test results are always reported as a combination of two tracks or single VWO (six options). When the two sources disagree, the final advice is normally determined as follows:
+
+- if the teacher's advice is higher than the test result, nothing changes;
+- if the teacher's advice is lower than the test result, the teacher should raise their advice.
+
+This asymmetrical up-only method has been implemented since the academic year 2023/2024 [@cvte2026]. Before that year, the raising of the advice was optional.
+
+Each school can choose which test provider to use, and the test is administered by the school itself. Currently, there are six test providers: AMN, Dia, DOE, IEP, Lib, and ROUTE 8. Furthermore, IEP and Lib are available in both paper and digital versions. The College voor Toetsen en Examens (CvTE) provides a framework for matching the results of the different test providers to the same reference levels [@cvte2026]. However, the CvTE has also published reports showing that pupils with the same provisional advice receive different test results depending on the test provider [@cvte2025; @cvte2026]. It is unclear whether this is due to differences in the test providers, or due to differences in the schools that use those providers.
+
+There are four main sources of potential disagreement between the teacher's advice and the test result:
+
+- **category design**: the teacher's advice has a different scale than the test result,
+- **test menu**: the tests have different providers and modes,
+- **teacher error**: teachers can make mistakes, and
+- **test error**: the tests have measurement uncertainty [@cito2026].
+
+We ask: what share of pupils is eligible for an upward revision, and how much does each source contribute to that share?
+Eligibility matters because it triggers reconsideration under the up-only rule, while schools choose which test their pupils take.
+The explorer is intended for policy makers comparing rules, school boards comparing tests and schools, and parents exploring outcomes by provisional advice.
+
+We fit a joint model to the CvTE tables, use Cito's simulated resit share to separate teacher and test error, and decompose eligibility into the four sources above.
+DUO data extends the analysis to schools, while a sensitivity check varies the assumed resit share.
+
+In the national model, category design is the largest component across the feasible anchors examined (@sec-sensitivity).
+The explorer's waterfall shows how the components add up, and its observed markers allow comparison with the data where available.
+Its school views and what-ifs help readers explore how the model results vary across schools and test choices (@fig-explorer).
+
+Open questions remain about whether the Cito anchor transfers to Lib paper, whether teacher and test errors are independent, and how representative the available pupils are.
+The model also cannot establish which advice is correct for an individual child.

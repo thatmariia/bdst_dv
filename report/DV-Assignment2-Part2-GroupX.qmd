@@ -1,0 +1,73 @@
+---
+title: "DV Assignment 2: Why pupils become eligible for higher school advice"
+author: "Mariia Steeghs-Turchina"
+date: today
+bibliography: references.bib
+csl: https://www.zotero.org/styles/apa
+link-citations: true
+format:
+  html:
+    number-sections: true
+    include-in-header:
+      text: |
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+          p {
+            text-align: justify;
+          }
+        </style>
+    mermaid:
+      theme: neutral
+    fontsize: 11pt
+    theme: cosmo
+    mainfont: "'IBM Plex Sans', sans-serif"
+    toc: true
+    toc-location: left
+    code-fold: true
+execute:
+  echo: false
+knitr:
+  opts_knit:
+    root.dir: ".."
+---
+
+<!-- define latex operators -->
+$\newcommand{\Var}{\operatorname{Var}}$
+$\newcommand{\Cov}{\operatorname{Cov}}$
+$\newcommand{\PP}{\mathbb{P}}$
+$\newcommand{\EE}{\mathbb{E}}$
+$\newcommand{\indicator}{\mathbf{1}}$
+
+```{r}
+#| label: setup
+#| include: false
+# clear environment so rendering only depends on what's in this file
+rm(list = ls())
+
+library(dplyr)
+
+# downloads the DUO files into data/raw/ if needed, applies conventions
+# D1-D7, reads the report tables in data/reports/, and stops if the sources
+# disagree (see R/data/get-data.R). `datasets` lists the resulting tables,
+# `data_overview` describes them (provenance from data/sources.csv plus
+# rows and columns), and `source_checks` holds the checks.
+source("R/data/get-data.R")
+```
+
+{{< include sections/_01-introduction.qmd >}}
+
+{{< include sections/_02-getting-data.qmd >}}
+
+{{< include sections/_03-exploratory-process.qmd >}}
+
+{{< include sections/_04-modeling.qmd >}}
+
+{{< include sections/_05-fitting.qmd >}}
+
+{{< include sections/_06-final-visualization.qmd >}}
+
+{{< include sections/_07-conclusion.qmd >}}
+
+{{< include sections/_08-ai.qmd >}}
+
+{{< include sections/_09-references.qmd >}}

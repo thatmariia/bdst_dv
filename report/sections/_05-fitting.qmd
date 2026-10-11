@@ -1,0 +1,22 @@
+## Fitting
+
+We fit the model to the CvTE tables of each year, separate the teacher's error from the test's, and use the result to decompose eligibility into its sources, first nationally and then per school.
+
+```{r}
+#| label: model-setup
+#| include: false
+# fits the reduced model per year (fits, fit_quality), separates the teacher
+# and test errors (structural), and decomposes eligibility (decomposition)
+source("R/national-model/setup.R")
+source("R/school-model/setup.R")
+```
+
+{{< include sections/fitting/_01-tables.qmd >}}
+
+{{< include sections/fitting/_02-errors.qmd >}}
+
+{{< include sections/fitting/_03-decomposition.qmd >}}
+
+{{< include sections/fitting/_04-sensitivity.qmd >}}
+
+{{< include sections/fitting/_05-school.qmd >}}

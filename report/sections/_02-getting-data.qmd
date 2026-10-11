@@ -1,0 +1,184 @@
+## Getting data
+
+We use and derive the following tables from the mentioned sources: CvTE [@cvte2025; @cvte2026], DUO [@duo_eindscores; @duo_heroverweging; @duo_advies; @duo_conversion], the Inspectorate [@inspectie_schoolweging], and Cito [@cito2026]. @tbl-data-overview in @sec-data-sources shows the provenance of each table, and Tables [-@tbl-duo-gap-matrix]-[-@tbl-school-weighting]
+in @sec-data-tables shows the glimpses of the tables themselves, with a short description of their contents.
+
+### Data sources {#sec-data-sources}
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data sources"}
+```{r}
+#| label: tbl-data-overview
+#| tbl-cap: "Provenance and contents of every dataset in this report: source, citation, years, unit, and the loaded rows and columns."  # nolint: line_length_linter
+knitr::kable(data_overview, format.args = list(big.mark = ","))
+```
+:::
+
+
+### Data tables {#sec-data-tables}
+::: {.callout-note collapse="true" appearance="minimal" title="Data tables"}
+
+#### DUO gap matrix
+
+@tbl-duo-gap-matrix shows the quantitative relationships between tracks in the teacher's advice and the test result, as defined by DUO [@duo_conversion]. The rows correspond to the provisional advice, and the columns correspond to the test result. Let $G(i, j)$ be the entry in row $i$ and column $j$ of this matrix. Then $G(i, j)$ is the indication of how much higher the test result $j$ is than the provisional advice $i$.
+
+```{r}
+#| label: tbl-duo-gap-matrix
+#| tbl-cap: "DUO gap matrix $G(i, j)$: how much higher the test result $j$ is valued than the provisional advice $i$ [@duo_conversion]."  # nolint: line_length_linter
+knitr::kable(gap_matrix, format.args = list(big.mark = ","))
+```
+
+To compare the recommendations, we define two weight vectors $v$ and $w$ for the provisional advice $i$ and the test result $j$, respectively. The weight vectors are defined as follows:
+
+$$
+v_i = (0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0),
+$$
+
+$$
+w_j = (0.5, 1.5, 2.5, 3.5, 4.5, 5.0).
+$$
+
+The mismatch between the provisional advice and the test result is what constitutes the category design source of disagreement.
+
+#### CvTE data
+
+For each test (separating the paper and digital versions) and year, CvTE [@cvte2025; @cvte2026] provides a table that shows the distribution of a test result $j$ for each provisional advice $i$. A sample is shown in @tbl-cvte-conditional.
+
+```{r}
+#| label: tbl-cvte-conditional
+#| tbl-cap: "Sample of the CvTE tables: test results of pupils with a havo provisional advice who took Lib digital in 2025 [@cvte2025]."  # nolint: line_length_linter
+cvte_conditional |>
+    filter(test_year == 2025 & test == "Lib digital" & provisional == "havo") |>
+    knitr::kable()
+```
+
+CvTE also provides a table showing the distribution of provisional advice $i$ for each test and year (@tbl-cvte-provisional).
+
+```{r}
+#| label: tbl-cvte-provisional
+#| tbl-cap: "Sample of the CvTE tables: provisional advice of the pupils who took Lib digital in 2025 [@cvte2025]."  # nolint: line_length_linter
+cvte_provisional |>
+    filter(test_year == 2025 & test == "Lib digital") |>
+    knitr::kable()
+```
+
+The number of pupils that have taken each test in a particular year is also provided, example shown in @tbl-cvte-pupils.
+
+```{r}
+#| label: tbl-cvte-pupils
+#| tbl-cap: "Number of pupils who took Lib digital, per test year [@cvte2025; @cvte2026]."  # nolint: line_length_linter
+cvte_pupils |>
+    filter(test == "Lib digital") |>
+    knitr::kable()
+```
+
+The CvTE tables cover pupils with a known provisional advice, including special education (s(b)o), whereas our DUO data is restricted to regular schools.
+Their populations therefore differ, which limits direct comparisons.
+The coverage fraction $f_y$ is recorded in @tbl-cvte-coverage [@cvte2025; @cvte2026].
+
+```{r}
+#| label: tbl-cvte-coverage
+#| tbl-cap: "Share of test participants with a known provisional advice."
+knitr::kable(cvte_coverage, digits = 2)
+```
+
+Two missing `###` cells in the 2026 Lib digital table were recovered as 100 minus the other row percentages.
+One Lib paper row summing to 95.6% was renormalised to 100%; the `note` column records these repairs.
+
+#### DUO data
+
+DUO [@duo_eindscores] provides a table (@tbl-main-provider) that shows the test provider used by each school for each year and the share of pupils that took that test.
+
+```{r}
+#| label: tbl-main-provider
+#| tbl-cap: "Sample of the DUO data: main test of school 00AP per test year, and its share of the tested pupils [@duo_eindscores]."  # nolint: line_length_linter
+main_provider |>
+    distinct(provider, .keep_all = TRUE) |>
+    distinct(test_year, .keep_all = TRUE) |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+They also provide a table that shows, for each school and year, the number of pupils that took each test. For some results, we do not have the number of pupils, but we do have a lower and upper bound (for $n < 5$). The example is shown in @tbl-test-scores.
+
+```{r}
+#| label: tbl-test-scores
+#| tbl-cap: "Sample of the DUO data: pupils tested per test at school 00CD, with bounds for suppressed counts [@duo_eindscores]."  # nolint: line_length_linter
+test_scores |>
+    filter(institution_code == "00CD") |>
+    distinct(provider, .keep_all = TRUE) |>
+    knitr::kable()
+```
+
+From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-reconsiderations, that records, for each school and year, the number of pupils whose test advice was higher/lower than the provisional advice, and the number of pupils whose provisional advice was raised/lowered (including the lower and upper bounds for $n < 5$). The table also shows the share of pupils whose provisional advice was raised.
+
+```{r}
+#| label: tbl-advice-reconsiderations
+#| tbl-cap: "Sample of the DUO data: pupils with a higher or lower test advice and raised advices at school 00DD, per test year [@duo_heroverweging]."  # nolint: line_length_linter
+advice_reconsiderations |>
+    filter(institution_code == "00DD") |>
+    knitr::kable()
+```
+
+DUO [@duo_advies] also supplies the table (@tbl-final-advice) with final advice after revisions, which shows the number of pupils (with lower and upper bounds for $n < 5$) that received each final advice for each school and year.
+
+```{r}
+#| label: tbl-final-advice
+#| tbl-cap: "Sample of the DUO data: final vmbo-gt advices at school 00BB, per test year [@duo_advies]."  # nolint: line_length_linter
+final_advice |>
+    filter(institution_code == "00BB" & advice == "vmbo gt") |>
+    filter(n > 2.5) |>
+    knitr::kable()
+```
+
+We summarize the final advice table (@tbl-advice-summary) for a single school per year, showing the total number of pupils, mean advice, and shares of VWO and combined advice.
+
+```{r}
+#| label: tbl-advice-summary
+#| tbl-cap: "Summary of the final advice at school 31LH per test year: pupils, mean advice, and shares of vwo and combined advice."  # nolint: line_length_linter
+advice_summary |>
+    filter(institution_code == "31LH") |>
+    knitr::kable()
+```
+
+We also use DUO data that contains the name, place, municipality, province, and school board (with names) of each school location, spread over
+Tables [-@tbl-school-locations]-[-@tbl-school-boards] [@duo_schooladviezen; @duo_adressen].
+
+```{r}
+#| label: tbl-school-locations
+#| tbl-cap: "Name and region of school location 00AP [@duo_schooladviezen]."
+school_locations |>
+    filter(institution_code == "00AP") |>
+    knitr::kable()
+```
+
+```{r}
+#| label: tbl-school-boards
+#| tbl-cap: "Name of school board 41646 [@duo_adressen]."
+school_boards |>
+    filter(board_number == "41646") |>
+    knitr::kable()
+```
+
+#### Cito data
+
+The simulated data from Cito [@cito2026] (@tbl-cito-misclassification) shows how measurement uncertainty could change test advice. For each original test advice, they show the percentage of pupils that would receive a different or unchanged advice if the test was repeated.
+
+```{r}
+#| label: tbl-cito-misclassification
+#| tbl-cap: "Simulated share of pupils whose test advice would be lower, equal, or higher if they took the test again, per test advice [@cito2026]."  # nolint: line_length_linter
+cito_misclassification |>
+    knitr::kable()
+```
+
+#### Inspectorate data
+
+The Inspectorate [@inspectie_schoolweging] provides the data on socioeconomic weighting of schools (see @tbl-school-weighting). The higher the weighting, the more disadvantaged pupils are in that school. The table also supplies the spread of the socioeconomic weighting along with the number of pupils in that school.
+
+```{r}
+#| label: tbl-school-weighting
+#| tbl-cap: "Sample of the Inspectorate data: school weighting of school 00DN per test year [@inspectie_schoolweging]."  # nolint: line_length_linter
+school_weighting |>
+    filter(institution_code == "00DN") |>
+    knitr::kable()
+```
+:::

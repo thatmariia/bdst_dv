@@ -1,0 +1,135 @@
+### Fitting tables
+
+We fit the reduced model to the published table of each test and year, and check how closely the fitted tables match the published ones.
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+#### Model predictions
+
+For each test $t$, the data provides the joint distribution $J_t(i, j)$ of the provisional advice and test result, as shown in @eq-joint.
+The model predicts the same share $q_t(i, j)$ (the model's counterpart of $J_t(i, j)$),
+which is the probability that the pupil's evaluations are within the rectangular area defined by the thresholds of $i$ and $j$ (see @eq-thresholds):
+
+- the provisional advice thresholds $\lambda_i$ and $\lambda_{i+1}$, and
+- the test result thresholds $\tau_j$ and $\tau_{j+1}$.
+
+To obtain $q_t(i, j)$, we need to standardize the thresholds, i.e., its boundaries, to the latent scale of the provisional advice $L^*$, which is the reference indicator in our measurement model.
+We do this by subtracting the evaluation's mean and dividing by its standard deviation from Equations [-@eq-reduced-model] and [-@eq-reduced-variance-correlation]:
+
+$$
+u_{t, i} = \frac{\lambda_i - \mu_t}{\sigma_t}, \quad
+v_{t, j} = \frac{\tau_j - (a_t + b_t \mu_t)}{s_t}.
+$$ {#eq-standardized-thresholds}
+
+The standardized thresholds $u_{t, i}$ and $v_{t, j}$ are the boundaries of the rectangular area in the bivariate normal distribution of the reduced model.
+Then, $q_t(i, j)$ is the probability mass within this area, which can be computed using the bivariate normal cumulative distribution function $\Phi_2$ [@olsson1979]:
+
+$$
+q_t(i, j) =
+\Phi_2(u_{t, i+1}, v_{t, j+1}, \rho_t) -
+\Phi_2(u_{t, i}, v_{t, j+1}, \rho_t) -
+\Phi_2(u_{t, i+1}, v_{t, j}, \rho_t) +
+\Phi_2(u_{t, i}, v_{t, j}, \rho_t),
+$$ {#eq-model-probability}
+
+i.e., the probability below the upper-right corner,
+minus the areas to the left and below,
+plus the lower-left corner that was subtracted twice.
+
+CvTE provides $J_t(i, j)$ as the share of pupils with provisional advice $i$ and test result $j$ in test $t$.
+To approximate the number of pupils with these evaluations,
+we multiply the share by the number of pupils in test $t$ and the fraction of pupils in year $y$, for whom the provisional advice is available [@cvte2025; @cvte2026]:
+
+$$
+n_t(i, j) = N_t f_y J_t(i, j).
+$$ {#eq-model-counts}
+
+The resulting pseudo counts are shown in @fig-model-counts.
+
+```{r}
+#| label: fig-model-counts
+#| fig-height: 6.5
+#| fig-cap: "Pseudo model counts of pupils per provisional advice $i$ and test result $j$, by test and year (choose a test and a year above the plot).  Each bubble represents the pseudo count for that combination. Cells under 0.05% are not shown."  # nolint: line_length_linter
+model_counts_plot(model_counts, gap_matrix)
+```
+
+#### Likelihood
+
+As mentioned in @sec-measurement-model, the model assumes that pupils are independent.
+Then the counts $n_t(i, j)$ follow a multinomial distribution with probabilities $q_t(i, j)$.
+The log-likelihood of the model is then given by:
+
+$$
+\log \mathcal{L} = \sum_t \sum_{i, j} n_t(i, j) \log q_t(i, j).
+$$ {#eq-log-likelihood}
+
+We fit all tests of a year jointly, so they share the thresholds $\lambda$ and $\tau$: one common ruler.
+Separate thresholds for each test could absorb differences in leniency.
+We can maximize the log-likelihood to find the best-fitting parameters of the published data.
+The model is constrained: each $10 \times 6$ table has 59 free cell probabilities, compared with five parameters per non-reference test and 14 thresholds shared across tests.
+The pseudo counts use rounded percentages and only pupils with known provisional advice; pupils are also clustered in schools.
+Naive multinomial standard errors would ignore these features, so we assess fit descriptively.
+
+As mentioned in @sec-measurement-model,
+the measurement scale is set by the teacher's advice ($\mu_\text{ref} = 0$ and $\sigma^2_\text{ref} = 1$);
+the origin of the test's scale is set by the test's leniency ($\beta_\text{ref} = 0$).
+We cannot set the test's sensitivity $\alpha_\text{ref}$ to a fixed value, because it is not identifiable.
+Instead, we set $\psi^2_\text{ref} = 1$, which fixes the test units without changing fitted probabilities.
+The value of $\alpha_\text{ref}$ depends on the teacher/test error split, identified in the next step.
+
+#### Parameters
+
+There are two types of restrictions on the parameters:
+thresholds must increase ($\lambda_1 < \dots < \lambda_9$, $\tau_1 < \dots < \tau_5$), and
+spreads must be positive ($\sigma_t, \psi_t > 0$).
+We handle these restrictions by transforming these parameters to unconstrained parameters as follows:
+
+- the first threshold of each scale is estimated directly -- this sets the origin of the scale,
+- the gaps between consecutive thresholds are estimated on the log scale,
+i.e., $\lambda_{l+1} - \lambda_l = e^{\gamma_l}$ and $\tau_{l+1} - \tau_l = e^{\zeta_l}$, --
+this ensures that the thresholds increase by forcing the gaps to be positive,
+- the spreads are estimated on the log scale, i.e., $\sigma_t = e^{\eta_t}$ and $\psi_t = e^{\xi_t}$. --
+this ensures that the spreads are positive.
+
+The final set of parameters to be estimated is then:
+
+- the first threshold of the teacher's advice $\lambda_1$ ($\#$ = 1),
+- the gaps between consecutive thresholds of the teacher's advice $\gamma_1, \dots, \gamma_8$ ($\#$ = 8),
+- the first threshold of the test result $\tau_1$ ($\#$ = 1),
+- the gaps between consecutive thresholds of the test result $\zeta_1, \dots, \zeta_4$ ($\#$ = 4),
+- the slope of the reference test $b_\text{ref}$ ($\#$ = 1),
+- the parameters of the other tests $(\mu_t, \log \sigma_t, a_t, b_t, \log \psi_t)$ ($\#$ = 5 per test).
+
+We estimate per-test parameters for the tests in each year, with only its slope free for the reference test; its other parameters are fixed by the normalization.
+Then, the total number of parameters is
+`{r} length(fits[["2025"]]$par)` in 2025 (`{r} length(fits[["2025"]]$counts)` tests) and
+`{r} length(fits[["2026"]]$par)` in 2026 (`{r} length(fits[["2026"]]$counts)` tests).
+
+We maximize the log-likelihood in @eq-log-likelihood with the quasi-Newton L-BFGS-B algorithm [@byrd1995],
+a quasi-Newton method that uses the slope and an estimate of the curvature to choose each step.
+We then use a dissimilarity index to summarize the fit (@fig-dissimilarity-index), which is the share of pupils that
+would have to move to another cell for the fitted table to equal the published one:
+
+$$
+\text{DI}_t = \frac12 \sum_{i, j} \left| \hat q_t(i, j) - J_t(i, j) \right|.
+$$ {#eq-dissimilarity-index}
+
+```{r}
+#| label: fig-dissimilarity-index
+#| fig-height: 5
+#| fig-cap: "Dissimilarity index of the model fit per test and year. The index represents the share of pupils that would have to move to another cell. Open circle: 2025, filled: 2026."  # nolint: line_length_linter
+dissimilarity_plot(fit_quality)
+```
+
+The dissimilarity index is about 3–6% for Lib, IEP, and Dia, compared with 7–13% for AMN, ROUTE 8, and DOE.
+The latter tests have more pupils with PrO advice in the published tables; this population difference may contribute to the weaker fit, but the index does not establish its cause.
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-fit-quality
+#| tbl-cap: "Fitted parameters of the reduced model and the dissimilarity index per test and year."  # nolint: line_length_linter
+knitr::kable(fit_quality, digits = 3)
+```
+:::
+:::

@@ -1,0 +1,64 @@
+### Per-school decomposition {#sec-final-school-model}
+
+Do the teachers of some schools advise higher or lower than their pupils' test results suggest?
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+```{r}
+#| label: per-school-setup
+#| include: false
+# School estimates were prepared by the fitting setup.
+per_100 <- function(x) sprintf("%.0f", 100 * x)
+percent <- function(x) sprintf("%.0f%%", 100 * x)
+estimated <- school_estimates$schools
+national_2025 <- national_decomposition(decomposition, cvte_pupils) |>
+    filter(test_year == school_year)
+# pupil-weighted average over all schools
+all_schools <- Reduce(
+    `+`,
+    Map(
+        \(r, n) n * r$decomposition, school_estimates$results,
+        estimated$total
+    )
+) / sum(estimated$total)
+leniency_z <- estimated$delta / estimated$se_delta
+model_eligible <- vapply(
+    school_estimates$results, \(r) r$decomposition[["eligible"]], 0
+)
+```
+
+To go from the Netherlands to single schools, we fit the model of @sec-measurement-model to each school $s$ separately.
+The pupils of a school have their own distribution of the common factor, $\theta_p \sim \mathcal{N}(\mu_s, \sigma^2_s)$,
+and the teachers of the school have a leniency $\delta_s$ that shifts their provisional advice:
+
+$$
+L^*_p = \theta_p + \delta_s + \epsilon_{L, p}.
+$$ {#eq-school-teacher}
+
+A positive $\delta_s$ means that the teachers advise higher than the teacher of the national model ($\delta_s = 0$) for the same pupils,
+and a negative $\delta_s$ that they advise lower.
+The thresholds, the teacher error, and the parameters of the tests are the national ones of `{r} school_year` (@tbl-original-parameters).
+DUO does not say whether a school took the paper or the digital version of IEP or Lib, so we use a mix of both versions, weighted by their national number of pupils.
+
+For each school, DUO gives the number of pupils with a higher, equal, and lower test advice, the number of raised advices [@duo_heroverweging],
+the final advice per category [@duo_advies], and the test [@duo_eindscores].
+Counts below five are suppressed, and we use their midpoint 2.5.
+We fit $(\mu_s, \sigma_s, \delta_s)$ to these counts by maximum likelihood,
+where the final advice is the provisional advice, raised to the test result for the school's share of raised advices.
+Most schools are small (median `{r} median(estimated$total)` pupils), so we use an empirical Bayes prior:
+we first fit the schools with at least 50 pupils, and use the spread of their estimates as a normal prior for all schools,
+so that the estimates of small schools move towards the average.
+The final advice in the DUO data is somewhat higher than the model predicts from the provisional advice and the raises, which would make all schools look lenient.
+We absorb this in a national offset of `{r} sprintf("%.2f", school_estimates$model$final_shift)` in the final advice,
+so that the leniency of the schools is centred on the national teacher.
+
+The decomposition of a school then follows @eq-shapley with four sources:
+the teacher error, the teachers' leniency ($\delta_s$ instead of zero), the test error, and the test menu (the school's test instead of the reference test).
+Groups of schools are averages of their schools, weighted by their number of pupils.
+Over all `{r} format(nrow(estimated), big.mark = ",")` schools, the school-level model gives a category design of `{r} per_100(all_schools[["category_design"]])` in 100 pupils
+and `{r} per_100(all_schools[["eligible"]])` eligible pupils in 100,
+close to the national model (`{r} per_100(national_2025$category_design)` and `{r} per_100(national_2025$eligible)`).
+For single schools, the model's share of eligible pupils correlates `{r} sprintf("%.2f", cor(model_eligible, estimated$higher / estimated$total))` with the observed share of pupils with a higher test advice.
+The teachers of `{r} percent(mean(leniency_z <= -2))` of the schools are clearly stricter than the national teacher ($\delta_s$ at least two standard errors below zero),
+and those of `{r} percent(mean(leniency_z >= 2))` are clearly more lenient.
+:::

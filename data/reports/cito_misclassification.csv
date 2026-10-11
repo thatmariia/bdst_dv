@@ -1,0 +1,8 @@
+test_advice,n,lower,equal,higher
+pro/vmbo bb,154,0,67.9,32.1
+vmbo bb/kb,6582,2.3,85.1,12.6
+vmbo kb/gt,11475,9.6,76.9,13.5
+vmbo gt/havo,15092,12.3,74.8,12.9
+havo/vwo,11215,18.1,67.1,14.8
+vwo,10088,15.5,84.5,0
+total,54606,12.3,76.7,11

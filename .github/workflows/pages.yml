@@ -1,4 +1,4 @@
-name: Publish reports
+name: Publish report
 
 on:
   push:
@@ -26,23 +26,17 @@ jobs:
         with:
           r-version: renv
 
-      - uses: quarto-dev/quarto-actions/setup@v2
-        with:
-          version: 1.10.18
-
       - uses: r-lib/actions/setup-renv@v2
 
       - name: Check lint and style
         run: Rscript scripts/check.R
 
-      - name: Render landing page
-        run: quarto render index.qmd
-
-      - name: Assemble website
+      # The report HTML is rendered locally (it needs the downloaded data) and
+      # committed; publish it as the site's front page.
+      - name: Assemble site
         run: |
-          mkdir -p build/report build/downloads
-          cp report/*.html build/report/
-          cp report/*.Rmd build/downloads/
+          mkdir -p build
+          cp report/DV-Assignment2-Part2-GroupX.html build/index.html
 
       - uses: actions/configure-pages@v5
 
@@ -50,6 +44,6 @@ jobs:
         with:
           path: build
 
-      - name: Publish reports
+      - name: Publish report
         id: deployment
         uses: actions/deploy-pages@v4

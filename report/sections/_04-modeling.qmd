@@ -1,0 +1,7 @@
+## Modeling
+
+To separate the sources of disagreement, we model the provisional advice and the test result as two imperfect measurements of the same thing about a pupil.
+
+{{< include sections/modeling/_01-measurement.qmd >}}
+
+{{< include sections/modeling/_02-reduced.qmd >}}

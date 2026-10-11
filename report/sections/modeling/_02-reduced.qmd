@@ -1,0 +1,50 @@
+### Reduced model
+
+This step turns the measurement model into something we can fit to the published tables.
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+We never observe the common factor $\theta_p$.
+The CvTE tables only provide the provisional advice and test results, and we can observe the final advice.
+Therefore, we need to eliminate the latent variable $\theta_p$ by integrating it out of the model, resulting in a reduced model.
+
+Because the common factor $\theta$ and the error terms $\epsilon_L$ and $\epsilon_{T, t}$ are normally distributed and mutually independent,
+we can write the joint distribution of the provisional advice and test result as a bivariate normal distribution.
+Then, in a test $t$ population, the joint distribution is given by:
+
+$$
+L^*_p \sim \mathcal{N}(\mu_t, \sigma^2_t), \quad
+T^*_p \mid L^*_p \sim \mathcal{N}(a_t + b_t L^*_p, \psi^2_t),
+$$ {#eq-reduced-model}
+
+where $\mu_t$ and $\sigma^2_t$ are the mean and variance of the latent provisional advice, and
+the latent test result is a regression on $L^*_p$ with intercept $a_t$, slope $b_t$, and residual variance $\psi^2_t$.
+Matching means, variances, and the covariance $\Cov(L^*_p, T^*_p) = \alpha_t \sigma^2_{\theta, t}$
+of the reduced model with the original model,
+we can express the parameters in terms of the original model parameters:
+
+$$
+\sigma^2_t = \sigma^2_{\theta, t} + \sigma^2_L, \quad
+b_t = \frac{\alpha_t \sigma^2_{\theta, t}}{\sigma^2_t}, \quad
+a_t = \alpha_t \mu_t + \beta_t - b_t \mu_t, \quad
+\psi^2_t = \frac{
+    \alpha^2_t \sigma^2_{\theta, t} \sigma^2_L
+}{
+    \sigma^2_t
+} + \sigma^2_{T, t}.
+$$ {#eq-reduced-parameters}
+
+The variance of the latent provisional advice $\sigma^2_t$ combines the spreads of pupils and the teacher's error.
+The slope $b_t$ is the loading factor $\alpha_t$ scaled by the share of provisional-advice variance due to the common factor, $\sigma^2_{\theta,t}/\sigma^2_t$ (the teacher's reliability).
+The intercept $a_t$ is the test's leniency $\beta_t$ adjusted for the difference between the provisional advice and the test result.
+The residual variance $\psi^2_t$ combines the test's measurement uncertainty $\sigma^2_{T, t}$ and the part of the teacher's error that the test cannot explain.
+
+For a given test $t$, the reduced model in @eq-reduced-model is a bivariate normal distribution behind the polychoric correlation [@olsson1979],
+with parameters $\mu_t, \sigma^2_t, a_t, b_t, \psi^2_t$.
+By the law of total variance, the variance of the latent test result and the correlation between the latent provisional advice and test result are given by:
+
+$$
+s^2_t = \Var(T^*_p) = b^2_t \sigma^2_t + \psi^2_t, \quad
+\rho_t = \frac{\Cov(L^*_p, T^*_p)}{\sigma_t s_t} = \frac{b_t \sigma_t}{s_t}.
+$$ {#eq-reduced-variance-correlation}
+:::

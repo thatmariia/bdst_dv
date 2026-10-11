@@ -1,0 +1,61 @@
+provisional,test_advice,gap
+pro,pro/vmbo bb,0
+vmbo bb,pro/vmbo bb,-0.5
+vmbo bb/kb,pro/vmbo bb,-1
+vmbo kb,pro/vmbo bb,-1
+vmbo kb/gt,pro/vmbo bb,-1
+vmbo gt,pro/vmbo bb,-1
+vmbo gt/havo,pro/vmbo bb,-1
+havo,pro/vmbo bb,-1
+havo/vwo,pro/vmbo bb,-1
+vwo,pro/vmbo bb,-1
+pro,vmbo bb/kb,1
+vmbo bb,vmbo bb/kb,0.5
+vmbo bb/kb,vmbo bb/kb,0
+vmbo kb,vmbo bb/kb,-0.5
+vmbo kb/gt,vmbo bb/kb,-1
+vmbo gt,vmbo bb/kb,-1
+vmbo gt/havo,vmbo bb/kb,-1
+havo,vmbo bb/kb,-1
+havo/vwo,vmbo bb/kb,-1
+vwo,vmbo bb/kb,-1
+pro,vmbo kb/gt,1
+vmbo bb,vmbo kb/gt,1
+vmbo bb/kb,vmbo kb/gt,1
+vmbo kb,vmbo kb/gt,0.5
+vmbo kb/gt,vmbo kb/gt,0
+vmbo gt,vmbo kb/gt,-0.5
+vmbo gt/havo,vmbo kb/gt,-1
+havo,vmbo kb/gt,-1
+havo/vwo,vmbo kb/gt,-1
+vwo,vmbo kb/gt,-1
+pro,vmbo gt/havo,1
+vmbo bb,vmbo gt/havo,1
+vmbo bb/kb,vmbo gt/havo,1
+vmbo kb,vmbo gt/havo,1
+vmbo kb/gt,vmbo gt/havo,1
+vmbo gt,vmbo gt/havo,0.5
+vmbo gt/havo,vmbo gt/havo,0
+havo,vmbo gt/havo,-0.5
+havo/vwo,vmbo gt/havo,-1
+vwo,vmbo gt/havo,-1
+pro,havo/vwo,1
+vmbo bb,havo/vwo,1
+vmbo bb/kb,havo/vwo,1
+vmbo kb,havo/vwo,1
+vmbo kb/gt,havo/vwo,1
+vmbo gt,havo/vwo,1
+vmbo gt/havo,havo/vwo,1
+havo,havo/vwo,0.5
+havo/vwo,havo/vwo,0
+vwo,havo/vwo,-0.5
+pro,vwo,1
+vmbo bb,vwo,1
+vmbo bb/kb,vwo,1
+vmbo kb,vwo,1
+vmbo kb/gt,vwo,1
+vmbo gt,vwo,1
+vmbo gt/havo,vwo,1
+havo,vwo,1
+havo/vwo,vwo,0.5
+vwo,vwo,0

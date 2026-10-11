@@ -1,0 +1,101 @@
+### Separating errors {#sec-separating-errors}
+
+The tables alone cannot tell the teacher's error apart from the test's, so we anchor the size of the test error to Cito's resit simulation [@cito2026].
+
+::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
+
+We now reverse the reduced parameters in @eq-reduced-parameters back to the original parameters given $\sigma^2_L$:
+
+$$
+\sigma^2_{\theta, t} = \sigma^2_t - \sigma^2_L, \quad
+\alpha_t = \frac{b_t \sigma^2_t}{\sigma^2_{\theta, t}}, \quad
+\beta_t = a_t + b_t \mu_t - \alpha_t \mu_t, \quad
+\sigma^2_{T, t} = s^2_t - \alpha_t^2 \sigma^2_{\theta, t}.
+$$ {#eq-original-parameters}
+
+However, we cannot identify the teacher's error $\sigma^2_L$ from the data.
+The CvTE tables only provide information on the joint distribution of the provisional advice and test result,
+but they do not attribute the discrepancy to either teacher or the test errors.
+Any $0 \leq \sigma^2_L \leq \min_t(\psi_t^2\sigma_t^2/s_t^2)$ gives the same fitted tables with non-negative error variances.
+Two noisy measurements reveal their disagreement, but an outside constraint is needed to split it between them.
+
+```{r}
+#| label: tot-cito-misclassification
+#| include: false
+tot_cito <- cito_misclassification |>
+    filter(test_advice == "total") |>
+    mutate(flip = (lower + higher))
+```
+
+The tests have measurement uncertainty, which implies that the test results are not perfectly reliable.
+Hence, if a pupil were to take the equivalent test multiple times, we would not expect the same result each time.
+Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the share of test advices changing category was
+$r$ = `{r} sprintf("%.1f", tot_cito$flip)`%
+(`{r} sprintf("%.1f", tot_cito$lower)`% lower advice categories, `{r} sprintf("%.1f", tot_cito$higher)`% higher advice categories).
+We use Lib paper as the reference test and assume that the same category-change share applies to it.
+This transfers a result from a different test and year; it is an anchoring assumption, assessed in @sec-sensitivity.
+
+Following the redraw construction, we centre a simulated result on the pupil's original reading, rather than draw two independent errors around the common factor.
+This is why the added perturbation has one error variance.
+Then the new test result is $T^{**}_p = T^*_p + \epsilon_{T, p}$, where $\epsilon_{T, p} \sim \mathcal{N}(0, \sigma^2_{T, \text{ref}})$,
+(see @eq-test). Then the resit $T^{**}_p$ has the same outcome as the original test $T^*_p$ if the difference is within the thresholds of the test result:
+$\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}$, which follows from @eq-thresholds.
+By normal distribution, the probability of this happening is given by:
+
+$$
+\Pr(\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}) =
+\Phi\left(\frac{
+    \tau_{T_p + 1} - T^*_p
+}{
+    \sigma_{T, \text{ref}}
+}\right) -
+\Phi\left(\frac{
+    \tau_{T_p} - T^*_p
+}{
+    \sigma_{T, \text{ref}}
+}\right).
+$$ {#eq-resit-probability-same}
+
+Then the share of pupils that would have the results that change the category is
+one minus the probability above, averaged over all pupils in the reference test population.
+From @eq-reduced-model, we have $T^*_p \sim \mathcal{N}(a_\text{ref} + b_\text{ref}\mu_\text{ref}, s^2_\text{ref}) = \mathcal{N}(0, s^2_\text{ref})$.
+Forcing it to be equal to Cito's category-change share, we obtain
+
+$$
+\EE \left[ 1 -
+\Pr(\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1})
+\right] = r.
+$$ {#eq-resit-share}
+
+The probability that a pupil's test result changes category depends on the category of the original test result.
+Therefore, we cannot solve @eq-resit-share analytically.
+Instead, we solve for $\sigma_{T, \text{ref}}$ via Brent’s method [@brent1973],
+a root-finding algorithm that combines bisection, secant, and inverse quadratic interpolation methods.
+
+Once we have the test's measurement uncertainty $\sigma^2_{T, \text{ref}}$ (@tbl-anchor),
+we can use @eq-original-parameters to solve for its loading factor $\alpha_{\text{ref}}$ and for the teacher's error $\sigma^2_L$:
+
+$$
+\alpha_{\text{ref}} = \frac{s_{\text{ref}}^2 - \sigma^2_{T, \text{ref}}}{b_{\text{ref}} \sigma^2_{\text{ref}}}, \quad
+\sigma^2_L = \sigma^2_{\text{ref}} - \frac{b_{\text{ref}} \sigma^2_{\text{ref}}}{\alpha_{\text{ref}}}.
+$$ {#eq-loading-teacher-error}
+
+```{r}
+#| label: tbl-anchor
+#| tbl-cap: "Test error $\\sigma_{T, \\text{ref}}$ and loading factor $\\alpha_{\\text{ref}}$ of the reference test (in estimation units), and the teacher's error variance $\\sigma^2_L$, per test year."  # nolint: line_length_linter
+knitr::kable(anchor_summary(structural), digits = 3)
+```
+
+At this anchor, the teacher's reliability in the reference population, $1-\sigma_L^2$, is about 0.80–0.81, compared with about 0.94 for the reference test.
+Thus the teacher has the larger error share under this assumed anchor; @sec-sensitivity shows how that comparison changes with $r$.
+
+Finally, we scale $\alpha_t$, $\beta_t$, $\sigma_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
+so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (see @sec-measurement-model).
+@tbl-original-parameters shows the scaled original parameters per test and year.
+
+```{r}
+#| label: tbl-original-parameters
+#| tbl-cap: "Original parameters per test and year: the mean $\\mu_t$ and variance $\\sigma^2_{\\theta, t}$ of the common factor, the loading factor $\\alpha_t$, the intercept $\\beta_t$, and the test error $\\sigma_{T, t}$, with $\\alpha_{\\text{ref}} = 1$."  # nolint: line_length_linter
+knitr::kable(original_parameters(structural), digits = 3)
+```
+:::
