@@ -9,6 +9,9 @@ school_weighting,"Inspectorate, schoolweging 2022–2025",[@inspectie_schoolwegi
 cvte_conditional,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2025; @cvte2026],provisional × test advice per test and mode (row %),,national × test
 cvte_provisional,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2025; @cvte2026],provisional advice per test,,national × test
 cvte_pupils,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2026],pupils per test,,national × test
+cvte_coverage,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2025; @cvte2026],share of participating pupils with a known provisional advice,,national
 cvte_agreement,"CvTE, Terugblik normering doorstroomtoetsen 2025 and 2026",[@cvte2026],published shares of lower / equal / higher test advice (validation),,national
 cito_misclassification,"Cito (2026), Doorstroomonderzoek eindtoetsen 2022, App. D",[@cito2026],simulated share of changing test advices if the test was repeated with its standard error,2022,national (paper CET)
 gap_matrix,"DUO, conversion table (toelichting bestand nr. 11)",[@duo_conversion],definition of “higher” and “lower”,–,matrix
+school_locations,DUO schooladviezen 2024–2025 (course file),[@duo_schooladviezen],"name, place, municipality, province, and school board of each school location (D1)",,school location
+school_boards,DUO adressen_bo (besturenbo),[@duo_adressen],name of each school board,2026 register,school board
