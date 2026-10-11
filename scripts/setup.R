@@ -3,7 +3,11 @@ renv::restore(prompt = FALSE)
 
 # Keep hooks local to this worktree so other branches can run independently.
 stopifnot(system2("git", c("config", "extensions.worktreeConfig", "true")) == 0)
-stopifnot(system2("git", c(
-    "config", "--worktree", "core.hooksPath", ".githooks"
-)) == 0)
+stopifnot(
+    system2(
+        "git", c(
+            "config", "--worktree", "core.hooksPath", ".githooks"
+        )
+    ) == 0
+)
 message("Packages restored and Git hooks enabled for this checkout.")
