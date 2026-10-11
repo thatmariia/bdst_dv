@@ -97,11 +97,8 @@ add_decomposition_year <- function(plot, segments, label_x, visible) {
 #'   the subtitle out.
 decomposition_plot <- function(
     decomposition,
-    title = "Category design is the largest source of eligibility",
-    subtitle = paste(
-        "Share of pupils eligible for a higher track if the whole national",
-        "population took the test."
-    )
+    title = "Shapley decomposition of eligibility",
+    subtitle = NULL
 ) {
     segments <- decomposition_segments(decomposition)
     years <- sort(unique(segments$test_year))

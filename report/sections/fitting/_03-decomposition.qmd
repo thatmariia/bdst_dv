@@ -1,3 +1,124 @@
-### Decomposition
+### Decomposition {#sec-decomposition}
 
-<!-- TODO -->
+With the original parameters in @tbl-original-parameters, we can switch each source of disagreement on and off,
+and see how the share of pupils that are eligible for a higher track changes.
+To compare the tests on the same pupils, we let the whole national population take each test.
+Similar to @eq-national-share, the national population is the combination of the test populations in @eq-common-factor,
+weighted by the number of pupils $N_t$ that took each test:
+
+$$
+\theta_p \sim \sum_t w_t \mathcal{N}(\mu_t, \sigma^2_{\theta, t}), \quad w_t = \frac{N_t}{\sum_{t'} N_{t'}}.
+$$ {#eq-national-population}
+
+Since we assume the teacher and the test make their errors in measuring $\theta_p$ independently (see @sec-measurement-model),
+we can use Equations [-@eq-teacher], [-@eq-test], and [-@eq-thresholds],
+to compute the probabilities that the teacher gives the provisional advice $i$ and that the test $t$ gives the test result $j$:
+
+$$
+\begin{aligned}
+\PP(L_p = i \mid \theta_p) &=
+\Phi\left(\frac{\lambda_{i+1} - \theta_p}{\sigma_L}\right) -
+\Phi\left(\frac{\lambda_i - \theta_p}{\sigma_L}\right), \\
+\PP_t(T_p = j \mid \theta_p) &=
+\Phi\left(\frac{\tau_{j+1} - \alpha_t \theta_p - \beta_t}{\sigma_{T, t}}\right) -
+\Phi\left(\frac{\tau_j - \alpha_t \theta_p - \beta_t}{\sigma_{T, t}}\right).
+\end{aligned}
+$$ {#eq-category-probabilities}
+
+The share of eligible pupils $\tilde{h}_t$, given the whole national population took the test $t$, is then given by:
+
+$$
+\tilde{h}_t = \sum_{i, j : G(i, j) > 0} \EE_\theta \left[ \PP(L_p = i \mid \theta_p) \PP_t(T_p = j \mid \theta_p) \right],
+$$ {#eq-eligibility}
+
+i.e., the model's counterpart of the standardized eligibility $h_t$ in @eq-standardized-eligibility.
+We evaluate the expectation over the national population numerically, on a fine grid of $\theta$ values.
+Switching an error off means setting its standard deviation to zero.
+Then the teacher or the test reads the common factor exactly,
+and the probability in @eq-category-probabilities is one for the category that contains the error and zero otherwise.
+
+We attribute the eligibility to three sources:
+
+- **teacher error** ($L$): the teacher's error $\sigma_L$ instead of zero,
+- **test error** ($T$): the test's error $\sigma_{T, t}$ instead of zero, and
+- **test menu** ($M$): the parameters $(\alpha_t, \beta_t, \sigma_{T, t})$ of the test $t$ instead of the parameters of the reference test.
+
+Let $\tilde{h}(S)$ be the eligibility when the sources in the set $S \subseteq \{L, T, M\}$ are switched on, and the others are off.
+When all sources are off, both the teacher and the reference test are perfect,
+and the only remaining reason for eligibility is the mismatch between the two scales.
+Therefore, $\tilde{h}(\emptyset)$ is the *category design* source of disagreement.
+
+The contribution of a source depends on the order in which the sources are switched on, because the sources interact.
+For example, how much eligibility the test error adds depends on where the test's thresholds lie relative to the teacher's thresholds,
+which is what the test menu changes.
+Therefore, we use the Shapley value [@shapley1953],
+which averages the contribution of a source $k$ over all $3! = 6$ orders in which the sources can be switched on:
+
+$$
+\text{Sh}_k = \sum_{S \subseteq \{L, T, M\} \setminus \{k\}}
+\frac{|S|! \, (2 - |S|)!}{3!}
+\left[ \tilde{h}(S \cup \{k\}) - \tilde{h}(S) \right].
+$$ {#eq-shapley}
+
+The weight of a set $S$ is the share of the orders in which exactly the sources in $S$ are switched on before $k$.
+Since the contributions along each order add up to the total change in eligibility, so do their averages:
+
+$$
+\tilde{h}_t = \tilde{h}(\emptyset) + \text{Sh}_L + \text{Sh}_T + \text{Sh}_M.
+$$ {#eq-decomposition}
+
+The test menu contribution $\text{Sh}_M$ is negative for the tests that are stricter than the reference test, and zero for the reference test itself.
+
+```{r}
+#| label: decomposition-values
+#| include: false
+pp <- function(x) sprintf("%.1f", 100 * x)
+
+decomposition_of <- function(year, test_name = reference_test) {
+    filter(decomposition, test_year == year, test == test_name)
+}
+
+strictest_test <- function(year) {
+    decomposition |>
+        filter(test_year == year) |>
+        slice_min(test_menu)
+}
+
+ref_2025 <- decomposition_of(2025)
+ref_2026 <- decomposition_of(2026)
+year_2026 <- filter(decomposition, test_year == 2026)
+```
+
+@fig-decomposition shows the decomposition per test, for the chosen year.
+If the whole national population took the reference test in 2026,
+`{r} pp(ref_2026$eligible)`% of pupils would be eligible for a higher track.
+Category design accounts for `{r} pp(ref_2026$category_design)` percentage points,
+teacher error for `{r} pp(ref_2026$teacher_error)`, and test error for `{r} pp(ref_2026$test_error)`.
+In 2025, these were `{r} pp(ref_2025$category_design)`, `{r} pp(ref_2025$teacher_error)`, and `{r} pp(ref_2025$test_error)`
+out of `{r} pp(ref_2025$eligible)`%.
+Hence, `{r} sprintf("%.0f", 100 * ref_2026$category_design / ref_2026$eligible)`% of the eligibility would remain even if both the teacher and the test were perfect,
+and the teacher error adds about `{r} round(ref_2026$teacher_error / ref_2026$test_error)` times as much eligibility as the test error.
+
+Across the tests in 2026, the teacher error contributes between
+`{r} pp(min(year_2026$teacher_error))`% and `{r} pp(max(year_2026$teacher_error))`%,
+and the test error between
+`{r} pp(min(year_2026$test_error))`% and `{r} pp(max(year_2026$test_error))`%.
+The test menu contribution is largest for `{r} strictest_test(2026)$test`, which removes
+`{r} pp(-strictest_test(2026)$test_menu)`% in 2026
+(`{r} strictest_test(2025)$test`, `{r} pp(-strictest_test(2025)$test_menu)`% in 2025).
+I.e., taking the strictest test instead of the reference test removes more eligibility than the teacher error adds for any test.
+
+```{r}
+#| label: fig-decomposition
+#| fig-height: 5.5
+#| fig-cap: "Shapley decomposition of the share of pupils eligible for a higher track, if the whole national population took the test, per test (choose the year above the plot). Bars stack category design, teacher error, and test error; the hatched band is the eligibility that the test menu removes (since the reference test is the least strict); dots mark the total. Source: model fitted to CvTE [@cvte2025; @cvte2026], with Cito's resit share [@cito2026]."  # nolint: line_length_linter
+decomposition_plot(decomposition)
+```
+
+::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
+
+```{r}
+#| label: tbl-decomposition
+knitr::kable(decomposition, digits = 3)
+```
+:::
