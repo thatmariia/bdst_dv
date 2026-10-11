@@ -1,0 +1,67 @@
+### Fitting tables
+
+#### Model predictions
+
+For each test $t$, the data provides the joint distribution $J_t(i, j)$ of the provisional advice and test result, as shown in @eq-joint.
+The model predicts the same share $q_t(i, j)$ (the model's counterpart of $J_t(i, j)$),
+which is the probability that the pupil's evaluations are within the rectangular area defined by the thresholds of $i$ and $j$ (see @eq-thresholds):
+
+- the provisional advice thresholds $\lambda_i$ and $\lambda_{i+1}$, and
+- the test result thresholds $\tau_j$ and $\tau_{j+1}$.
+
+To obtain $q_t(i, j)$, we need to standardize the thresholds, i.e., its boundaries, to the latent scale of the provisional advice $L^*$, which is the reference indicator in our measurement model.
+We do this by subtracting the evaluation's mean and dividing by its standard deviation from Equations [-@eq-reduced-model] and [-@eq-reduced-variance-correlation]:
+
+$$
+u_{t, i} = \frac{\lambda_i - \mu_t}{\sigma_t}, \quad
+v_{t, j} = \frac{\tau_j - (a_t + b_t \mu_t)}{s_t}.
+$$ {#eq-standardized-thresholds}
+
+The standardized thresholds $u_{t, i}$ and $v_{t, j}$ are the boundaries of the rectangular area in the bivariate normal distribution of the reduced model.
+Then, $q_t(i, j)$ is the probability mass within this area, which can be computed using the bivariate normal cumulative distribution function $\Phi_2$ [@olsson1979]:
+
+$$
+q_t(i, j) =
+\Phi_2(u_{t, i+1}, v_{t, j+1}, \rho_t) -
+\Phi_2(u_{t, i}, v_{t, j+1}, \rho_t) -
+\Phi_2(u_{t, i+1}, v_{t, j}, \rho_t) +
+\Phi_2(u_{t, i}, v_{t, j}, \rho_t),
+$$ {#eq-model-probability}
+
+i.e., the probability below the upper-right corner,
+minus the areas to the left and below,
+plus the lower-left corner that was subtracted twice.
+
+CvTE provides $J_t(i, j)$ as the share of pupils with provisional advice $i$ and test result $j$ in test $t$.
+To approximate the number of pupils with these evaluations,
+we multiply the share by the number of pupils in test $t$ and the fraction of pupils in year $y$, for whom the provisional advice is available:
+
+$$
+n_t(i, j) = N_t f_y J_t(i, j).
+$$ {#eq-model-counts}
+
+The resulting pseudo counts are shown in @fig-model-counts.
+
+```{r}
+#| label: fig-model-counts
+#| fig-cap: "Psudo model counts of pupils with provisional advice $i$ and test result $j$, per test and year."  # nolint: line_length_linter
+# TODO
+```
+
+#### Likelihood
+
+As mentioned in @sec-measurement-model, the model assumes that pupils are independent.
+Then the counts $n_t(i, j)$ follow a multinomial distribution with probabilities $q_t(i, j)$.
+The log-likelihood of the model is then given by:
+
+$$
+\log \mathcal{L} = \sum_t \sum_{i, j} n_t(i, j) \log q_t(i, j).
+$$ {#eq-log-likelihood}
+
+We can maximize the log-likelihood to find the best-fitting parameters of the published data.
+
+As mentioned in @sec-measurement-model,
+the measurement scale is set by the teacher's advice ($\mu_\text{ref} = 0$ and $\sigma^2_\text{ref} = 1$);
+the origin of the test's scale is set by the test's leniency ($\beta_\text{ref} = 0$).
+We cannot set the test's sensitivity $\alpha_\text{ref}$ to a fixed value, because it is not identifiable.
+Instead, we set $\psi^2_\text{ref} = 1$.

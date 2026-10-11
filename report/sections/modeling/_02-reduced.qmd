@@ -35,7 +35,7 @@ The slope $b_t$ is the loading factor $\alpha_t$ scaled by the share of teacher'
 The intercept $a_t$ is the test's leniency $\beta_t$ adjusted for the difference between the provisional advice and the test result.
 The residual variance $\psi^2_t$ combines the test's measurement uncertainty $\sigma^2_{T, t}$ and the part of the teacher's error that the test cannot explain.
 
-For a given test $t$, the reduced model in @eq-reduced-model is a bivariate normal distribution behind the polychoric correlation,
+For a given test $t$, the reduced model in @eq-reduced-model is a bivariate normal distribution behind the polychoric correlation [@olsson1979],
 with parameters $\mu_t, \sigma^2_t, a_t, b_t, \psi^2_t$.
 By the law of total variance, the variance of the latent test result and the correlation between the latent provisional advice and test result are given by:
 
