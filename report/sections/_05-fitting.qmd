@@ -5,7 +5,8 @@
 #| include: false
 # fits the reduced model per year (fits, fit_quality), separates the teacher
 # and test errors (structural), and decomposes eligibility (decomposition)
-source("R/model/setup.R")
+source("R/national-model/setup.R")
+source("R/school-model/setup.R")
 ```
 
 {{< include sections/fitting/_01-tables.qmd >}}
@@ -16,4 +17,4 @@ source("R/model/setup.R")
 
 {{< include sections/fitting/_04-sensitivity.qmd >}}
 
-
+{{< include sections/fitting/_05-school.qmd >}}
