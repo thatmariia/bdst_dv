@@ -24,7 +24,58 @@ tot_cito <- cito_misclassification |>
 The tests have measurement uncertainty, which implies that the test results are not perfectly reliable.
 Hence, if a pupil were to take the equivalent test multiple times, we would not expect the same result each time.
 Cito [@cito2026] ran a test-retest simulation study on the Centrale Eindtoets in 2022 and found that the test's measurement uncertainty was
-`{r} sprintf("%.1f", tot_cito$flip)`%
+$r$ = `{r} sprintf("%.1f", tot_cito$flip)`%
 (`{r} sprintf("%.1f", tot_cito$lower)`% lower scores, `{r} sprintf("%.1f", tot_cito$higher)`% higher).
 Lib paper test is a successor of the Centrale Eindtoets, and we assume that it has a similar measurement uncertainty.
 Hence, we take Lib paper test as a reference test and set its measurement uncertainty to $\sigma_{T, \text{ref}}$ is the same.
+
+Suppose a pupil is retaking a test in our model.
+Then the new test result is $T^{**}_p = T^*_p + \epsilon_{T, p}$, where $\epsilon_{T, p} \sim \mathcal{N}(0, \sigma^2_{T, \text{ref}})$,
+(see @eq-test). Then the resit $T^{**}_p$ has the same outcome as the original test $T^*_p$ if the difference is within the thresholds of the test result:
+$\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}$, which follows from @eq-thresholds.
+By normal distribution, the probability of this happening is given by:
+
+$$
+\Pr(\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1}) =
+\Phi\left(\frac{
+    \tau_{T_p + 1} - T^*_p
+}{
+    \sigma_{T, \text{ref}}
+}\right) -
+\Phi\left(\frac{
+    \tau_{T_p} - T^*_p
+}{
+    \sigma_{T, \text{ref}}
+}\right).
+$$ {#eq-resit-probability-same}
+
+Then the share of pupils that would have the results that change the category is
+one minus the probability above, averaged over all pupils in the reference test population.
+From @eq-reduced-model, we have $T^*_p \sim \mathcal{N}(\mu_\text{ref}, s^2_\text{ref})$.
+Forcing it to be equal to Cito's measurement uncertainty, we obtain
+
+$$
+\EE \left[ 1 -
+\Pr(\tau_{T_p} < T^*_p + \epsilon_{T, p} \leq \tau_{T_p + 1})
+\right] = r.
+$$ {#eq-resit-share}
+
+The probability that a pupil's test result changes category depends on the category of the original test result.
+Therefore, we cannot solve @eq-resit-share analytically.
+Instead, we estimate the share via Brent’s method [@brent1973],
+a root-finding algorithm that combines bisection, secant, and inverse quadratic interpolation methods.
+
+<!-- TODO: actually do it -->
+
+Once we have the test's measurement uncertainty $\sigma^2_{T, \text{ref}}$,
+we can use @eq-original-parameters to solve for its loading factor $\alpha_{\text{ref}}$ and for the teacher's error $\sigma^2_L$:
+
+$$
+\alpha_{\text{ref}} = \frac{s_{\text{ref}}^2 - \sigma^2_{T, \text{ref}}}{b_{\text{ref}} \sigma^2_{\text{ref}}}, \quad
+\sigma^2_L = \sigma^2_{\text{ref}} - \frac{b_{\text{ref}} \sigma^2_{\text{ref}}}{\alpha_{\text{ref}}}.
+$$ {#eq-loading-teacher-error}
+
+Finally, we scale $\alpha_t$, $\beta_t$, $\sigma^2_{T, t}$, and the thresholds $\tau$ by dividing them by $\alpha_{\text{ref}}$,
+so that we have $\alpha_{\text{ref}} = 1$ as required for the reference test (see @sec-measurement-error).
+
+<!-- TODO: actually do it and report the results in a table. -->
