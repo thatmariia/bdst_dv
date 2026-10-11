@@ -11,10 +11,7 @@ format:
     include-in-header:
       text: |
         <style>
-          body {
-            @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
-            body { font-family: 'IBM Plex Sans', sans-serif; }
-          }
+          @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
           p {
             text-align: justify;
           }
@@ -23,7 +20,7 @@ format:
       theme: neutral
     fontsize: 11pt
     theme: cosmo
-    mainfont: "Optima"
+    mainfont: "'IBM Plex Sans', sans-serif"
     toc: true
     toc-location: left
     code-fold: true
