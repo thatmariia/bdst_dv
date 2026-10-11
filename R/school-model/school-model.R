@@ -224,20 +224,13 @@ estimate_schools <- function(schools, model, gap, large = 50) {
 #' cells with every source switched on.
 school_results <- function(school, model, gap) {
     mixture <- model$mixtures[[school$provider]]
-    # cells of every set of switched-on sources, keyed like shapley_values()
-    key <- function(on) {
-        if (length(on) == 0) "none" else paste(sort(on), collapse = "+")
-    }
-    subsets <- all_subsets(school_sources)
-    cells <- lapply(subsets, \(on) school_cells(school, model, mixture, on))
-    names(cells) <- vapply(subsets, key, "")
-    value <- function(on) eligibility(cells[[key(on)]], gap)
+    cells <- subset_cells(
+        school_sources, \(on) school_cells(school, model, mixture, on)
+    )
     list(
-        decomposition = c(
-            category_design = value(character(0)),
-            shapley_values(school_sources, value),
-            eligible = value(school_sources)
+        decomposition = decompose_cells(
+            cells, school_sources, \(table) eligibility(table, gap)
         ),
-        cells = cells[[key(school_sources)]]
+        cells = cells[[subset_key(school_sources)]]
     )
 }

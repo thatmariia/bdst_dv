@@ -1,4 +1,4 @@
-# Fits the school-level model and aggregates its results. Run after
+# Fits the school-level model. Run after
 # R/national-model/setup.R, from the project root. School fits are cached
 # in data/derived/.
 source("R/school-model/cache.R")
@@ -19,4 +19,3 @@ school_estimates <- estimate_all_schools(
     ),
     gap_matrix
 )
-school_groups <- aggregate_schools(school_estimates)

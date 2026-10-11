@@ -1,5 +1,7 @@
 ### Reduced model
 
+This step turns the measurement model into something we can fit to the published tables.
+
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
 We never observe the common factor $\theta_p$.

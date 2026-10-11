@@ -1,5 +1,7 @@
 ## Exploratory process
 
+Before modeling anything, we look at what the data show directly: whether schools raise the advice, how the provisional advice and the test advice disagree, and whether the tests disagree with each other.
+
 ```{r}
 #| label: exploratory-setup
 #| include: false
@@ -69,6 +71,7 @@ joint_plot(joint)
 
 ```{r}
 #| label: tbl-joint-table
+#| tbl-cap: "Joint distribution of provisional and test advice per test year, with the gap $G(i, j)$ of each cell."  # nolint: line_length_linter
 joint |>
     select(test_year, provisional, test_advice, gap, share) |>
     knitr::kable(digits = 4)
@@ -76,6 +79,8 @@ joint |>
 :::
 
 ### Test menu
+
+Do the tests themselves differ, or only the pupils who take them?
 
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
@@ -180,6 +185,7 @@ standardized_plot(standardized)
 
 ```{r}
 #| label: tbl-standardized
+#| tbl-cap: "Standardized shares of higher and lower test advice, leniency, and disagreement per test and year."  # nolint: line_length_linter
 knitr::kable(standardized, digits = 4)
 ```
 :::

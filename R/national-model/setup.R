@@ -37,19 +37,23 @@ resit_flip <- cito_misclassification |>
     with((lower + higher) / 100)
 structural <- lapply(fits, structural_parameters, flip = resit_flip)
 
-# Step 3: decompose eligibility in the national population.
-decomposition <- bind_rows(
+# Step 3: decompose eligibility in the national population, among all
+# pupils and per provisional advice (the latter for the explorer).
+decomposition_by_advice <- bind_rows(
     lapply(
         model_years,
         function(year) {
-            decompose_year(
-                structural[[as.character(year)]], cvte_pupils, gap_matrix, year
+            decompose_national(
+                structural[[as.character(year)]], cvte_pupils, gap_matrix,
+                year,
+                advice = c("all", provisional_levels)
             )
         }
-    ),
-    .id = "test_year"
-) |>
-    mutate(test_year = as.integer(test_year))
+    )
+)
+decomposition <- decomposition_by_advice |>
+    filter(advice == "all") |>
+    select(-advice)
 
 # Step 4: repeat the decomposition for other resit shares r.
 sensitivity <- anchor_sensitivity(

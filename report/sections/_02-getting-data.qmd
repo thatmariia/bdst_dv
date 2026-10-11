@@ -8,6 +8,7 @@ in @sec-data-tables shows the glimpses of the tables themselves, with a short de
 ::: {.callout-note collapse="true" appearance="minimal" title="Data sources"}
 ```{r}
 #| label: tbl-data-overview
+#| tbl-cap: "Provenance and contents of every dataset in this report: source, citation, years, unit, and the loaded rows and columns."  # nolint: line_length_linter
 knitr::kable(data_overview, format.args = list(big.mark = ","))
 ```
 :::
@@ -22,6 +23,7 @@ knitr::kable(data_overview, format.args = list(big.mark = ","))
 
 ```{r}
 #| label: tbl-duo-gap-matrix
+#| tbl-cap: "DUO gap matrix $G(i, j)$: how much higher the test result $j$ is valued than the provisional advice $i$ [@duo_conversion]."  # nolint: line_length_linter
 knitr::kable(gap_matrix, format.args = list(big.mark = ","))
 ```
 
@@ -43,6 +45,7 @@ For each test (separating the paper and digital versions) and year, CvTE [@cvte2
 
 ```{r}
 #| label: tbl-cvte-conditional
+#| tbl-cap: "Sample of the CvTE tables: test results of pupils with a havo provisional advice who took Lib digital in 2025 [@cvte2025]."  # nolint: line_length_linter
 cvte_conditional |>
     filter(test_year == 2025 & test == "Lib digital" & provisional == "havo") |>
     knitr::kable()
@@ -52,6 +55,7 @@ CvTE also provides a table showing the distribution of provisional advice $i$ fo
 
 ```{r}
 #| label: tbl-cvte-provisional
+#| tbl-cap: "Sample of the CvTE tables: provisional advice of the pupils who took Lib digital in 2025 [@cvte2025]."  # nolint: line_length_linter
 cvte_provisional |>
     filter(test_year == 2025 & test == "Lib digital") |>
     knitr::kable()
@@ -61,6 +65,7 @@ The number of pupils that have taken each test in a particular year is also prov
 
 ```{r}
 #| label: tbl-cvte-pupils
+#| tbl-cap: "Number of pupils who took Lib digital, per test year [@cvte2025; @cvte2026]."  # nolint: line_length_linter
 cvte_pupils |>
     filter(test == "Lib digital") |>
     knitr::kable()
@@ -85,6 +90,7 @@ DUO [@duo_eindscores] provides a table (@tbl-main-provider) that shows the test 
 
 ```{r}
 #| label: tbl-main-provider
+#| tbl-cap: "Sample of the DUO data: main test of school 00AP per test year, and its share of the tested pupils [@duo_eindscores]."  # nolint: line_length_linter
 main_provider |>
     distinct(provider, .keep_all = TRUE) |>
     distinct(test_year, .keep_all = TRUE) |>
@@ -96,6 +102,7 @@ They also provide a table that shows, for each school and year, the number of pu
 
 ```{r}
 #| label: tbl-test-scores
+#| tbl-cap: "Sample of the DUO data: pupils tested per test at school 00CD, with bounds for suppressed counts [@duo_eindscores]."  # nolint: line_length_linter
 test_scores |>
     filter(institution_code == "00CD") |>
     distinct(provider, .keep_all = TRUE) |>
@@ -106,6 +113,7 @@ From DUO [@duo_heroverweging], we also have a table, shown in @tbl-advice-recons
 
 ```{r}
 #| label: tbl-advice-reconsiderations
+#| tbl-cap: "Sample of the DUO data: pupils with a higher or lower test advice and raised advices at school 00DD, per test year [@duo_heroverweging]."  # nolint: line_length_linter
 advice_reconsiderations |>
     filter(institution_code == "00DD") |>
     knitr::kable()
@@ -115,6 +123,7 @@ DUO [@duo_advies] also supplies the table (@tbl-final-advice) with final advice 
 
 ```{r}
 #| label: tbl-final-advice
+#| tbl-cap: "Sample of the DUO data: final vmbo-gt advices at school 00BB, per test year [@duo_advies]."  # nolint: line_length_linter
 final_advice |>
     filter(institution_code == "00BB" & advice == "vmbo gt") |>
     filter(n > 2.5) |>
@@ -125,6 +134,7 @@ We summarize the final advice table (@tbl-advice-summary) for a single school pe
 
 ```{r}
 #| label: tbl-advice-summary
+#| tbl-cap: "Summary of the final advice at school 31LH per test year: pupils, mean advice, and shares of vwo and combined advice."  # nolint: line_length_linter
 advice_summary |>
     filter(institution_code == "31LH") |>
     knitr::kable()
@@ -135,6 +145,7 @@ Tables [-@tbl-school-locations]-[-@tbl-school-boards] [@duo_schooladviezen; @duo
 
 ```{r}
 #| label: tbl-school-locations
+#| tbl-cap: "Name and region of school location 00AP [@duo_schooladviezen]."
 school_locations |>
     filter(institution_code == "00AP") |>
     knitr::kable()
@@ -142,6 +153,7 @@ school_locations |>
 
 ```{r}
 #| label: tbl-school-boards
+#| tbl-cap: "Name of school board 41646 [@duo_adressen]."
 school_boards |>
     filter(board_number == "41646") |>
     knitr::kable()
@@ -153,6 +165,7 @@ The simulated data from Cito [@cito2026] (@tbl-cito-misclassification) shows how
 
 ```{r}
 #| label: tbl-cito-misclassification
+#| tbl-cap: "Simulated share of pupils whose test advice would be lower, equal, or higher if they took the test again, per test advice [@cito2026]."  # nolint: line_length_linter
 cito_misclassification |>
     knitr::kable()
 ```
@@ -163,6 +176,7 @@ The Inspectorate [@inspectie_schoolweging] provides the data on socioeconomic we
 
 ```{r}
 #| label: tbl-school-weighting
+#| tbl-cap: "Sample of the Inspectorate data: school weighting of school 00DN per test year [@inspectie_schoolweging]."  # nolint: line_length_linter
 school_weighting |>
     filter(institution_code == "00DN") |>
     knitr::kable()

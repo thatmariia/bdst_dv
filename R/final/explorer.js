@@ -1,14 +1,15 @@
 // Eligibility explorer (@fig-explorer). Attached with htmlwidgets::onRender()
 // by eligibility_explorer() in R/final/explorer.R: `el` holds the figure
 // (the waterfall on top, 100 pupils as icons below), and `data` the school
-// model, the schools, the groups of schools, and the Netherlands.
+// model, the schools, and the Netherlands. Groups of schools are computed
+// here from their schools.
 // The controls choose the unit (the Netherlands, a province, municipality,
 // school board, group of similar schools, or school), the pupils (all, or
 // those with one provisional advice), and what-ifs: another test or, for a
 // school, the teachers of another school. The figure is filled with
 // Plotly.react().
 function (el, x, data) {
-  const { model, schools, groups, national, labels, style } = data;
+  const { model, schools, national, labels, style } = data;
   const sources = ["teacher_error", "leniency", "test_error", "test_menu"];
   const all = (1 << sources.length) - 1;
   const schoolYear = 2025;
@@ -141,8 +142,41 @@ function (el, x, data) {
   // ---------- units ----------
 
   const school = k => Object.fromEntries(Object.keys(schools).map(key => [key, schools[key][k]]));
+  const sum = (members, get) => members.reduce((a, k) => a + get(k), 0);
+
+  // Groups of schools per level, in order of their first school, with their
+  // pupils, observed shares, and tests (pupil-weighted over their schools).
+  const groups = [];
+  ["province", "municipality", "board", "similar"].forEach(level => {
+    const byName = new Map();
+    schools[level].forEach((name, k) => {
+      if (name == null) return;
+      if (!byName.has(name)) byName.set(name, []);
+      byName.get(name).push(k);
+    });
+    byName.forEach((members, name) => {
+      const pupils = sum(members, k => schools.pupils[k]);
+      const higher = sum(members, k => schools.higher[k] * schools.pupils[k]);
+      const perTest = new Map();
+      [...new Set(members.map(k => schools.provider[k]))].sort().forEach(test => perTest.set(test, 0));
+      members.forEach(k => perTest.set(schools.provider[k], perTest.get(schools.provider[k]) + schools.pupils[k] / pupils));
+      const tests = [...perTest].sort((a, b) => b[1] - a[1])
+        .map(([test, share]) => `${test} ${share < 0.005 ? "<1" : Math.round(100 * share)}%`).join(", ");
+      groups.push({
+        level, name, members, schools: members.length, pupils, higher: higher / pupils,
+        // no raised share without pupils with a higher test advice
+        raised: higher > 0 ? sum(members, k => schools.raised_pupils[k]) / higher : null,
+        tests
+      });
+    });
+  });
   const groupIndex = new Map(groups.map((g, k) => [`${g.level}|${g.name}`, k]));
-  const membersOf = g => schools.id.map((_, k) => k).filter(k => schools[g.level][k] === g.name);
+  // the cells of a group with its own tests, computed when first needed
+  const ownCells = new Map();
+  const cellsOf = k => {
+    if (!ownCells.has(k)) ownCells.set(k, groupCells(groups[k].members, {}));
+    return ownCells.get(k);
+  };
   const levelName = {
     province: "province", municipality: "municipality", board: "school board",
     similar: "similar schools"
@@ -263,19 +297,16 @@ function (el, x, data) {
       };
     }
     const g = groups[unit.index];
-    // all pupils with their own tests are precomputed; the rest is computed
-    // from the schools of the group
-    const precomputed = state.advice === "all" && !state.test;
-    const now = precomputed ? null : groupCells(membersOf(g), {});
-    const result = state.test ? groupCells(membersOf(g), { test: state.test }) : now;
-    const decomposition = precomputed ? g.decomposition : decompose(result, state.advice);
-    const before = precomputed ? g.decomposition : decompose(now, state.advice);
+    const now = cellsOf(unit.index);
+    const result = state.test ? groupCells(g.members, { test: state.test }) : now;
+    const decomposition = decompose(result, state.advice);
+    const before = decompose(now, state.advice);
+    const observed = state.test || state.advice !== "all" ? null : g.higher;
     return {
       kind: "group", name: g.name, group: g, pupils: g.pupils,
-      decomposition, asIs: state.test ? before.eligible : null,
-      observed: state.test || state.advice !== "all" ? null : g.higher,
-      top: Math.max(peak(before), peak(decomposition), precomputed ? g.higher : 0),
-      tests, outcomes: outcomesOf(precomputed ? g.cells : result[all]), estimated: true,
+      decomposition, asIs: state.test ? before.eligible : null, observed,
+      top: Math.max(peak(before), peak(decomposition), observed ?? 0),
+      tests, outcomes: outcomesOf(result[all]), estimated: true,
       raised: g.raised, raisedWhere: "",
       whatIf: state.test ? `if all pupils took ${state.test}` : ""
     };
@@ -720,7 +751,8 @@ function (el, x, data) {
   // Computing a group from its schools takes up to about a second, so the
   // figure fades until it is done.
   function update() {
-    const busy = state.unit.kind === "group" && (Boolean(state.test) || state.advice !== "all");
+    const unit = state.unit;
+    const busy = unit.kind === "group" && (Boolean(state.test) || !ownCells.has(unit.index));
     el.style.opacity = busy ? 0.5 : 1;
     setTimeout(() => {
       const v = view();

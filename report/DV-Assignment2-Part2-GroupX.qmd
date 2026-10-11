@@ -45,7 +45,6 @@ $\newcommand{\indicator}{\mathbf{1}}$
 rm(list = ls())
 
 library(dplyr)
-library(ggplot2)
 
 # downloads the DUO files into data/raw/ if needed, applies conventions
 # D1-D7, reads the report tables in data/reports/, and stops if the sources

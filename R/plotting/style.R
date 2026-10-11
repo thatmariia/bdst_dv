@@ -1,4 +1,4 @@
-# Shared colours, fonts, labels, formats, and theme, so the same concept
+# Shared colours, fonts, labels, and formats, so the same concept
 # looks the same in every plot. The combinations below were checked with the
 # dataviz skill's palette validator (light surface).
 pal <- c(
@@ -107,25 +107,3 @@ short_advice <- function(x) {
 # Percentage formats: one decimal for values, none for axes and tiles.
 pct <- scales::percent_format(accuracy = 0.1)
 pct_whole <- scales::percent_format(accuracy = 1)
-
-#' Base ggplot theme: white, hairline axes, ink-coloured text, and optional
-#' horizontal gridlines.
-theme_report <- function(grid_y = FALSE) {
-    theme_classic(base_size = 11) +
-        theme(
-            axis.line = element_line(colour = ink[["axis"]]),
-            axis.ticks = element_line(colour = ink[["muted"]]),
-            axis.text = element_text(colour = ink[["secondary"]]),
-            axis.title = element_text(colour = ink[["secondary"]]),
-            plot.title = element_text(
-                face = "bold", size = 14, colour = ink[["primary"]]
-            ),
-            plot.subtitle = element_text(colour = ink[["secondary"]]),
-            plot.title.position = "plot",
-            panel.grid.major.y = if (grid_y) {
-                element_line(colour = ink[["grid"]], linewidth = 0.3)
-            } else {
-                element_blank()
-            }
-        )
-}

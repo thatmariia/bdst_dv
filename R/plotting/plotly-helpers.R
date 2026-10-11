@@ -127,27 +127,6 @@ plotly_arrows <- function(x0, y0, x1, y1, colour) {
     )
 }
 
-#' ggplotly with tidied traces: plain legend names, one legend entry per
-#' name (which toggles all its traces), and no hover or legend entry for
-#' filled areas (ribbons, background bands).
-tidy_ggplotly <- function(plot) {
-    widget <- plotly::ggplotly(plot, tooltip = "text")
-    in_legend <- character()
-    widget$x$data <- lapply(
-        widget$x$data,
-        function(trace) {
-            trace$name <- sub("^\\((.*),1\\)$", "\\1", trace$name)
-            is_area <- identical(trace$fill, "toself") || !nzchar(trace$name)
-            if (is_area) trace$hoverinfo <- "skip"
-            trace$legendgroup <- trace$name
-            trace$showlegend <- !is_area && !trace$name %in% in_legend
-            if (trace$showlegend) in_legend <<- c(in_legend, trace$name)
-            trace
-        }
-    )
-    widget
-}
-
 #' Adds the provider encoding to rows with a test and test_year: colour and
 #' legend group by provider, open circles for the first year and filled
 #' circles for later years.
@@ -200,24 +179,6 @@ wrap_html <- function(text, width) {
     paste(strwrap(text, width), collapse = "<br>")
 }
 
-#' Section title at the left edge of the figure, above the paper position y.
-#' @param left Left margin of the plot in pixels.
-plotly_section <- function(text, y, left, note = NULL) {
-    if (!is.null(note)) {
-        text <- paste0(
-            "<b>", text, "</b>  <span style='color:", ink[["muted"]], "'>",
-            note, "</span>"
-        )
-    } else {
-        text <- paste0("<b>", text, "</b>")
-    }
-    list(
-        x = 0, xref = "paper", xanchor = "left", xshift = 8 - left,
-        y = y, yref = "paper", yanchor = "bottom", showarrow = FALSE,
-        text = text, font = list(size = 13, color = ink[["primary"]])
-    )
-}
-
 #' Font in a text colour (marks carry the colour, text never does).
 plotly_font <- function(size = 12, colour = ink[["secondary"]]) {
     list(size = size, color = colour)
@@ -229,13 +190,5 @@ plotly_vline <- function(x, xref = "x", yref = "y domain",
     list(
         type = "line", xref = xref, yref = yref, x0 = x, x1 = x, y0 = 0,
         y1 = 1, line = list(color = colour, width = 1)
-    )
-}
-
-#' Label above the top of an axis domain at x.
-plotly_top_label <- function(x, text, xref = "x", yref = "y domain") {
-    list(
-        x = x, xref = xref, y = 1, yref = yref, yanchor = "bottom",
-        showarrow = FALSE, text = text, font = plotly_font(11)
     )
 }

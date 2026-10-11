@@ -3,10 +3,6 @@
 # Reference test: fixes the latent scales (@sec-measurement-model).
 reference_test <- "Lib paper"
 
-#' Number of free parameters for a year with `n_tests` tests: 9 teacher and
-#' 5 test thresholds, the reference test's slope, and 5 per other test.
-n_parameters <- function(n_tests) 15 + 5 * (n_tests - 1)
-
 #' Starting values for the free parameters: evenly spread thresholds and
 #' the same reduced-form parameters for every test.
 start_parameters <- function(tests) {

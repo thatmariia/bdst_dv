@@ -70,6 +70,17 @@ scenario_cells <- function(population, structure, test_name, on) {
 #' (@eq-eligibility).
 eligibility <- function(cells, gap) sum(cells[gap > 0])
 
+#' Share of eligible pupils among all pupils ("all") or among the pupils
+#' with one provisional advice, in a table of cell shares.
+#' @param advice "all" or a provisional advice.
+eligibility_among <- function(cells, gap, advice) {
+    if (advice == "all") {
+        return(eligibility(cells, gap))
+    }
+    row <- cells[advice, ]
+    sum(row[gap[advice, ] > 0]) / sum(row)
+}
+
 #' All subsets of a set, including the empty one.
 all_subsets <- function(x) {
     c(
@@ -81,17 +92,21 @@ all_subsets <- function(x) {
     )
 }
 
+#' Name of a set of players or sources, e.g. "test_error+test_menu".
+subset_key <- function(set) {
+    if (length(set) == 0) "none" else paste(sort(set), collapse = "+")
+}
+
 #' Shapley values (@eq-shapley): each player's added value, averaged over all
 #' orders in which the players can be switched on.
 #' @param players Character vector of players.
 #' @param value Function of a set of players (character vector).
 #' @return Named vector with one value per player.
 shapley_values <- function(players, value) {
-    key <- function(set) {
-        if (length(set) == 0) "none" else paste(sort(set), collapse = "+")
-    }
     subsets <- all_subsets(players)
-    values <- setNames(vapply(subsets, value, numeric(1)), sapply(subsets, key))
+    values <- setNames(
+        vapply(subsets, value, numeric(1)), sapply(subsets, subset_key)
+    )
     n <- length(players)
     vapply(
         players,
@@ -100,7 +115,8 @@ shapley_values <- function(players, value) {
             gains <- vapply(
                 before,
                 function(set) {
-                    values[[key(c(set, player))]] - values[[key(set)]]
+                    values[[subset_key(c(set, player))]] -
+                        values[[subset_key(set)]]
                 },
                 numeric(1)
             )
@@ -118,44 +134,69 @@ shapley_values <- function(players, value) {
     )
 }
 
-#' Shapley decomposition of eligibility for every test of one year
-#' (@eq-decomposition): category design (both errors off, reference test)
-#' plus the contributions of teacher error, test error, and test menu.
+#' The cells of every set of switched-on sources, named by subset_key().
+#' @param cells_of Function of a set of sources that returns their cells.
+subset_cells <- function(sources, cells_of) {
+    subsets <- all_subsets(sources)
+    setNames(lapply(subsets, cells_of), vapply(subsets, subset_key, ""))
+}
+
+#' Decomposition (@eq-decomposition) of a share of eligible pupils: category
+#' design (no source switched on), the Shapley value of every source, and
+#' the total.
+#' @param cells Output of subset_cells().
+#' @param share Function of cells that returns the share of eligible pupils.
+decompose_cells <- function(cells, sources, share) {
+    value <- function(on) share(cells[[subset_key(on)]])
+    contributions <- shapley_values(sources, value)
+    result <- c(
+        category_design = value(character(0)), contributions,
+        eligible = value(sources)
+    )
+    # the parts add up to the total by construction
+    parts <- result[["category_design"]] + sum(contributions)
+    stopifnot(isTRUE(all.equal(parts, result[["eligible"]])))
+    result
+}
+
+#' Decomposition of every test of one year, among all pupils ("all") or
+#' among the pupils with each provisional advice in `advice`, if the whole
+#' national population took the test.
 #' @param structure Output of structural_parameters().
 #' @param pupils cvte_pupils.
 #' @param gap DUO gap matrix.
 #' @param year Test year.
-#' @return One row per test, in shares of all pupils.
-decompose_year <- function(structure, pupils, gap, year) {
+#' @return One row per test and advice, in shares of the pupils.
+decompose_national <- function(structure, pupils, gap, year,
+                               advice = "all") {
     population <- national_population(structure, pupils, year)
     rows <- lapply(
         structure$tests$test,
-        function(this_test) {
-            value <- function(on) {
-                cells <- scenario_cells(population, structure, this_test, on)
-                eligibility(cells, gap)
-            }
-            contributions <- shapley_values(decomposition_sources, value)
-            result <- tibble(
-                test = this_test,
-                category_design = value(character(0)),
-                !!!as.list(contributions),
-                eligible = value(decomposition_sources)
+        function(test) {
+            cells <- subset_cells(
+                decomposition_sources,
+                \(on) scenario_cells(population, structure, test, on)
             )
-            # the parts add up to the total by construction
-            parts <- result$category_design + sum(contributions)
-            stopifnot(isTRUE(all.equal(parts, result$eligible)))
-            result
+            lapply(
+                advice,
+                function(among) {
+                    shares <- decompose_cells(
+                        cells, decomposition_sources,
+                        \(table) eligibility_among(table, gap, among)
+                    )
+                    tibble(test = test, advice = among, !!!as.list(shares))
+                }
+            )
         }
     )
-    bind_rows(rows)
+    bind_rows(unlist(rows, recursive = FALSE)) |>
+        mutate(test_year = as.integer(year), .before = 1)
 }
 
 #' National decomposition per year: the decomposition of every test,
 #' weighted by the number of pupils that took it, i.e., with the tests that
 #' schools actually chose.
-#' @param decomposition Output of decompose_year() for all years, with
-#'   test_year.
+#' @param decomposition Output of decompose_national() for all years.
 #' @param pupils cvte_pupils.
 national_decomposition <- function(decomposition, pupils) {
     decomposition |>

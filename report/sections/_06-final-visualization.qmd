@@ -45,34 +45,32 @@ the only year with both school data and a fitted model.
 #| fig-height: 7
 #| fig-cap: "Eligibility explorer. Search the Netherlands, a province, municipality, school board, group of similar schools, or school, and choose the pupils (all, or those with one provisional advice) and what-ifs above the figure. Top: where eligibility for a higher track comes from (hover over the info icons for what each source means and who can change it); the diamond marks the observed share of pupils with a higher test advice. Bottom: the test results of these pupils, one icon per percent. Sources: model fitted to CvTE [@cvte2025; @cvte2026] with Cito's resit share [@cito2026]; school data from DUO [@duo_heroverweging; @duo_advies; @duo_eindscores; @duo_schooladviezen; @duo_adressen] and the Inspectorate [@inspectie_schoolweging]."  # nolint: line_length_linter
 eligibility_explorer(
-    school_estimates, school_groups, national_explorer, gap_matrix,
-    compliance
+    school_estimates, national_explorer, gap_matrix, compliance
 )
 ```
 
 ::: {.callout-note collapse="true" appearance="minimal" title="Data table"}
 
 ```{r}
-#| label: tbl-explorer-provinces
-school_groups |>
-    filter(level == "province") |>
-    select(name, schools, pupils, higher, decomposition) |>
-    tidyr::unnest_wider(decomposition) |>
-    knitr::kable(digits = 3, format.args = list(big.mark = ","))
+#| label: tbl-explorer-national
+#| tbl-cap: "National decomposition of eligibility in the latest year, among all pupils and per provisional advice."  # nolint: line_length_linter
+by_advice |>
+    select(-test_year, -test) |>
+    knitr::kable(digits = 3)
 ```
 :::
 
 The waterfall in @fig-explorer shows the model's decomposition of eligibility (@eq-decomposition).
 Where available, a diamond marks the observed share for comparison.
 Search and navigation links switch between schools and groups; what-ifs recompute the model with another test or another school's estimated teacher leniency.
-The vertical line marks the estimate without that change. These are model scenarios, not measured effects of changing tests or teachers.
+The vertical line marks the estimate without that change. Note that these are model scenarios.
 
 In the national CvTE tables for `{r} latest`, `{r} percent(observed_rule$any)` of pupils have a higher test advice, but only `{r} percent(observed_rule$full)` have a difference of at least a full level.
 The model's error-free reference scenario estimates eligibility of `{r} design_for("havo")` among pupils assigned havo advice in that scenario; this is not an observed share attributable to category design.
 
-The 100 dots show rounded outcome proportions for the selected group and advice, not an individual child's chances.
+The 100 dots show rounded outcome proportions for the selected group and advice.
 National dots use observed CvTE tables; when a test is selected, they describe its actual participants, while the waterfall models that test for the national population.
 School and group dots use model estimates.
 
 School estimates depend on the model assumptions and limited pupil counts.
-The stricter/more-lenient label uses an estimated leniency at least two standard errors from zero; the warning below 20 pupils is an additional caution, not a guarantee of reliability above that threshold.
+The stricter/more-lenient label uses an estimated leniency at least two standard errors from zero; the warning below 20 pupils is an additional caution.

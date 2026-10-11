@@ -5,6 +5,6 @@ source("R/final/units.R")
 source("R/final/explorer.R")
 
 national_explorer <- national_units(
-    structural, cvte_pupils, cvte_conditional, cvte_provisional, joint,
-    gap_matrix
+    decomposition_by_advice, cvte_pupils, cvte_conditional, cvte_provisional,
+    joint
 )

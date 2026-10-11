@@ -13,36 +13,51 @@ compliance_heatmap <- function(
     subtitle = NULL
 ) {
     years <- seq(min(compliance$test_year), max(compliance$test_year))
-    tibble(test_year = years) |>
+    ramp <- scales::col_numeric(raised_ramp, domain = c(0, 1))
+    tiles <- tibble(test_year = years) |>
         left_join(compliance, by = "test_year") |>
         mutate(
-            label = if_else(
-                is.na(compliance), "no test", pct_whole(compliance)
+            missing = is.na(compliance),
+            label = if_else(missing, "no test", pct_whole(compliance)),
+            # the ramp stays light enough for dark labels on every tile
+            colour = if_else(missing, ink[["shade"]], ramp(compliance)),
+            tooltip = if_else(
+                missing, paste0(test_year, ": no test"),
+                sprintf("%d: %s raised", test_year, pct(compliance))
+            )
+        )
+    plotly::plot_ly(tiles) |>
+        plotly::add_bars(
+            x = ~test_year, y = 1, width = 1, text = ~label,
+            textposition = "inside", insidetextanchor = "middle", textangle = 0,
+            textfont = plotly_font(12, ink[["primary"]]),
+            marker = list(
+                color = ~colour, line = list(color = "white", width = 2)
+            ),
+            hovertext = ~tooltip, hoverinfo = "text", showlegend = FALSE
+        ) |>
+        plotly::layout(
+            title = plotly_title(title, subtitle),
+            margin = list(
+                t = plotly_top_margin(subtitle), b = 30, l = 10, r = 10
+            ),
+            bargap = 0,
+            xaxis = list(
+                title = "", tickvals = years, showgrid = FALSE,
+                showline = FALSE, fixedrange = TRUE
+            ),
+            yaxis = list(
+                title = "", range = c(0, 1), showgrid = FALSE,
+                showticklabels = FALSE, fixedrange = TRUE
+            ),
+            shapes = list(
+                modifyList(
+                    plotly_vline(mandatory_from - 0.5),
+                    list(line = list(width = 2))
+                )
             )
         ) |>
-        ggplot(aes(x = test_year, y = 1, fill = compliance)) +
-        geom_tile(colour = "white", linewidth = 1) +
-        # the ramp stays light enough for dark labels on every tile
-        geom_text(aes(label = label), colour = ink[["primary"]], size = 3.5) +
-        geom_vline(
-            xintercept = mandatory_from - 0.5,
-            colour = ink[["primary"]], linewidth = 0.6
-        ) +
-        scale_fill_gradient(
-            low = raised_ramp[1], high = raised_ramp[2], limits = c(0, 1),
-            na.value = ink[["shade"]], guide = "none"
-        ) +
-        scale_x_continuous(breaks = years, expand = c(0, 0)) +
-        labs(
-            title = title, subtitle = subtitle, x = NULL, y = NULL
-        ) +
-        theme_report() +
-        theme(
-            axis.line = element_blank(),
-            axis.ticks = element_blank(),
-            axis.text.y = element_blank(),
-            plot.subtitle = element_text(margin = margin(b = 6))
-        )
+        plotly_style()
 }
 
 #' Interactive lines: shares of pupils with a higher or lower test advice
@@ -66,45 +81,56 @@ compliance_plot <- function(
     ymax <- max(measures$hi)
     ends <- filter(measures, test_year == max(test_year))
 
-    plot <- measures |>
-        # text is for the plotly tooltip; ggplot2 only checks layer
-        # aesthetics, and the group keeps per-point text from splitting lines.
-        ggplot(
-            aes(
-                x = test_year, y = est, color = measure, fill = measure,
-                group = segment, text = tooltip
+    plot <- plotly::plot_ly()
+    for (name in levels(measures$measure)) {
+        colour <- measure_colours[[name]]
+        rows <- filter(measures, measure == name)
+        # a band per segment, so that bands break at years without a test
+        for (part in split(rows, droplevels(rows$segment))) {
+            plot <- plotly::add_trace(
+                plot,
+                x = c(part$test_year, rev(part$test_year)),
+                y = c(part$lo, rev(part$hi)), type = "scatter",
+                mode = "lines", fill = "toself",
+                fillcolor = plotly::toRGB(colour, 0.15),
+                line = list(width = 0), legendgroup = name,
+                showlegend = FALSE, hoverinfo = "skip"
             )
-        ) +
-        # plotly cannot draw infinite limits, so the band uses the data range.
-        annotate(
-            "rect",
-            fill = ink[["shade"]],
-            xmin = mandatory_from - 0.5, xmax = max(years) + 0.5,
-            ymin = 0, ymax = ymax
-        ) +
-        geom_ribbon(aes(ymin = lo, ymax = hi), alpha = .15, color = NA) +
-        geom_line(linewidth = 0.7) +
-        geom_point(size = 2) +
-        scale_x_continuous(
-            breaks = years, expand = expansion(add = c(0.3, 2.2))
-        ) +
-        scale_y_continuous(
-            labels = pct_whole,
-            limits = c(0, NA), expand = expansion(mult = c(0, 0.05))
-        ) +
-        scale_color_manual(values = measure_colours) +
-        scale_fill_manual(values = measure_colours) +
-        labs(
-            x = "Test year", y = "Share of pupils", color = NULL, fill = NULL
-        ) +
-        theme_report(grid_y = TRUE)
-
-    tidy_ggplotly(plot) |>
+        }
+        # missing years as NA, so that the line breaks there
+        line <- tibble(test_year = years) |>
+            left_join(rows, by = "test_year")
+        plot <- plotly::add_trace(
+            plot,
+            x = line$test_year, y = line$est, type = "scatter",
+            mode = "lines+markers", name = name, legendgroup = name,
+            line = list(color = colour, width = 2),
+            marker = list(color = colour, size = 7),
+            text = line$tooltip, hoverinfo = "text"
+        )
+    }
+    plot |>
         plotly::layout(
             title = plotly_title(title, subtitle),
             margin = list(t = plotly_top_margin(subtitle), b = 90),
             hovermode = "x unified",
             legend = plotly_legend("bottom"),
+            xaxis = list(
+                title = "Test year", tickvals = years, showgrid = FALSE,
+                showline = TRUE,
+                range = c(min(years) - 0.3, max(years) + 2.2)
+            ),
+            yaxis = list(
+                title = "Share of pupils", tickformat = ".0%",
+                range = c(0, ymax * 1.05), showline = TRUE
+            ),
+            shapes = list(
+                list(
+                    type = "rect", layer = "below", fillcolor = ink[["shade"]],
+                    line = list(width = 0), x0 = mandatory_from - 0.5,
+                    x1 = max(years) + 0.5, y0 = 0, y1 = ymax
+                )
+            ),
             annotations = c(
                 plotly_labels(
                     ends$test_year, ends$est, as.character(ends$measure)

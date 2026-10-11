@@ -1,5 +1,7 @@
 ### Anchor sensitivity {#sec-sensitivity}
 
+How much do our conclusions depend on the one assumption behind the split between teacher and test error?
+
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
 ```{r}
@@ -37,6 +39,7 @@ sensitivity_plot(sensitivity, resit_flip)
 
 ```{r}
 #| label: tbl-sensitivity
+#| tbl-cap: "National decomposition of eligibility for every resit share $r$ that the tables allow, per test year."  # nolint: line_length_linter
 knitr::kable(filter(sensitivity, feasible), digits = 3)
 ```
 :::

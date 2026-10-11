@@ -15,13 +15,6 @@ duo_advice_levels <- c(
     "vmbo gt/havo", "havo", "havo/vwo", "vwo", "no advice possible"
 )
 
-#' Providers behind the DOORSTROOMTOETS_PO codes in brin6_referentieniveau,
-#' identified by matching school-years against brin6_eindscores.
-duo_reference_providers <- c(
-    "0011" = "CET", "0012" = "ROUTE 8", "0013" = "IEP", "0014" = "DIA",
-    "0015" = "CESAN", "0016" = "AMN", "0017" = "DOE", "0018" = "LIB"
-)
-
 #' Read a DUO school file with English names and the shared year coding.
 #' reference_year (DUO's PEILJAAR) 2023 = school year 2023-24 = test in
 #' spring 2024. A suppressed count (-1, meaning 1-4 pupils) is kept as bounds
@@ -126,32 +119,6 @@ tidy_final_advice <- function(path) {
             advice = factor(
                 duo_advice_levels[as.integer(ADVIES)],
                 levels = duo_advice_levels
-            ),
-            suppressed, n_lo, n_mid, n_hi
-        )
-}
-
-#' Reference levels reached per school, year, provider, and subject.
-#' @param path brin6_referentieniveau CSV path.
-#' @return Tibble with provider, subject, and level.
-tidy_reference_levels <- function(path) {
-    subjects <- c(
-        REKENEN = "maths", TAAL_LV = "reading",
-        TAAL_TV = "language_conventions"
-    )
-    read_duo_school_file(path) |>
-        transmute(
-            across(all_of(school_year_key)),
-            provider = unname(duo_reference_providers[DOORSTROOMTOETS_PO]),
-            subject = unname(
-                subjects[
-                    sub("_(LAGER_1F|1F|1S|2F)$", "", REFERENTIENIVEAU)
-                ]
-            ),
-            level = factor(
-                sub("^.*_LAGER_1F$|^.*_(1F|1S|2F)$", "\\1", REFERENTIENIVEAU),
-                levels = c("", "1F", "1S", "2F"),
-                labels = c("<1F", "1F", "1S", "2F")
             ),
             suppressed, n_lo, n_mid, n_hi
         )

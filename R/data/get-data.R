@@ -30,8 +30,7 @@ duo_resource_url <- function(id, file = NULL) {
 duo_datasets <- c(
     advice_reconsiderations = "wpoheroverweging-v1",
     test_scores = "wpo-eindscores",
-    final_advice = "wpoadvies-v1",
-    reference_levels = "wporeferentieniveau-v1"
+    final_advice = "wpoadvies-v1"
 )
 # The course's DUO file of school advices 2024-2025, used for the names and
 # regions of the school locations.
@@ -51,7 +50,6 @@ paths <- file.path(
         advice_reconsiderations = "brin6_heroverweging.csv",
         test_scores = "brin6_eindscores.csv",
         final_advice = "brin6_advies.csv",
-        reference_levels = "brin6_referentieniveau.csv",
         school_weighting = "schoolweging_2022-2025.ods",
         school_locations = "schooladviezen_2024-2025.csv",
         school_boards = "besturenbo.csv"
@@ -85,25 +83,22 @@ advice_reconsiderations <- tidy_advice_reconsiderations(
 test_scores <- tidy_test_scores(paths[["test_scores"]])
 main_provider <- main_providers(test_scores)
 final_advice <- tidy_final_advice(paths[["final_advice"]])
-reference_levels <- tidy_reference_levels(paths[["reference_levels"]])
 school_weighting <- tidy_school_weighting(paths[["school_weighting"]])
 school_locations <- tidy_school_locations(paths[["school_locations"]])
 school_boards <- tidy_school_boards(paths[["school_boards"]])
 
-# ---- Conventions D1-D8 (R/data/filter-data.R, R/data/measures.R) ----
+# ---- Conventions D1-D7 (R/data/filter-data.R, R/data/measures.R) ----
 # Only the columns the study uses; main_provider needs the unfiltered
-# test_scores. Join main_provider with provider_sample() when needed.
+# test_scores.
 advice_reconsiderations <- advice_reconsiderations |>
     filter_reconsiderations() |>
-    add_revision_shares()
+    mutate(raised_share = raised / total)
 main_provider <- filter_main_provider(main_provider)
 test_scores <- filter_test_scores(test_scores)
 final_advice <- filter_final_advice(final_advice)
 advice_summary <- summarise_final_advice(final_advice)
-reading_2f <- summarise_reading_2f(filter_reading_levels(reference_levels))
 school_weighting <- filter_school_weighting(school_weighting)
 school_locations <- filter_school_locations(school_locations)
-rm(reference_levels)
 
 # ---- Report tables (CvTE Terugblik 2025/2026, Cito 2022, DUO gap matrix) ----
 read_report_table <- function(name) {

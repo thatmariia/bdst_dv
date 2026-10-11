@@ -1,17 +1,26 @@
 ### Per-school decomposition {#sec-final-school-model}
 
+Do the teachers of some schools advise higher or lower than their pupils' test results suggest?
+
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
 ```{r}
 #| label: per-school-setup
 #| include: false
-# School estimates and groups were prepared by the fitting setup.
+# School estimates were prepared by the fitting setup.
 per_100 <- function(x) sprintf("%.0f", 100 * x)
 percent <- function(x) sprintf("%.0f%%", 100 * x)
 estimated <- school_estimates$schools
 national_2025 <- national_decomposition(decomposition, cvte_pupils) |>
     filter(test_year == school_year)
-all_schools <- filter(school_groups, level == "national")$decomposition[[1]]
+# pupil-weighted average over all schools
+all_schools <- Reduce(
+    `+`,
+    Map(
+        \(r, n) n * r$decomposition, school_estimates$results,
+        estimated$total
+    )
+) / sum(estimated$total)
 leniency_z <- estimated$delta / estimated$se_delta
 model_eligible <- vapply(
     school_estimates$results, \(r) r$decomposition[["eligible"]], 0

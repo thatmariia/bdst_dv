@@ -1,5 +1,7 @@
 ## Fitting
 
+We fit the model to the CvTE tables of each year, separate the teacher's error from the test's, and use the result to decompose eligibility into its sources, first nationally and then per school.
+
 ```{r}
 #| label: model-setup
 #| include: false

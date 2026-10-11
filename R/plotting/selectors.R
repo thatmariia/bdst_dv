@@ -30,33 +30,3 @@ with_selectors <- function(widget, traces, selectors, initial, layouts = NULL) {
         )
     )
 }
-
-#' Whether a combination of selector values is the initial choice.
-#' @param choice One-row data frame (or list) of selector values.
-is_initial_choice <- function(choice, initial) {
-    all(vapply(
-        names(initial),
-        \(name) identical(as.character(choice[[name]]), as.character(initial[[name]])), # nolint: line_length_linter.
-        logical(1)
-    ))
-}
-
-#' Layout updates for with_selectors() from a list of combinations, each a
-#' list with the selector values (choice) and its layout updates (patch).
-selector_layouts <- function(combinations) {
-    lapply(
-        combinations,
-        \(combination) {
-            list(key = as.list(combination$choice), patch = combination$patch)
-        }
-    )
-}
-
-#' Selector values of every trace, for combinations that add `per_choice`
-#' traces each.
-selector_keys <- function(combinations, per_choice) {
-    bind_rows(lapply(
-        combinations,
-        \(combination) combination$choice[rep(1, per_choice), ]
-    ))
-}

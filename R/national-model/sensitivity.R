@@ -25,8 +25,10 @@ anchor_sensitivity <- function(fits, pupils, gap, flips) {
                             feasible = FALSE
                         ))
                     }
-                    decompose_year(structure, pupils, gap, as.integer(year)) |>
-                        mutate(test_year = as.integer(year)) |>
+                    decompose_national(
+                        structure, pupils, gap, as.integer(year)
+                    ) |>
+                        select(-advice) |>
                         national_decomposition(pupils) |>
                         mutate(flip = flip, feasible = TRUE)
                 }

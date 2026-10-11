@@ -1,5 +1,7 @@
 ### Separating errors {#sec-separating-errors}
 
+The tables alone cannot tell the teacher's error apart from the test's, so we anchor the size of the test error to Cito's resit simulation [@cito2026].
+
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
 We now reverse the reduced parameters in @eq-reduced-parameters back to the original parameters given $\sigma^2_L$:

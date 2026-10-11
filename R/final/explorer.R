@@ -72,9 +72,10 @@ rounded <- function(data, digits = 5) {
 explorer_figure <- function(subtitle) {
     labels <- explorer_rows$name
     eligible <- labels[length(labels)]
+    # a line colour (plotly_style()) would switch the axis line on
     hidden <- list(
-        title = "", showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE,
-        fixedrange = TRUE
+        title = "", showgrid = FALSE, zeroline = FALSE, showline = FALSE,
+        showticklabels = FALSE, fixedrange = TRUE
     )
     plot <- plotly::plot_ly() |>
         plotly::add_bars(
@@ -147,24 +148,22 @@ explorer_figure <- function(subtitle) {
         plotly_style()
 }
 
-#' Data of the explorer: the school model, the schools, the groups of
-#' schools, the Netherlands, and the shared labels and colours.
+#' Data of the explorer: the school model, the schools, the Netherlands, and
+#' the shared labels and colours.
 #' @param estimates Output of estimate_all_schools().
-#' @param groups Output of aggregate_schools().
 #' @param national Output of national_units().
 #' @param compliance Output of compliance_by_year().
-explorer_data <- function(estimates, groups, national, gap, compliance) {
+explorer_data <- function(estimates, national, gap, compliance) {
     model <- estimates$model
     schools <- estimates$schools |>
         transmute(
             id, name, place, municipality, province, board,
             similar = weighting_band(school_weighting),
             weighting = school_weighting, pupils = total, provider,
-            higher = higher / total, raised = raised_share, mu, sigma, delta,
-            se_delta
+            higher = higher / total, raised_pupils = raised,
+            raised = raised_share, mu, sigma, delta, se_delta
         ) |>
         rounded()
-    groups <- filter(groups, level != "national")
     latest_compliance <- filter(compliance, test_year == max(test_year))
     list(
         model = list(
@@ -183,22 +182,6 @@ explorer_data <- function(estimates, groups, national, gap, compliance) {
         ),
         gap = unname(gap),
         schools = as.list(schools),
-        groups = lapply(
-            seq_len(nrow(groups)),
-            function(k) {
-                list(
-                    level = groups$level[k], name = groups$name[k],
-                    schools = groups$schools[k], pupils = groups$pupils[k],
-                    higher = round(groups$higher[k], 5),
-                    raised = round(groups$raised[k], 5),
-                    tests = groups$tests[k],
-                    decomposition = as.list(
-                        round(groups$decomposition[[k]], 5)
-                    ),
-                    cells = unname(round(groups$cells[[k]], 6))
-                )
-            }
-        ),
         national = list(
             decomposition = rounded(national$decomposition),
             results = rounded(national$results),
@@ -235,13 +218,13 @@ explorer_data <- function(estimates, groups, national, gap, compliance) {
 #' Interactive eligibility explorer with its controls (R/final/explorer.js).
 #' @param title,subtitle Title and subtitle; by default (NULL) the title is
 #'   the headline of the chosen unit, and there is no subtitle.
-eligibility_explorer <- function(estimates, groups, national, gap,
-                                 compliance, title = NULL, subtitle = NULL) {
+eligibility_explorer <- function(estimates, national, gap, compliance,
+                                 title = NULL, subtitle = NULL) {
     script <- paste(
         readLines("R/final/explorer.js", encoding = "UTF-8"),
         collapse = "\n"
     )
-    data <- explorer_data(estimates, groups, national, gap, compliance)
+    data <- explorer_data(estimates, national, gap, compliance)
     data$title <- title
     data$subtitle <- subtitle
     htmlwidgets::onRender(explorer_figure(subtitle), script, data = data)

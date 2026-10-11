@@ -1,5 +1,7 @@
 ### Fitting tables
 
+We fit the reduced model to the published table of each test and year, and check how closely the fitted tables match the published ones.
+
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
 #### Model predictions
@@ -126,6 +128,7 @@ The latter tests have more pupils with PrO advice in the published tables; this 
 
 ```{r}
 #| label: tbl-fit-quality
+#| tbl-cap: "Fitted parameters of the reduced model and the dissimilarity index per test and year."  # nolint: line_length_linter
 knitr::kable(fit_quality, digits = 3)
 ```
 :::

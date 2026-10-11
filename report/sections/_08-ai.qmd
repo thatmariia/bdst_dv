@@ -4,7 +4,8 @@ I used Claude Opus & Sonnet 5.5 for the following tasks: brainstorming and actin
 
 In particular,
 brainstorming ways to polish the research question, questioning the validity of the models I was considering and using, searching for alternative approaches, finding literature to corroborate our thinking, and looking for data I can use.
+AI also used it to help me read and udnerstand the papers, especially the ones in Dutch.
 
-In code, I asked it to code boring sections for me (such as extracting data from sources), translate it, help me plot, and find existing libraries/functions I can use. I also asked it to better structure/modularize my code, clean it up, and document my functions.
+In code, I asked it to code boring sections for me (such as extracting data from sources), translate it, help me plot, and find existing libraries/functions I can use. I also asked it to better structure/modularize my code, clean it up, and document my functions. Before submitting, I asked it to check my entire codebase for bugs and redundancies, then to fix any issues it found.
 
 I also have GitHub Co-pilot line completion installed in VScode, where I developed this project.

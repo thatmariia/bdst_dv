@@ -1,5 +1,7 @@
 ### Decomposition {#sec-decomposition}
 
+This is the core result: how much of the eligibility for a higher track each source of disagreement causes.
+
 ::: {.callout-note collapse="true" appearance="minimal" title="Nerdy details"}
 
 With the original parameters in @tbl-original-parameters, we can switch each source of disagreement on and off,
@@ -122,6 +124,7 @@ decomposition_plot(decomposition)
 
 ```{r}
 #| label: tbl-decomposition
+#| tbl-cap: "Shapley decomposition of eligibility per test and year, as shares of all pupils."  # nolint: line_length_linter
 knitr::kable(decomposition, digits = 3)
 ```
 :::

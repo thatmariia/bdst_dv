@@ -1,4 +1,4 @@
-#' Turn the tidy DUO tables into the analysis tables (conventions D1-D8), with
+#' Turn the tidy DUO tables into the analysis tables (conventions D1-D7), with
 #' only the columns the study uses. Every table is keyed by school and test
 #' year; counts are n (midpoint) with bounds n_lo and n_hi.
 school_key <- c("institution_code", "location_code", "test_year")
@@ -44,13 +44,6 @@ filter_final_advice <- function(final_advice) {
         filter(advice %in% provisional_levels) |>
         mutate(advice = factor(advice, levels = provisional_levels)) |>
         select(all_of(school_key), advice, all_of(counts))
-}
-
-#' D8: reading levels only (input to summarise_reading_2f()).
-filter_reading_levels <- function(reference_levels) {
-    finalise_duo(reference_levels) |>
-        filter(subject == "reading") |>
-        select(all_of(school_key), provider, level, all_of(counts))
 }
 
 #' D7: institutions with a single location in that year, to be merged on

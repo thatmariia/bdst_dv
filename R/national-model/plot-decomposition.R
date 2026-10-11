@@ -3,7 +3,7 @@
 #' Segments of the decomposition bars: category design, teacher error, and
 #' test error stack up from zero; the test menu segment runs from their end
 #' back (or on) to the total.
-#' @param decomposition Output of decompose_year() for all years.
+#' @param decomposition Output of decompose_national() for all years.
 decomposition_segments <- function(decomposition) {
     ends <- decomposition |>
         mutate(
@@ -92,7 +92,7 @@ add_decomposition_year <- function(plot, segments, label_x, visible) {
 
 #' Interactive Shapley decomposition of eligibility per test
 #' (@eq-decomposition), with radio buttons for the test year.
-#' @param decomposition Output of decompose_year() for all years.
+#' @param decomposition Output of decompose_national() for all years.
 #' @param title,subtitle Plot title and subtitle; subtitle = NULL leaves
 #'   the subtitle out.
 decomposition_plot <- function(
