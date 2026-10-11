@@ -107,7 +107,7 @@ explorer_figure <- function(subtitle) {
             hoverinfo = "text", showlegend = FALSE, xaxis = "x2", yaxis = "y2"
         ) |>
         plotly::layout(
-            title = plotly_title("", subtitle, "container"),
+            title = plotly_title("", subtitle),
             # room for a headline of three lines
             margin = list(
                 t = plotly_top_margin(subtitle) + 44, l = explorer_left,
@@ -144,7 +144,7 @@ explorer_figure <- function(subtitle) {
                 )
             )
         ) |>
-        plotly::config(displayModeBar = FALSE)
+        plotly_style()
 }
 
 #' Data of the explorer: the school model, the schools, the groups of

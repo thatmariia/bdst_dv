@@ -1,22 +1,73 @@
 # Small builders for the plotly layouts shared by the interactive plots.
 
-#' Bold title with an optional smaller grey subtitle; anchored to the top
-#' left of the plot area, or of the whole figure with xref = "container"
-#' (for plots with wide labels on the left).
-plotly_title <- function(title, subtitle = NULL, xref = "paper") {
+# Layout defaults of the report: the fonts and ink of R/plotting/style.R,
+# hairline gridlines, no zero lines, and white hover labels.
+plotly_defaults <- list(
+    font = list(
+        family = fonts[["text"]], size = 12, color = ink[["secondary"]]
+    ),
+    title = list(font = list(
+        family = fonts[["title"]], size = 17, color = ink[["primary"]]
+    )),
+    paper_bgcolor = "rgba(0, 0, 0, 0)",
+    plot_bgcolor = "rgba(0, 0, 0, 0)",
+    colorway = unname(pal),
+    hoverlabel = list(
+        bgcolor = "white", bordercolor = ink[["axis"]], align = "left",
+        font = list(
+            family = fonts[["text"]], size = 12, color = ink[["primary"]]
+        )
+    ),
+    legend = list(
+        bgcolor = "rgba(0, 0, 0, 0)",
+        font = list(size = 12, color = ink[["secondary"]])
+    )
+)
+plotly_axis_defaults <- list(
+    gridcolor = ink[["grid"]], gridwidth = 1, linecolor = ink[["axis"]],
+    zeroline = FALSE, ticks = "", tickcolor = ink[["axis"]],
+    tickfont = list(size = 11, color = ink[["muted"]]),
+    title = list(font = list(size = 12, color = ink[["secondary"]])),
+    automargin = TRUE
+)
+
+#' Finishes a plotly figure in the style of the report: the defaults above
+#' for the layout and every axis (what the figure sets itself wins), and no
+#' mode bar. (A plotly template would be neater, but plotly for R drops the
+#' name of its layout.)
+plotly_style <- function(plot) {
+    built <- plotly::plotly_build(plot)
+    layout <- built$x$layout
+    with_defaults <- function(values, defaults) {
+        modifyList(defaults, values %||% list())
+    }
+    layout <- with_defaults(layout, plotly_defaults)
+    # a title given as text only keeps the default font
+    if (is.character(layout$title)) layout$title <- list(text = layout$title)
+    layout$title <- with_defaults(layout$title, plotly_defaults$title)
+    for (axis in grep("^[xy]axis[0-9]*$", names(layout), value = TRUE)) {
+        layout[[axis]] <- with_defaults(layout[[axis]], plotly_axis_defaults)
+    }
+    built$x$layout <- layout
+    plotly::config(built, displayModeBar = FALSE)
+}
+
+#' Bold title with an optional smaller grey subtitle, anchored to the
+#' top left of the figure, so that every title lines up with the text.
+plotly_title <- function(title, subtitle = NULL) {
     text <- paste0("<b>", title, "</b>")
     if (!is.null(subtitle)) {
         text <- paste0(
-            text, "<br><span style='font-size:12px;color:",
-            ink[["secondary"]], "'>", subtitle, "</span>"
+            text, "<br><span style='font-family:", fonts[["text"]],
+            ";font-size:13px;color:", ink[["secondary"]], "'>", subtitle,
+            "</span>"
         )
     }
     list(
         text = text,
-        x = 0, xanchor = "left", xref = xref,
+        x = 0, xanchor = "left", xref = "container",
         # Multi-line titles grow upwards, so the pad keeps them on the page.
-        y = 1, yanchor = "top", yref = "container",
-        pad = list(t = 30, l = if (xref == "container") 8 else 0)
+        y = 1, yanchor = "top", yref = "container", pad = list(t = 24)
     )
 }
 
@@ -28,7 +79,7 @@ plotly_top_margin <- function(subtitle = NULL, legend_on_top = FALSE) {
     } else {
         length(strsplit(subtitle, "<br>", fixed = TRUE)[[1]])
     }
-    65 + 18 * subtitle_lines + 35 * legend_on_top
+    70 + 19 * subtitle_lines + 35 * legend_on_top
 }
 
 #' Horizontal legend above the plot area ("top") or below it ("bottom").

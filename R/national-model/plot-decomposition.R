@@ -137,7 +137,7 @@ decomposition_plot <- function(
                 categoryarray = test_order(max(years)), fixedrange = TRUE
             )
         ) |>
-        plotly::config(displayModeBar = FALSE) |>
+        plotly_style() |>
         with_selectors(
             # six traces per year: four sources, the totals, their labels
             traces = tibble(test_year = rep(years, each = 6)),

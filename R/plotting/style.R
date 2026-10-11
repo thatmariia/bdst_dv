@@ -1,76 +1,88 @@
-# Shared colours, labels, formats, and theme, so the same concept looks the
-# same in every plot. Hues are the dataviz skill's reference palette; the
-# combinations below were checked with its validator (light surface).
+# Shared colours, fonts, labels, formats, and theme, so the same concept
+# looks the same in every plot. The combinations below were checked with the
+# dataviz skill's palette validator (light surface).
 pal <- c(
-    blue = "#2a78d6",
-    orange = "#eb6834",
-    aqua = "#1baf7a",
-    green = "#008300",
-    magenta = "#e87ba4",
-    violet = "#4a3aa7",
-    red = "#e34948",
-    grey = "#898781"
+    blue = "#3D69DD",
+    sky = "#5DB1F7",
+    green = "#3CBA77",
+    aqua = "#64E9D1",
+    pink = "#FF7BAC",
+    periwinkle = "#7C7FD3",
+    coral = "#F87553",
+    orange = "#FF8C29",
+    yellow = "#FED255",
+    olive = "#BCBD42",
+    grey = "#8E8D86"
 )
 
 # Text and chrome colours.
 ink <- c(
-    primary = "#0b0b0b",
-    secondary = "#52514e",
-    muted = "#898781",
-    axis = "#c3c2b7",
-    shade = "#f0efec"
+    primary = "#1C1B19",
+    secondary = "#55524C",
+    muted = "#8E8C86",
+    axis = "#D3D0C8",
+    grid = "#ECE9E2",
+    shade = "#F4F2ED"
+)
+
+# Fonts of the report (loaded in the report header): the same sans as the
+# text and headings of the report, for titles too.
+fonts <- c(
+    title = "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
+    text = "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif"
 )
 
 # Test advice relative to the teacher's (provisional/original) advice:
-# diverging, with blue and red as opposite poles and a neutral grey middle.
+# diverging, with blue and a deep coral as opposite poles and a neutral grey
+# middle.
 comparison_colours <- c(
     "test lower" = pal[["blue"]],
     "equal" = pal[["grey"]],
-    "test higher" = pal[["red"]]
+    "test higher" = "#B83A24"
 )
 
 # The same comparison in five steps, by the gap G(i, j): a full level (or
-# more) and half a level lower or higher. The half steps are lighter tints
-# of the same hues; each arm passes the validator's ordinal checks.
+# more) and half a level lower or higher. Each arm is one hue, lighter for
+# half a level, and passes the validator's ordinal checks.
 gap_colours <- c(
     "-1" = pal[["blue"]],
-    "-0.5" = "#86b6ef",
+    "-0.5" = pal[["sky"]],
     "0" = pal[["grey"]],
-    "0.5" = "#f29b9a",
-    "1" = pal[["red"]]
+    "0.5" = pal[["coral"]],
+    "1" = comparison_colours[["test higher"]]
 )
 
-# Revision measures over time: lower and higher as above, raised in violet.
+# Revision measures over time: lower and higher as above, raised in green
+# (the lines are labelled directly, which the validator asks for this pair).
 measure_colours <- c(
-    "test advice higher" = pal[["red"]],
+    "test advice higher" = comparison_colours[["test higher"]],
     "test advice lower" = pal[["blue"]],
-    "advice raised" = pal[["violet"]]
+    "advice raised" = pal[["green"]]
 )
 
 # One-hue ramp for the share raised (compliance), ending in the raised colour.
-raised_ramp <- c("#ecebf7", pal[["violet"]])
+raised_ramp <- c("#E9F6EE", pal[["green"]])
 
-# One-hue ramp for counts; it ends at a mid blue so that dark cell labels
-# stay readable.
-count_ramp <- c(ink[["shade"]], "#6da7ec")
+# One-hue ramp for counts.
+count_ramp <- c(ink[["shade"]], pal[["sky"]])
 
 # Sources of eligibility in the decomposition; category design is the
 # neutral baseline.
 source_colours <- c(
     "category design" = pal[["grey"]],
-    "teacher error" = pal[["magenta"]],
+    "teacher error" = pal[["pink"]],
     "test error" = pal[["green"]],
-    "test menu" = pal[["violet"]]
+    "test menu" = pal[["periwinkle"]]
 )
 
-# A school's teacher leniency (school-level model): a darker step of the
-# teacher error's magenta, validated between teacher error and test error.
-leniency_colour <- "#a8336a"
+# A school's teacher leniency (school-level model): a deeper step of the
+# teacher error's pink, validated between teacher error and test error.
+leniency_colour <- "#C94A7F"
 
 # Providers: Lib, IEP, and all other tests.
 provider_colours <- c(
     "Lib" = pal[["blue"]], "IEP" = pal[["orange"]],
-    "other tests" = pal[["aqua"]]
+    "other tests" = pal[["green"]]
 )
 
 #' Provider group of a test ("Lib digital" -> "Lib").
@@ -105,11 +117,13 @@ theme_report <- function(grid_y = FALSE) {
             axis.ticks = element_line(colour = ink[["muted"]]),
             axis.text = element_text(colour = ink[["secondary"]]),
             axis.title = element_text(colour = ink[["secondary"]]),
-            plot.title = element_text(face = "bold"),
+            plot.title = element_text(
+                face = "bold", size = 14, colour = ink[["primary"]]
+            ),
             plot.subtitle = element_text(colour = ink[["secondary"]]),
             plot.title.position = "plot",
             panel.grid.major.y = if (grid_y) {
-                element_line(colour = "#e1e0d9", linewidth = 0.3)
+                element_line(colour = ink[["grid"]], linewidth = 0.3)
             } else {
                 element_blank()
             }

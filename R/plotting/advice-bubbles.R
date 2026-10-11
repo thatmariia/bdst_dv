@@ -81,6 +81,6 @@ advice_bubble_plot <- function(
                 rev(provisional_levels), "teacher's provisional advice"
             )
         ) |>
-        plotly::config(displayModeBar = FALSE) |>
+        plotly_style() |>
         with_selectors(traces, selectors, initial)
 }

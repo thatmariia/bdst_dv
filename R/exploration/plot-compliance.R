@@ -18,12 +18,12 @@ compliance_heatmap <- function(
         mutate(
             label = if_else(
                 is.na(compliance), "no test", pct_whole(compliance)
-            ),
-            dark_tile = coalesce(compliance > 0.5, FALSE)
+            )
         ) |>
         ggplot(aes(x = test_year, y = 1, fill = compliance)) +
         geom_tile(colour = "white", linewidth = 1) +
-        geom_text(aes(label = label, colour = dark_tile), size = 3.5) +
+        # the ramp stays light enough for dark labels on every tile
+        geom_text(aes(label = label), colour = ink[["primary"]], size = 3.5) +
         geom_vline(
             xintercept = mandatory_from - 0.5,
             colour = ink[["primary"]], linewidth = 0.6
@@ -31,10 +31,6 @@ compliance_heatmap <- function(
         scale_fill_gradient(
             low = raised_ramp[1], high = raised_ramp[2], limits = c(0, 1),
             na.value = ink[["shade"]], guide = "none"
-        ) +
-        scale_colour_manual(
-            values = c("TRUE" = "white", "FALSE" = ink[["primary"]]),
-            guide = "none"
         ) +
         scale_x_continuous(breaks = years, expand = c(0, 0)) +
         labs(
@@ -122,5 +118,6 @@ compliance_plot <- function(
                     )
                 )
             )
-        )
+        ) |>
+        plotly_style()
 }

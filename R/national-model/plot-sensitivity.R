@@ -144,7 +144,7 @@ sensitivity_plot <- function(
                 zerolinecolor = ink[["axis"]], fixedrange = TRUE
             )
         ) |>
-        plotly::config(displayModeBar = FALSE) |>
+        plotly_style() |>
         with_selectors(
             # the legend entries for every year, then one trace per year and
             # series

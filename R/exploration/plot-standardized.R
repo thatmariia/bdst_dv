@@ -63,5 +63,6 @@ standardized_plot <- function(
                     )
                 )
             )
-        )
+        ) |>
+        plotly_style()
 }

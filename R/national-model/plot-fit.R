@@ -78,5 +78,6 @@ dissimilarity_plot <- function(
                 title = "", type = "category",
                 categoryorder = "array", categoryarray = test_order$test
             )
-        )
+        ) |>
+        plotly_style()
 }
