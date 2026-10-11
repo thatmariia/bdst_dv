@@ -38,13 +38,15 @@ school_weighting_url <- paste0(
     "schoolweging-2022-2023-2024.ods"
 )
 
-paths <- file.path(raw_dir, c(
-    advice_reconsiderations = "brin6_heroverweging.csv",
-    test_scores = "brin6_eindscores.csv",
-    final_advice = "brin6_advies.csv",
-    reference_levels = "brin6_referentieniveau.csv",
-    school_weighting = "schoolweging_2022-2025.ods"
-))
+paths <- file.path(
+    raw_dir, c(
+        advice_reconsiderations = "brin6_heroverweging.csv",
+        test_scores = "brin6_eindscores.csv",
+        final_advice = "brin6_advies.csv",
+        reference_levels = "brin6_referentieniveau.csv",
+        school_weighting = "schoolweging_2022-2025.ods"
+    )
+)
 names(paths) <- c(names(duo_datasets), "school_weighting")
 
 # Only ask the DUO API for a URL when the file still needs downloading.

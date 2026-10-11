@@ -65,19 +65,22 @@ school_year_key <- c(
 #' @return Tibble with total, higher, lower, raised as _lo/_mid/_hi.
 tidy_advice_reconsiderations <- function(path) {
     read_duo_school_file(path) |>
-        mutate(count = recode(
-            TOETSEN_EN_ADVIEZEN,
-            TOTAAL = "total",
-            AANTAL_HOGER_TOETSADVIES = "higher",
-            AANTAL_LAGER_TOETSADVIES = "lower",
-            AANTAL_BIJSTELLINGEN = "raised"
-        )) |>
+        mutate(
+            count = recode(
+                TOETSEN_EN_ADVIEZEN,
+                TOTAAL = "total",
+                AANTAL_HOGER_TOETSADVIES = "higher",
+                AANTAL_LAGER_TOETSADVIES = "lower",
+                AANTAL_BIJSTELLINGEN = "raised"
+            )
+        ) |>
         select(all_of(school_year_key), count, n_lo, n_mid, n_hi) |>
         pivot_wider(
             names_from = count, values_from = c(n_lo, n_mid, n_hi),
             names_glue = "{count}_{sub('n_', '', .value)}", values_fill = 0
         ) |>
-        relocate(starts_with("total"), starts_with("higher"),
+        relocate(
+            starts_with("total"), starts_with("higher"),
             starts_with("lower"), starts_with("raised"),
             .after = test_year
         )
@@ -140,9 +143,11 @@ tidy_reference_levels <- function(path) {
         transmute(
             across(all_of(school_year_key)),
             provider = unname(duo_reference_providers[DOORSTROOMTOETS_PO]),
-            subject = unname(subjects[
-                sub("_(LAGER_1F|1F|1S|2F)$", "", REFERENTIENIVEAU)
-            ]),
+            subject = unname(
+                subjects[
+                    sub("_(LAGER_1F|1F|1S|2F)$", "", REFERENTIENIVEAU)
+                ]
+            ),
             level = factor(
                 sub("^.*_LAGER_1F$|^.*_(1F|1S|2F)$", "\\1", REFERENTIENIVEAU),
                 levels = c("", "1F", "1S", "2F"),
@@ -159,10 +164,15 @@ tidy_reference_levels <- function(path) {
 #' @return Tibble per school and year with weighting, spread, and pupils.
 tidy_school_weighting <- function(path) {
     sheets <- c("2022-2023", "2023-2024", "2024-2025")
-    bind_rows(lapply(sheets, function(sheet) {
-        read_ods(path, sheet = sheet) |>
-            mutate(reference_year = as.integer(substr(sheet, 1, 4)))
-    })) |>
+    bind_rows(
+        lapply(
+            sheets,
+            function(sheet) {
+                read_ods(path, sheet = sheet) |>
+                    mutate(reference_year = as.integer(substr(sheet, 1, 4)))
+            }
+        )
+    ) |>
         transmute(
             institution_code = sub("\\|.*$", "", OVT),
             inspectorate_location = sub("^.*\\|", "", OVT),

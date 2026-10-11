@@ -44,12 +44,21 @@ overview_table <- function(sources, data, values = list()) {
     data <- data[sources$dataset]
     sources |>
         mutate(
-            content = vapply(content, function(text) {
-                as.character(glue::glue_data(values, text))
-            }, "", USE.NAMES = FALSE),
-            years = mapply(function(given, x) {
-                if (is.na(given)) format_test_years(x$test_year) else given
-            }, years, data, USE.NAMES = FALSE),
+            content = vapply(
+                content,
+                function(text) {
+                    as.character(glue::glue_data(values, text))
+                },
+                "",
+                USE.NAMES = FALSE
+            ),
+            years = mapply(
+                function(given, x) {
+                    if (is.na(given)) format_test_years(x$test_year) else given
+                },
+                years, data,
+                USE.NAMES = FALSE
+            ),
             rows = vapply(data, NROW, 0L),
             columns = vapply(data, describe_columns, "")
         )
