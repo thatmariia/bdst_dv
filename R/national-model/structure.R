@@ -44,6 +44,7 @@ structural_parameters <- function(fit, flip) {
     )
     alpha_ref <- (s_ref^2 - ref_test_sd^2) / (ref$b * ref$sigma^2)
     teacher_var <- ref$sigma^2 - ref$b * ref$sigma^2 / alpha_ref
+    if (teacher_var <= 0) stop("Negative variance for: teacher error")
 
     tests <- bind_rows(
         lapply(
