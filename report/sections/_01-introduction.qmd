@@ -33,3 +33,13 @@ There are four main sources of potential disagreement between the teacher's advi
 We ask: what share of pupils is eligible for an upward revision, and how much does each source contribute to that share?
 Eligibility matters because it triggers reconsideration under the up-only rule, while schools choose which test their pupils take.
 The explorer is intended for policy makers comparing rules, school boards comparing tests and schools, and parents exploring outcomes by provisional advice.
+
+We fit a joint model to the CvTE tables, use Cito's simulated resit share to separate teacher and test error, and decompose eligibility into the four sources above.
+DUO data extends the analysis to schools, while a sensitivity check varies the assumed resit share.
+
+In the national model, category design is the largest component across the feasible anchors examined (@sec-sensitivity).
+The explorer's waterfall shows how the components add up, and its observed markers allow comparison with the data where available.
+Its school views and what-ifs help readers explore how the model results vary across schools and test choices (@fig-explorer).
+
+Open questions remain about whether the Cito anchor transfers to Lib paper, whether teacher and test errors are independent, and how representative the available pupils are.
+The model also cannot establish which advice is correct for an individual child.
