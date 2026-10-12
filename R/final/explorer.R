@@ -160,7 +160,8 @@ explorer_data <- function(estimates, national, gap, compliance) {
             id, name, place, municipality, province, board,
             similar = weighting_band(school_weighting),
             weighting = school_weighting, pupils = total, provider,
-            higher = higher / total, raised_pupils = raised,
+            higher = higher / total, lower = lower / total,
+            raised_pupils = raised,
             raised = raised_share, mu, sigma, delta, se_delta
         ) |>
         rounded()

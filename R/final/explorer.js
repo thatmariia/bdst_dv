@@ -157,6 +157,7 @@ function (el, x, data) {
     byName.forEach((members, name) => {
       const pupils = sum(members, k => schools.pupils[k]);
       const higher = sum(members, k => schools.higher[k] * schools.pupils[k]);
+      const lower = sum(members, k => schools.lower[k] * schools.pupils[k]);
       const perTest = new Map();
       [...new Set(members.map(k => schools.provider[k]))].sort().forEach(test => perTest.set(test, 0));
       members.forEach(k => perTest.set(schools.provider[k], perTest.get(schools.provider[k]) + schools.pupils[k] / pupils));
@@ -164,6 +165,7 @@ function (el, x, data) {
         .map(([test, share]) => `${test} ${share < 0.005 ? "<1" : Math.round(100 * share)}%`).join(", ");
       groups.push({
         level, name, members, schools: members.length, pupils, higher: higher / pupils,
+        lower: lower / pupils,
         // no raised share without pupils with a higher test advice
         raised: higher > 0 ? sum(members, k => schools.raised_pupils[k]) / higher : null,
         tests
@@ -241,6 +243,10 @@ function (el, x, data) {
     }));
   }
 
+  // Observed shares of pupils with a higher, the same, and a lower test
+  // advice (DUO counts), shown next to the estimated ones.
+  const observedShares = ({ higher, lower }) => ({ higher, same: Math.max(1 - higher - lower, 0), lower });
+
   // Everything that the figure shows for the current state.
   function view() {
     const unit = state.unit;
@@ -289,6 +295,7 @@ function (el, x, data) {
         observed: active || state.advice !== "all" ? null : s.higher,
         top: Math.max(peak(before), peak(decomposition), state.advice === "all" ? s.higher : 0),
         tests, outcomes: outcomesOf(result[all]), estimated: true,
+        observedShares: active || state.advice !== "all" ? null : observedShares(s),
         raised: s.raised, raisedWhere: " at this school",
         whatIf: [
           state.test ? `with ${state.test}` : "",
@@ -307,6 +314,7 @@ function (el, x, data) {
       decomposition, asIs: state.test ? before.eligible : null, observed,
       top: Math.max(peak(before), peak(decomposition), observed ?? 0),
       tests, outcomes: outcomesOf(result[all]), estimated: true,
+      observedShares: observed == null ? null : observedShares(g),
       raised: g.raised, raisedWhere: "",
       whatIf: state.test ? `if all pupils took ${state.test}` : ""
     };
@@ -642,17 +650,19 @@ function (el, x, data) {
     const lower = r => r.gap < 0;
     const raised = v.raised == null ? "" :
       ` In ${national.raised.year}, ${Math.round(100 * v.raised)}% of these advices were raised${v.raisedWhere}.`;
+    // the observed share next to the estimated one, where DUO has it
+    const observed = key => (v.observedShares ? `observed: ${percent(v.observedShares[key])}` : "");
     return [
       possible(higher)
-        ? [`${total(higher)}%`, "score higher", breakdown(higher), `The school must reconsider the advice.${raised}`]
-        : ["–", "cannot score higher", "", `${advice} is the highest level.`],
+        ? [`${total(higher)}%`, "score higher", breakdown(higher), `The school must reconsider the advice.${raised}`, observed("higher")]
+        : ["–", "cannot score higher", "", `${advice} is the highest level.`, ""],
       possible(same)
-        ? [`${total(same)}%`, "score the same", "", "Teacher and test agree, so the advice stays."]
+        ? [`${total(same)}%`, "score the same", "", "Teacher and test agree, so the advice stays.", observed("same")]
         : ["–", `cannot score exactly ${advice}`, "",
-          `The test reports two levels at once, such as ${neighbour(-0.5)} or ${neighbour(0.5)}, so the result is always half a level lower or higher.`],
+          `The test reports two levels at once, such as ${neighbour(-0.5)} or ${neighbour(0.5)}, so the result is always half a level lower or higher.`, ""],
       possible(lower)
-        ? [`${total(lower)}%`, "score lower", breakdown(lower), "Nothing changes: the test can only raise an advice, never lower it."]
-        : ["–", "cannot score lower", "", `${advice} is the lowest level.`]
+        ? [`${total(lower)}%`, "score lower", breakdown(lower), "Nothing changes: the test can only raise an advice, never lower it.", observed("lower")]
+        : ["–", "cannot score lower", "", `${advice} is the lowest level.`, ""]
     ];
   }
 
@@ -735,11 +745,12 @@ function (el, x, data) {
         hovertext: labels.info[k], hoverlabel
       })),
       section("Test results of these pupils", 0.42,
-        v.estimated ? "estimated" : "observed (CvTE)", why),
-      ...outcomeTexts(results, v).map(([share, name, breakdown, meaning], k) => ({
+        v.estimated ? (v.observedShares ? "estimated, with observed shares (DUO)" : "estimated") : "observed (CvTE)", why),
+      ...outcomeTexts(results, v).map(([share, name, breakdown, meaning, observed], k) => ({
         x: 0.42, xref: "paper", xanchor: "left",
         y: [0.38, 0.27, 0.16][k], yref: "paper", yanchor: "top", showarrow: false, align: "left",
         text: `<span style='font-size:14px;color:${dots[k]}'>●</span> <span style='font-size:20px'><b>${share}</b></span> <b>${name}</b>${info}` +
+          (observed ? `  <span style='font-size:11px;color:${style.ink.secondary}'>${observed}</span>` : "") +
           (breakdown ? `<br><span style='font-size:11px;color:${style.ink.secondary}'>${breakdown}</span>` : ""),
         font: { size: 12, color: style.ink.primary },
         hovertext: wrap(meaning, 52), hoverlabel
